@@ -16,11 +16,11 @@ For additional information, including how the templates are generated, and assis
 
 ## Supported Versions
 
-###BIG-IP VE
+### BIG-IP VE
 The templates are developed for standard BIG-IP Virtual Edition images version 13.0 or later. 
 Earlier versions may require image patching to create OpenStack-ready images in *glance*. Please refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-heat) for launching pre-version 13.0 instances. 
 
-###OpenStack
+### OpenStack
 The templates support OpenStack Mitaka release. 
 
 ### Copyright
