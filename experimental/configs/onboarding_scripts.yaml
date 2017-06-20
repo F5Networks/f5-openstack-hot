@@ -1,0 +1,156 @@
+heat_template_version: 2016-04-08
+
+description: This template creates additional scripts required to provision a Big-IP.
+
+parameters:
+  cloudlibs_hash:
+    type: string
+    label: f5 cloud-libs hash
+    description: Hash for verifying f5-cloud-libs.tar.gz
+    default: 6db9649698cb7af311defc89ccea1c0208d3b6cfc73b7bab5b52ab9d5074677ec9a1559a5e54e7325aa334a02d26d76528b5ead08e1654dcbf77c94192156468
+  cloudlibs_aws_hash:
+    type: string
+    label: f5 cloud-libs-aws hash
+    description: Hash for verifying f5-cloud-libs-aws.tar.gz
+    default: 6a2cb0d101c918d37aa552528a45f14615ab50fe8a024c2040cf686a4ec1ce316a75930d936de3dc341a1a5f9cec14e9979f0f9cb601f51dba528929de607e6e
+  cloudlibs_azure_hash:
+    type: string
+    label: f5 cloud-libs-azure hash
+    description: Hash for verifying f5-cloud-libs-azure.tar.gz
+    default: a4ff4a9af058ce6058159531fd7bca07eb8808cdd1b1e13de0e1324ec7e4692211991ecaa58dc36021c6c88c7783837d480584393753c3dfc2fddf623781e3a9
+  bigip_addon_licenses:
+    type: comma_delimited_list
+    label: Additional VE License Keys
+    description: f5 TMOS License Add-On Keys.
+    default:
+      - 
+  bigip_license:
+    type: string
+    label: Primary VE License Base Key
+    description: f5 TMOS License Basekey
+  modules:
+    type: json
+    label: Modules to provision on the BIG-IP.
+    description: A list of modules to provision and their respective levels. <module_name:level>
+  ntp:
+    type: comma_delimited_list
+    label: NTP servers
+    description: A list of NTP servers
+  dns:
+    type: comma_delimited_list
+    label: Domain Name Servers
+    description: A list of Domain Name Servers
+  host_name:
+    type: string
+    label: Host Name
+    description: BIG-IP Host Name
+  management_port:
+    type: number
+    label: Management Port
+    description: Management port for the BIG-IP admin
+  ssh_key_name:
+    type: string
+    label: SSH Key Name
+    description: SSH Key Name to inject for Big-IP Access. 
+  use_config_drive:
+    type: boolean
+    label: Enable Config Drive
+    description: Determines if cloud init data is polled from config drive instead of metadata service. 
+    default: false
+  nic_count:
+    type: number
+    label: Number of NICs
+    description: Number of NICs that Big-IP is configured with. 
+  wait_handle_curl:
+    type: string
+    label: Wait Handle 
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+resources:
+  onboarding_scripts:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+        - path: /config/verifyHash
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __cloudlibs_hash__: { get_param: cloudlibs_hash }
+                  __cloudlibs_aws_hash__: { get_param: cloudlibs_aws_hash }
+                  __cloudlibs_azure_hash__: { get_param: cloudlibs_azure_hash }
+              template: { get_file: ../scripts/verifyHash }
+        - path: /config/preOnboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __ssh_key_name__: { get_param: ssh_key_name }
+                  __use_config_drive__: { get_param: use_config_drive }
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/preOnboard.sh }
+        - path: /config/wait_cloudlibs_install.sh
+          permissions: 0755
+          owner: root:root
+          content: { get_file: ../scripts/wait_cloudlibs_install.sh }
+        - path: /config/postOnboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __nic_count__ : { get_param: nic_count }
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/postOnboard.sh }
+        - path: /config/onboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __license__: { get_param: bigip_license }
+                  __use_config_drive__: { get_param: use_config_drive }
+                  __host_name__: { get_param: host_name }
+                  __mgmt_port__: { get_param: management_port }
+                  __add_on_licenses__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --add-on "addon"
+                          for_each:
+                            addon: {get_param: bigip_addon_licenses}
+                  __dns__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --dns server_dns
+                          for_each:
+                            server_dns: {get_param: dns}
+                  __modules__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --module bigip_module
+                          for_each:
+                            bigip_module: {get_param: modules}
+                  __ntp__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --ntp server_ntp
+                          for_each:
+                            server_ntp: {get_param: ntp}
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/onboard.sh }
+
+outputs:
+  OS::stack_id:
+    description: The F5::BigIP::OnboardingScripts resource.
+    value:
+      get_resource: onboarding_scripts

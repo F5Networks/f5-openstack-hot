@@ -1,0 +1,35 @@
+heat_template_version: 2016-04-08
+
+description: This template configures the security group for BIG-IP management VLAN.  
+
+parameters:
+  security_group_name:
+    type: string
+    label: Security Group Name
+    description: The name of the Big-IP management security group
+  management_port:
+    type: number
+    label: Management port
+    description: Port for the BIG-IP Management uri
+resources:
+  bigip_mgmt_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: security group rules for bigip mgmt port
+      name: { get_param: security_group_name }
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: { get_param: management_port }
+          port_range_max: { get_param: management_port }
+
+outputs:
+  mgmt_security_group_id:
+    description: Get resource id of this security group
+    value: { get_resource: bigip_mgmt_security_group }

@@ -1,0 +1,17 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_license_key: baseLicenseKey
+  external_network: external_net
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: Mgmt_secgroup_1_NIC
+
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../configs/onboarding_scripts.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../security_groups/bigip_mgmt_security_group.yaml

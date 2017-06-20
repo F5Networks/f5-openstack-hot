@@ -11,8 +11,10 @@ Welcome to the GitHub repository for F5's Heat Orchestration Templates for deplo
   The *experimental* directory also contains heat templates that have been created by F5 Networks. However, these templates have not completed full testing and are subject to change. F5 Networks does not offer technical support for templates in the experimental directory, so use these templates with caution.
 
 ## Template information
+These templates employ similar pattern as Openstack TripleO wherein the common/reusable templates and components such as software configs and scripts are referenced by parent templates. When launching a stack, you only need to specify the parent template as the template param, and Heat engine automatically takes care of the dependencies. 
+
 Descriptions for each template are contained at the top of each template in the *Description* key.
-For additional information, including how the templates are generated, and assistance in deploying a template, see the README file on the individual template pages.
+For additional information, and assistance in deploying a template, see the README file on the individual template pages.
 
 ## Supported Versions
 
@@ -21,7 +23,24 @@ The templates are developed for standard BIG-IP Virtual Edition images version 1
 Earlier versions may require image patching to create OpenStack-ready images in *glance*. Please refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-heat) for launching pre-version 13.0 instances. 
 
 ### OpenStack
-The templates support OpenStack Mitaka release. 
+The templates are developed on an operation OpenStack Mitaka deployment. 
+
+## General Prerequisites
+
+The following are prerequisites to sucessfully launching templates from this repo:
+  - Neutron Components:
+    - Management network and subnet (where management UI can be accessed)
+    - External network and subnet (where floating IP resides)
+    - Additional network(s) and subnet(s) (e.g. Data Subnet)
+    - Corresponding router(s) configuration
+    - f5-openstack-lbaasv2-driver installed (see docs)
+  - Nova Components:
+    - Key pair for SSH access to BIG-IP VE
+  - Heat Components:
+    - f5-openstack-heat-plugins are optional (see docs)
+  - Glance Components:
+    - BIG-IP Virtual Edition Image Version 13.0 or later added to Images. The image file must be in qcow.zip format and can be any size (ALL, LTM, or LTM_1SLOT).
+
 
 ### Copyright
 
