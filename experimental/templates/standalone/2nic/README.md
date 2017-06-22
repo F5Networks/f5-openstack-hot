@@ -24,10 +24,13 @@ This Heat Orchestration Template downloads helper code to configure the BIG-IP s
 3. Locate and update the environment file (_env.yaml) with the appropriate parameter values. Note that some default values will be used if no value is specified for an optional parameter. 
 4. Launch the stack using the OpenStack CLI with a command like below:
 
+#### CLI Syntax
 `openstack stack create <stackname> -t <path-to-template> -e <path-to-env>`
 
-For example:
-`openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic_env.yaml`
+#### CLI Example
+```
+openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic_env.yaml
+```
 
 ### Parameters
 The following parameters can be defined on your environment file. 
@@ -51,7 +54,7 @@ The following parameters can be defined on your environment file.
 | **BIG-IP Licensing and Modules** |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
-| bigip_modules |  | Modules to provision on the BIG-IP.  Default ltm:nominal | Syntax: List of <module:level>. See [Parameter Values: bigip_modules][bigip_modules:] |
+| bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](###-Parameter-Values:) |
 | |
 | **OS Network** |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
@@ -70,11 +73,11 @@ The following parameters can be defined on your environment file.
 | bigip_vlan_nic |  | The NIC associated with the BIG-IP VLAN. For 2-NIC this defaults to 1.1 |  |
 | bigip_vlan_selfip_addr | x | Self-IP address to associate with the BIG-IP VLAN.  | A static value must be supplied. |
 | bigip_vlan_cidr_block | x | CIDR Block for the BIG-IP SelfIP address. |  |
-| bigip_vlan_allow |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of <service:port> example: [tcp:443, tcp:22] |
+| bigip_vlan_allow |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
 
 <br>
 
-#### Parameter Values:
+### Parameter Values:
 bigip_modules: 
  - modules: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp]
  - levels: [custom,dedicated,minimum,nominal,none] 

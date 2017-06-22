@@ -23,9 +23,10 @@ This Heat Orchestration Template downloads helper code to configure the BIG-IP s
 3. Locate and update the environment file (_env.yaml) with the appropriate parameter values. Note that some default values will be used if no value is specified for an optional parameter. 
 4. Launch the stack using the OpenStack CLI with a command like below:
 
+#### CLI Syntax
 `openstack stack create <stackname> -t <path-to-template> -e <path-to-env>`
 
-For example:
+#### CLI Example
 ```
 openstack stack create stack-1NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/1nic/f5_bigip_standalone_1_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/1nic/f5_bigip_standalone_1_nic_env.yaml
 ```
@@ -52,7 +53,7 @@ The following parameters can be defined on your environment file.
 | **BIG-IP Licensing and Modules** |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
-| bigip_modules |  | Modules to provision on the BIG-IP.  Default ltm:nominal | Syntax: List of <module:level> module examples: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp] levels: [custom,dedicated,minimum,nominal,none]  |
+| bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](###-Parameter-Values:) |
 | |
 | **OS Network** |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
@@ -62,6 +63,12 @@ The following parameters can be defined on your environment file.
 | bigip_mgmt_port |  | Default 8443 |  |
 
 <br>
+
+### Parameter Values:
+bigip_modules: 
+ - modules: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp]
+ - levels: [custom,dedicated,minimum,nominal,none] 
+
 
 
 ## Filing Issues
