@@ -53,7 +53,7 @@ The following parameters can be defined on your environment file.
 | **BIG-IP Licensing and Modules** |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
-| bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](###-Parameter-Values:) |
+| bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](###-parameter-values) |
 | |
 | **OS Network** |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
@@ -64,7 +64,7 @@ The following parameters can be defined on your environment file.
 
 <br>
 
-### Parameter Values:
+### Parameter Values
 bigip_modules: 
  - modules: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp]
  - levels: [custom,dedicated,minimum,nominal,none] 
