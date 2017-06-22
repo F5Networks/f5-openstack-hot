@@ -20,18 +20,16 @@ This Heat Orchestration Template downloads helper code to configure the BIG-IP s
 ## Launching Stacks
 
 1. Ensure the prerequisites are configured in your environment. See README from this project's root folder. 
-2. Clone this repository or manually download the contents (zip/tar). As the templates use nested stacks and referenced components, it is recommended to retain the project structure as is for ease of deployment.
+2. Clone this repository or manually download the contents (zip/tar). As the templates use nested stacks and referenced components, it is recommended to retain the project structure as is for ease of deployment. If any of the files changed location, make sure that the corresponding paths are updated in the environment files. 
 3. Locate and update the environment file (_env.yaml) with the appropriate parameter values. Note that some default values will be used if no value is specified for an optional parameter. 
 4. Launch the stack using the OpenStack CLI with a command like below:
 
 `openstack stack create <stackname> -t <path-to-template> -e <path-to-env>`
 
 For example:
-```
-openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic_env.yaml
-```
+`openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic_env.yaml`
 
-###Parameters
+### Parameters
 The following parameters can be defined on your environment file. 
 <br>
 
@@ -42,7 +40,7 @@ The following parameters can be defined on your environment file.
 | bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
 | f5_cloudlibs_tag |  | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
-| f5_cloudlibs_tag |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used.  |  |
+| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used.  |  |
 | bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
 | bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
 | **BIG-IP Credentials** |  |  |  |
@@ -53,7 +51,7 @@ The following parameters can be defined on your environment file.
 | **BIG-IP Licensing and Modules** |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
-| bigip_modules |  | Modules to provision on the BIG-IP.  Default ltm:nominal | Syntax: List of <module:level> module examples: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp] levels: [custom,dedicated,minimum,nominal,none]  |
+| bigip_modules |  | Modules to provision on the BIG-IP.  Default ltm:nominal | Syntax: List of <module:level>. See [Parameter Values: bigip_modules][bigip_modules:] |
 | |
 | **OS Network** |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
@@ -76,6 +74,10 @@ The following parameters can be defined on your environment file.
 
 <br>
 
+#### Parameter Values:
+bigip_modules: 
+ - modules: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp]
+ - levels: [custom,dedicated,minimum,nominal,none] 
 
 ## Filing Issues
 If you find an issue, we would love to hear about it. 
