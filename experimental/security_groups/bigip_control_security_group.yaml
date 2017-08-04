@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: 2016-04-08
 
 description: This template deploys standard security group to be associated with a BIG-IP Cluster/HA VLAN.
 

@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: 2016-04-08
 
 description: This template deploys standard f5 BIG-IP VE - 2NIC instances in an active/standby cluster.
 

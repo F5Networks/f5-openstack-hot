@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: 2016-04-08
 
 description: This template performs overrides of defaults for a standard f5 standalone VE image.  
 
