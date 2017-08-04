@@ -44,13 +44,13 @@ fi
 #*************************************************************************************************
 echo 'Configuring access to cloud-init data'
 useConfigDrive="__use_config_drive__"
-configDriveSrc="/dev/hdd"
+configDriveSrc=$(blkid -t LABEL="config-2" -odevice)
 configDriveDest="/mnt/config"
 
 if [[ "$useConfigDrive" == "True" ]]; then
     echo 'Configuring Cloud-init ConfigDrive'
     mkdir -p $configDriveDest
-    if mount $configDriveSrc $configDriveDest; then
+    if mount "$configDriveSrc" $configDriveDest; then
         echo 'Adding SSH Key from Config Drive'
         if sshKey=$(python -c 'import sys, json; print json.load(sys.stdin)["public_keys"]["__ssh_key_name__"]' <"$configDriveDest"/openstack/latest/meta_data.json) ; then
             echo "$sshKey" >> /root/.ssh/authorized_keys
@@ -66,7 +66,7 @@ if [[ "$useConfigDrive" == "True" ]]; then
 else
     echo 'Adding SSH Key from Metadata service'
     declare -r tempKey="/config/cloud/openstack/os-ssh-key.pub"
-    if curl http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key -s -f --retry 5 --retry-max-time 300 --retry-delay 10 -o $tempKey ; then
+    if curl http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key -s -f --retry 5 --insecure  --retry-max-time 300 --retry-delay 10 -o $tempKey ; then
         (head -n1 $tempKey) >> /root/.ssh/authorized_keys 
         rm $tempKey
     else
@@ -88,6 +88,6 @@ else
     msg="Last Error:$msg . See /var/log/preOnboard.log for details."
 fi
 
-wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --insecure  --retry-max-time 300 --retry-delay 30
 echo "$msg"
 echo '******PRE-ONBOARD DONE******'

@@ -96,5 +96,8 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 
+# MacOS X .DS_Store files
+.DS_Store
+
 ## Dev Env files:
 dev_env/

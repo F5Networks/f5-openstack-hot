@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2015-10-15
 
 description: This template configures network components for a standard f5 standalone VE image.  
 
@@ -13,6 +13,11 @@ parameters:
     label: Default Gateway IP
     description: Upstream Gateway IP Address for VE instances.
     default: None
+  nic_count:
+    type: number
+    label: Number of NICs
+    description: Number of NICs that Big-IP is configured with.
+    default: 0
   vlan_name:
     type: string
     label: f5 BIG-IP VE VLAN name
@@ -72,6 +77,7 @@ resources:
           content:
             str_replace:
               params:
+                __nic_count__ : { get_param: nic_count }
                 __default_gateway__: { get_param: default_gateway }
                 __network_vlan_name__ : { get_param: vlan_name }
                 __network_vlan_create__: { get_param: vlan_create_new }

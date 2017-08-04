@@ -13,6 +13,7 @@ vlan_selfip=__network_vlan_selfip_addr__
 selfip_name=__network_vlan_selfip_name__
 selfip_cidr=__network_vlan_cidr_block__
 selfip_prefix=${selfip_cidr#*/}
+nicCount=__nic_count__
 
 if [[ "$default_gateway" == "None" ]]; then
     default_gateway=""
@@ -42,7 +43,7 @@ else
 fi
 
 
-if [ "$vlan_allow" == " " ]; then
+if [[ "$vlan_allow" == " " || "$vlan_allow" == "None" ]]; then
     vlan_allow=""
 else
     vlan_allow=",allow:${vlan_allow}"
@@ -77,4 +78,10 @@ else
 fi
 
 echo "$msg"
-wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --insecure  --retry-max-time 300 --retry-delay 30
+
+if [[ "$nicCount" -gt 1 ]]; then
+    echo "Disabling dhclient for mgmt nic"
+    tmsh modify sys db dhclient.mgmt { value disable }
+    tmsh save sys config 
+fi

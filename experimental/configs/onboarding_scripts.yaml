@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2015-10-15
 
 description: This template creates additional scripts required to provision a Big-IP.
 
@@ -57,10 +57,6 @@ parameters:
     label: Enable Config Drive
     description: Determines if cloud init data is polled from config drive instead of metadata service. 
     default: false
-  nic_count:
-    type: number
-    label: Number of NICs
-    description: Number of NICs that Big-IP is configured with. 
   wait_handle_curl:
     type: string
     label: Wait Handle 
@@ -101,7 +97,6 @@ resources:
           content:
             str_replace:
               params:
-                  __nic_count__ : { get_param: nic_count }
                   wc_notify: { get_param: wait_handle_curl}
               template: { get_file: ../scripts/postOnboard.sh }
         - path: /config/onboard.sh

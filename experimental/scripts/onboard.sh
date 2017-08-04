@@ -30,6 +30,13 @@ fi
 echo 'Temporary workaround for update-user'
 tmsh modify auth user admin shell tmsh password "$adminPwd"
 
+overrideLicenseServer="True"
+if [[ $overrideLicenseServer == "True" ]]; then
+    echo 'Adding dns entry for licensing server.'
+    tmsh modify sys global-settings remote-host add { activate.f5.com { hostname activate.f5.com addr 104.219.105.132 } }
+fi
+
+
 if [[ $hostName == "" ]]; then
 configDriveDest="/mnt/config"
     echo 'Attempting to retrieve hostname from metadata'
@@ -62,7 +69,8 @@ if f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/onboa
     licenseExists=$(tail /var/log/onboard.log -n 25 | grep "Fault code: 51092" -i -c)
 
     if [ "$licenseExists" -gt 0 ]; then
-        msg="Onboard command failed. Error 51092: This license has already been activated on a different unit."
+        msg="Onboard completed but licensing failed. Error 51092: This license has already been activated on a different unit."
+        stat="SUCCESS"
     else
         errorCount=$(tail /var/log/onboard.log | grep "BIG-IP onboard failed" -i -c)
 
@@ -78,4 +86,4 @@ else
 fi
 
 echo "$msg"
-wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --insecure  --retry-max-time 300 --retry-delay 30
