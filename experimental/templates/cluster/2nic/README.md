@@ -66,8 +66,8 @@ The following parameters can be defined in your environment file.
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_license_keys | x | List of Primary BIG-IP VE License Base Keys |  |
-| bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
+| bigip_license_keys | x | List of Primary BIG-IP VE License Base Keys | Syntax: List of Base License Keys |
+| bigip_addon_license_keys |  | Additional BIG-IP VE License Keys | Syntax: Nested List of AddOn License Keys |
 | bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
 #### OS Network

@@ -33,7 +33,7 @@ openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/temp
 ```
 
 ### Parameters
-The following parameters can be defined on your environment file. 
+The following parameters can be defined in your environment file. 
 <br>
 
 #### BIG-IP General Provisioning

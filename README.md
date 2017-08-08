@@ -38,7 +38,7 @@ The following is a summary of prerequisites for sucessfully launching templates 
   - Nova Components:
     - Key pair for SSH access to BIG-IP VE
   - Heat Components:
-    - [f5-openstack-heat-plugins](https://github.com/F5Networks/f5-openstack-heat-plugins) is optional and only needed if you reference a custom resource type in the env files. 
+    - [f5-openstack-heat-plugins](https://github.com/F5Networks/f5-openstack-heat-plugins) is optional. It is only needed if you need to reference a custom resource type that does not exist in the `resource_registry` section of the environment file. 
   - Glance Components:
     - BIG-IP Virtual Edition Image Version 13.0 or later added to Images. The image file must be in qcow.zip format and can be any size (ALL, LTM, or LTM_1SLOT).
 
