@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: 2015-10-15
 
 description: This template deploys a standard f5 standalone BIG-IP VE - 1NIC.
 
@@ -214,6 +214,9 @@ outputs:
   bigip_instance_name:
     description: Name of the BIG-IP instance
     value: { get_attr: [bigip_instance, name] }
+  floating_ip:
+    description: The Floating IP address of the BIG-IP instance
+    value: { get_attr: [floating_ip, floating_ip_address] }
   mgmt_ip:
     description: The mgmt IP address of BIG-IP instance
     value: { get_attr: [mgmt_port, fixed_ips, 0, ip_address] }

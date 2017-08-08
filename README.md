@@ -26,9 +26,7 @@ Please refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-h
 
 ### OpenStack
 The templates are developed on an operational OpenStack Mitaka deployment. 
-For resources on configuring OpenStack environments, please refer to this [configuration guide](https://f5-openstack-docs.readthedocs.io/en/latest/) 
-**Note:**
-The section [Launch BIG-IP VE in OpenStack](https://f5-openstack-docs.readthedocs.io/en/latest/guides/map_launch-bigip-gui.html) only applies to pre-version 13.0 instances. 
+For additional resources on configuring environments with F5 Integration for OpenStack Neutron LBaaS, please refer to this [configuration guide](http://clouddocs.f5.com/cloud/openstack/v1/lbaas/index.html) 
 
 ## Prerequisites
 The following is a summary of prerequisites for sucessfully launching templates from this repo:
@@ -37,11 +35,10 @@ The following is a summary of prerequisites for sucessfully launching templates 
     - External network and subnet (where floating IP resides)
     - Additional network(s) and subnet(s) (e.g. Data Subnet)
     - Corresponding router(s) configuration
-    - Ensure [f5-openstack-lbaasv2-driver](https://f5-openstack-lbaasv2-driver.readthedocs.io/en/latest/) is installed. This should be configured as part of the operational Mitaka deployment.
   - Nova Components:
     - Key pair for SSH access to BIG-IP VE
   - Heat Components:
-    - [f5-openstack-heat-plugins](https://f5-openstack-heat-plugins.readthedocs.io/en/latest/) is optional and only needed if you reference a custom resource type in the env files. 
+    - [f5-openstack-heat-plugins](https://github.com/F5Networks/f5-openstack-heat-plugins) is optional and only needed if you reference a custom resource type in the env files. 
   - Glance Components:
     - BIG-IP Virtual Edition Image Version 13.0 or later added to Images. The image file must be in qcow.zip format and can be any size (ALL, LTM, or LTM_1SLOT).
 

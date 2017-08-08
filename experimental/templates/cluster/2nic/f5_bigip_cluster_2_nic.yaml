@@ -145,7 +145,7 @@ parameters:
   bigip_vlan_selfip_addresses:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN SelfIP Address
-    description: Self-IP address to associate with the BIG-IP VLAN.
+    description: List of self-IP address to associate with the BIG-IP VLAN.
   bigip_vlan_cidr_block:
     type: string
     label: f5 BIG-IP VE VLAN CIDR Block
@@ -160,7 +160,7 @@ parameters:
   bigip_device_group:
     type: string
     label: f5 BIG-IP Device Group Name
-    description: Name of the BIG-IP Group to create or join
+    description: Name of the BIG-IP Device Group to create or join
     default: Sync
   bigip_sync_type:
     type: string

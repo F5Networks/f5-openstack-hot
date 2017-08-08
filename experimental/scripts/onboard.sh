@@ -30,13 +30,6 @@ fi
 echo 'Temporary workaround for update-user'
 tmsh modify auth user admin shell tmsh password "$adminPwd"
 
-overrideLicenseServer="True"
-if [[ $overrideLicenseServer == "True" ]]; then
-    echo 'Adding dns entry for licensing server.'
-    tmsh modify sys global-settings remote-host add { activate.f5.com { hostname activate.f5.com addr 104.219.105.132 } }
-fi
-
-
 if [[ $hostName == "" ]]; then
 configDriveDest="/mnt/config"
     echo 'Attempting to retrieve hostname from metadata'
