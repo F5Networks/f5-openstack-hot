@@ -11,7 +11,7 @@ The **cluster** heat orchestration template incorporates existing networks defin
 ## Configuration Notes and Constraints
   - The HA (Highly Available) solution consists of two templates that configures clustering:
     - *f5_bigip_cluster_2_nic.yaml*, the parent template that needs to be specified as the template paramater
-    - *f5_bigip_cluster_instance_2_nic*, the big-ip instance-specific template referenced by the parent template
+    - *f5_bigip_cluster_instance_2_nic.yaml*, the big-ip instance-specific template referenced by the parent template
   - Management Interface IP is determined via DHCP.
   - The Cluster Self-IP must reside on the same subnet as the vlan configured for the data/public NIC. 
   - Additional Network Interface static IP address must be provided. If DHCP is desired, the template can be modified to remove fixed_ips property for the port. 
