@@ -9,10 +9,11 @@ parameters:
     - bigip1baseLicenseKey
     - bigip2baseLicenseKey
   bigip_addon_license_keys: 
-    - bigip1addonKey1,bigip1addonKey2
-    - bigip2addonKey1,bigip1addonKey2
+    - bigip1addonKey1;bigip1addonKey2;bigip1addonKey3
+    - bigip2addonKey1;bigip1addonKey2;bigip2addonKey3
   bigip_modules:
     - ltm:nominal
+    - ilx:minimum
   external_network: external_net
   mgmt_network: mgmt_net
   mgmt_security_group_name: Mgmt_secgroup_2_NIC_cluster

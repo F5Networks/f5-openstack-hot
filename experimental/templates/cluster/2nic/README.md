@@ -109,7 +109,7 @@ The following parameters can be defined in your environment file.
 
 ### Parameter Values
 bigip_modules: 
- - modules: [afm,am,apm,asm,avr,fps,gtm,ilx,lc,ltm,pem,swg,vcmp]
+ - modules: [afm,am,apm,asm,avr,dos,fps,gtm,ilx,lc,ltm,pem,swg,urldb]
  - levels: [custom,dedicated,minimum,nominal,none] 
 
 ## Filing Issues

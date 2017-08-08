@@ -69,7 +69,7 @@ parameters:
   bigip_addon_license_keys:
     type: comma_delimited_list
     label: Additional BIG-IP VE License Keys
-    description: f5 BIG-IP License Add-On Keys.
+    description: f5 BIG-IP List of License Add-On Keys.
     default:
       -
   bigip_modules:

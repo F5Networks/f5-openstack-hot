@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template configures network components for a standard f5 standalone VE image.  
+description: This template configures clustering components for a standard f5 VE image in an active/standby group.  
 
 parameters:
   mgmt_ip:
