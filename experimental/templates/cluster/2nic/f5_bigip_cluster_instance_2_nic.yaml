@@ -341,7 +341,6 @@ resources:
     type: F5::BigIP::OnboardClusterConfig
     properties:
       mgmt_ip: { get_param: [mgmt_network_ips, { get_param: bigip_instance_num }]}
-      master_name: { get_param: [bigip_device_names, 0] }
       master_mgmt_ip: { get_param: [mgmt_network_ips, 0]}
       mgmt_port: { get_param: bigip_mgmt_port }
       device_group: { get_param: bigip_device_group }
