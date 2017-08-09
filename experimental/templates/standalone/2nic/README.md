@@ -4,25 +4,30 @@
  
 This solution uses a Heat Orchestration Template to launch a 2-NIC deployment of a BIG-IP VE in an Openstack Private Cloud. In a 2-NIC implementation, one interface is for management and data-plane traffic from the Internet, and the second interface is connected into the networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
 
-The **standalone** heat orchestration template incorporates existing networks defined in neutron. 
+The **standalone** heat orchestration template incorporates existing networks defined in Neutron. 
 
 ## Configuration Notes and Constraints
   - Management Interface IP is determined via DHCP. 
   - Additional Network Interface static IP address must be provided. If DHCP is desired, the template can be modified to remove fixed_ips property for the port. 
 
 ## Security
-This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If your organization is security conscious and you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
+This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
 
 ## Supported instance types and OpenStack versions:
  - BIG-IP Virtual Edition Image Version 13.0 or later
  - OpenStack Mitaka Deployment
 
+### Help
+While this template has been created by F5 Networks, it is in the experimental directory and therefore has not completed full testing and is subject to change.  F5 Networks does not offer technical support for templates in the experimental directory. For supported templates, see the templates in the **supported** directory.
+
+We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on F5 Cloud templates.  This channel is typically monitored Monday-Friday 9-5 PST by F5 employees who will offer best-effort support.
+
 ## Launching Stacks
 
 1. Ensure the prerequisites are configured in your environment. See README from this project's root folder. 
-2. Clone this repository or manually download the contents (zip/tar). As the templates use nested stacks and referenced components, it is recommended to retain the project structure as is for ease of deployment. If any of the files changed location, make sure that the corresponding paths are updated in the environment files. 
+2. Clone this repository or manually download the contents (zip/tar). As the templates use nested stacks and referenced components, we recommend you retain the project structure as is for ease of deployment. If any of the files changed location, make sure that the corresponding paths are updated in the environment files. 
 3. Locate and update the environment file (_env.yaml) with the appropriate parameter values. Note that some default values will be used if no value is specified for an optional parameter. 
-4. Launch the stack using the OpenStack CLI with a command like below:
+4. Launch the stack using the OpenStack CLI with a command like the following:
 
 #### CLI Syntax
 `openstack stack create <stackname> -t <path-to-template> -e <path-to-env>`
@@ -127,4 +132,4 @@ under the License.
 Contributor License Agreement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Individuals or business entities who contribute to this project must have
-completed and submitted the `F5 Contributor License Agreement`
+completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
