@@ -6,8 +6,10 @@ This solution uses a Heat Orchestration Template to launch a 1-NIC deployment of
 
 The **standalone** heat orchestration template incorporates existing networks defined in Neutron. 
 
-## Configuration Notes and Constraints
+## Prerequisites and configuration notes
   - Management Interface IP is determined via DHCP. 
+  - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is github and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
+
 
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.

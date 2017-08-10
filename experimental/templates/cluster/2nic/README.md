@@ -1,4 +1,4 @@
-# Deploying the BIG-IP in OpenStack - 2 NIC
+# Deploying the BIG-IP in OpenStack - Clustered 2 NIC
 
 ## Introduction
  
@@ -8,13 +8,14 @@ In a 2-NIC implementation, each BIG-IP VE has one interface used for management 
 
 The **cluster** heat orchestration template incorporates existing networks defined in Neutron. 
 
-## Configuration Notes and Constraints
+## Prerequisites and Configuration Notes
   - The HA (Highly Available) solution consists of two templates that configures clustering:
     - *f5_bigip_cluster_2_nic.yaml*, the parent template that needs to be specified as the template paramater
     - *f5_bigip_cluster_instance_2_nic.yaml*, the big-ip instance-specific template referenced by the parent template
   - Management Interface IP is determined via DHCP.
   - The cluster Self-IP must reside on the same subnet as the VLAN configured for the data/public NIC. 
   - An additional Network Interface static IP address must be provided. If DHCP is desired, the template can be modified to remove the fixed_ips property for the port. 
+  - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is github and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
 
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
@@ -30,7 +31,7 @@ We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.c
 
 ## Launching Stacks
 
-1. Ensure the prerequisites are configured in your environment. See README from this project's root folder. 
+1. Ensure the prerequisites are configured in your environment. See the README from this project's root folder. 
 2. Clone this repository or manually download the contents (zip/tar). As the templates use nested stacks and referenced components, we recommend you retain the project structure as is for ease of deployment. If any of the files changed location, make sure that the corresponding paths are updated in the environment files. 
 3. Locate and update the environment file (_env.yaml) with the appropriate parameter values. Note that some default values will be used if no value is specified for an optional parameter. 
 4. Launch the stack using the OpenStack CLI with a command like the following:
@@ -72,7 +73,7 @@ The following parameters can be defined in your environment file.
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
 | bigip_license_keys | x | List of Primary BIG-IP VE License Base Keys | Syntax: List of Base License Keys |
-| bigip_addon_license_keys |  | Additional BIG-IP VE License Keys | Syntax: Nested List of AddOn License Keys |
+| bigip_addon_license_keys | | Additional BIG-IP VE License Keys | Syntax: List of AddOn License Keys. One list item per BIG-IP instance. Each list item consists of add-on keys separated by a semicolon `addonKey1;addonKey2` |
 | bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
 #### OS Network
