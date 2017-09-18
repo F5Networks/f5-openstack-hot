@@ -40,6 +40,19 @@ resources:
               /usr/bin/passwd admin __admin_password_random__ >/dev/null 2>&1
               /usr/bin/passwd root __root_password_random__ >/dev/null 2>&1
 
+              echo "" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "********************************************************" >> /dev/kmsg
+              echo "*                                                      *" >> /dev/kmsg
+              echo "* random root password = __root_password_random__      *" >> /dev/kmsg
+              echo "* random admin password = __admin_password_random__    *" >> /dev/kmsg
+              echo "*                                                      *" >> /dev/kmsg
+              echo "********************************************************" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "    r=__root_password_random__  a=__admin_password_random__" >> /etc/issue
+              echo "" >> /etc/issue
+
               mkdir -m 0755 -p /config/cloud/openstack
               cd /config/cloud/openstack
               echo __admin_password__ >> /config/cloud/openstack/adminPwd

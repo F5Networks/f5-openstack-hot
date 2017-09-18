@@ -16,6 +16,7 @@ The **cluster** heat orchestration template incorporates existing networks defin
   - The cluster Self-IP must reside on the same subnet as the VLAN configured for the data/public NIC. 
   - An additional Network Interface static IP address must be provided. If DHCP is desired, the template can be modified to remove the fixed_ips property for the port. 
   - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is github and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
+  - If you specify a value for f5_cloudlibs_url_override or f5_cloudlibs_tag, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
 
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
@@ -56,7 +57,7 @@ The following parameters can be defined in your environment file.
 | bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
 | f5_cloudlibs_tag |  | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
-| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used.  |  |
+| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
 | bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
 | bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
 
@@ -97,9 +98,9 @@ The following parameters can be defined in your environment file.
 | bigip_vlan_mtu |  | MTU value of the VLAN on the BIG-IP. Default 1400 |  |
 | bigip_vlan_tag |  | Tag to apply on the VLAN on the BIG-IP. Use default value "None" for untagged |  |
 | bigip_vlan_nic |  | The NIC associated with the BIG-IP VLAN. For 2-NIC this defaults to 1.1 |  |
-| bigip_vlan_selfip_addresses | x | List of Self-IP addresses to associate with the BIG-IP VLAN.  | A static value must be supplied. |
-| bigip_vlan_cidr_block | x | CIDR Block for the BIG-IP SelfIP address. |  |
-| bigip_vlan_allow |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
+| bigip_self_ip_addresses | x | List of Self-IP addresses to associate with the BIG-IP VLAN.  | A static value must be supplied. |
+| bigip_self_cidr_block | x | CIDR Block for the BIG-IP SelfIP address. |  |
+| bigip_self_port_lockdown |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
 
 
 #### BIG-IP Cluster
@@ -109,7 +110,7 @@ The following parameters can be defined in your environment file.
 | bigip_device_group |  | Name of the BIG-IP Device Group to create or join. Default 'Sync'  |  |
 | bigip_auto_sync |  | Toggles flag for enabling BIG-IP Cluster Auto Sync. Default true  |  |
 | bigip_save_on_auto_sync |  | Toggles flag for enabling saving on config-sync auto-sync . Default true  |  |
-| bigip_cluster_selfip_addresses | x | List of BIG-IP Self-IP addresses to use for clustering |  |
+| bigip_cluster_self_ip_addresses | x | List of BIG-IP Self-IP addresses to use for clustering |  |
 
 <br>
 

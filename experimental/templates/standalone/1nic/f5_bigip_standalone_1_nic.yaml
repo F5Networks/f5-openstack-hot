@@ -24,12 +24,17 @@ parameters:
   f5_cloudlibs_tag:
     type: string
     label: f5 CloudLibs Tag
-    description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are updated for verifyHash.
-    default: v3.1.0
+    description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: v3.3.0
   f5_cloudlibs_url_override:
     type: string
     label: f5 cloud-libs URL Override
-    description: Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used.
+    description: Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: None
+  f5_cloudlibs_verify_hash_url_override:
+    type: string
+    label: f5 cloud-libs verifyHash URL Override
+    description: Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
     default: None
   bigip_servers_ntp:
     type: comma_delimited_list
@@ -110,6 +115,7 @@ parameter_groups:
   - use_config_drive
   - f5_cloudlibs_tag
   - f5_cloudlibs_url_override
+  - f5_cloudlibs_verify_hash_url_override
   - bigip_servers_ntp
   - bigip_servers_dns
 - label: BIG-IP Credentials
@@ -168,12 +174,14 @@ resources:
   init_3_onboard_scripts:
     type: F5::BigIP::OnboardingScripts
     properties:
+      verify_hash_url_override: { get_param: f5_cloudlibs_verify_hash_url_override}
       bigip_addon_licenses: { get_param: bigip_addon_license_keys }
       bigip_license: { get_param: bigip_license_key }
       modules: { get_param: bigip_modules }
       ntp: { get_param: bigip_servers_ntp }
       dns: { get_param: bigip_servers_dns }
       host_name: { get_attr: [mgmt_port, show, dns_assignment, 0, fqdn] }
+      management_ip: { get_attr: [mgmt_port, fixed_ips, 0, ip_address] }
       management_port: { get_param: bigip_mgmt_port }
       ssh_key_name: { get_param: bigip_os_ssh_key }
       use_config_drive: { get_param: use_config_drive }
@@ -201,7 +209,7 @@ resources:
       image: { get_param: bigip_image }
       flavor: { get_param: bigip_flavor }
       key_name: { get_param: bigip_os_ssh_key }
-      admin_user: root
+      #admin_user: root
       config_drive: { get_param: use_config_drive }
       networks:
         - port: {get_resource: mgmt_port}

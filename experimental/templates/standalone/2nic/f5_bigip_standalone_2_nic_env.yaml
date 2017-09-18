@@ -17,9 +17,9 @@ parameters:
   network_vlan_name: data_net
   network_vlan_subnet: data_subnet
   network_vlan_security_group_name: Data_secgroup_2_NIC
-  bigip_vlan_selfip_addr: 10.1.9.70
-  bigip_vlan_cidr_block: 10.1.9.0/24
-  bigip_vlan_allow: 
+  bigip_self_ip_addr: 10.1.9.70
+  bigip_self_cidr_block: 10.1.9.0/24
+  bigip_self_port_lockdown: 
     - tcp:4353
     - tcp:22
     - tcp:443

@@ -1,6 +1,12 @@
 #!/bin/bash
 echo '******STARTING PRE-ONBOARD******'
 
+verifyHashOverride="__verify_hash_override__"
+
+if [[ "$verifyHashOverride" != "" && "$verifyHashOverride" != "None" ]]; then
+    curl ${verifyHashOverride} > /config/verifyHash
+fi
+
 msg=""
 stat=""
 

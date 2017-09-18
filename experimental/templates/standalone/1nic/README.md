@@ -9,6 +9,7 @@ The **standalone** heat orchestration template incorporates existing networks de
 ## Prerequisites and configuration notes
   - Management Interface IP is determined via DHCP. 
   - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is github and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
+  - If you specify a value for f5_cloudlibs_url_override or f5_cloudlibs_tag, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
 
 
 ## Security
@@ -52,7 +53,7 @@ The following parameters can be defined in your environment file.
 | bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
 | f5_cloudlibs_tag |  | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
-| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used.  |  |
+| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
 | bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
 | bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
 

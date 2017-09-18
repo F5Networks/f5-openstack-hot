@@ -13,11 +13,6 @@ parameters:
     label: Default Gateway IP
     description: Upstream Gateway IP Address for VE instances.
     default: None
-  nic_count:
-    type: number
-    label: Number of NICs
-    description: Number of NICs that Big-IP is configured with.
-    default: 0
   vlan_name:
     type: string
     label: f5 BIG-IP VE VLAN name
@@ -41,19 +36,19 @@ parameters:
     label: f5 BIG-IP VE VLAN NIC
     description: The NIC associated with the BIG-IP VLAN.
     default: "1.1"
-  vlan_selfip_name:
+  self_name:
     type: string
     label: f5 BIG-IP VE VLAN SelfIP Name
     default: None
-  vlan_selfip_addr:
+  self_ip_addr:
     type: string
     label: f5 BIG-IP VE VLAN SelfIP Address
     description: Self-IP address to associate with the BIG-IP VLAN.
-  vlan_cidr_block:
+  self_cidr_block:
     type: string 
     label: f5 BIG-IP VE VLAN CIDR Block
     description: CIDR Block for the BIG-IP SelfIP address.
-  vlan_allow:
+  self_port_lockdown:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN Allow Services
     description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default port lockdown settings are used. 
@@ -77,24 +72,25 @@ resources:
           content:
             str_replace:
               params:
-                __nic_count__ : { get_param: nic_count }
                 __default_gateway__: { get_param: default_gateway }
                 __network_vlan_name__ : { get_param: vlan_name }
                 __network_vlan_create__: { get_param: vlan_create_new }
                 __network_vlan_tag__ : { get_param: vlan_tag}
                 __network_vlan_mtu__ : { get_param: vlan_mtu }
                 __network_vlan_nic__ : { get_param: vlan_nic }
-                __network_vlan_selfip_name__ : { get_param: vlan_selfip_name }
-                __network_vlan_selfip_addr__ : { get_param: vlan_selfip_addr }
-                __network_vlan_cidr_block__ : { get_param: vlan_cidr_block }
-                __network_vlan_allow__ :
+                __network_vlan_nic_index__ : ""
+                __network_vlan_last_nic_index__ : ""
+                __network_self_name__ : { get_param: self_name }
+                __network_self_ip_addr__ : { get_param: self_ip_addr }
+                __network_self_cidr_block__ : { get_param: self_cidr_block }
+                __network_self_port_lockdown__ :
                   list_join:
                   - ' '
                   -
                     repeat:
                       template: allowport
                       for_each:
-                        allowport: { get_param: vlan_allow }
+                        allowport: { get_param: self_port_lockdown }
                 wc_notify: { get_param: wait_handle_curl }
               template: { get_file: ../scripts/onboard-network.sh}
 outputs:

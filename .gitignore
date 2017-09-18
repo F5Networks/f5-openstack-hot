@@ -101,3 +101,10 @@ crashlytics-build.properties
 
 ## Dev Env files:
 dev_env/
+
+## Test Env files:
+
+test_env/
+
+## VS Code files:
+.vscode
