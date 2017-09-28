@@ -248,7 +248,7 @@ resources:
     type: OS::Heat::WaitCondition
     properties:
       handle: {get_resource: wait_handle_onboard}
-      count: 2
+      count: 3
       timeout: 1800
   wait_handle_onboard:
     type: OS::Heat::WaitConditionHandle

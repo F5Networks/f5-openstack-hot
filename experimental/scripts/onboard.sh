@@ -44,7 +44,6 @@ function set_vars() {
 }
 
 function set_adminPwd() {
-    echo 'Temporary workaround for update-user'
     tmsh modify auth user admin shell tmsh password "$adminPwd"
 }
 

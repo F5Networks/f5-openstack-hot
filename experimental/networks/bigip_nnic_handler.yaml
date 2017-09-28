@@ -52,7 +52,7 @@ parameters:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN CIDR Block
     description: CIDR Block for the BIG-IP SelfIP address.
-  bigip_self_portlockdowns:
+  bigip_self_port_lockdowns:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN Allow Services
     description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default is used.
@@ -105,7 +105,7 @@ resources:
           vlan_last_nic_index: { get_param: bigip_last_nic_index }
           self_ip_addrs: { get_param: bigip_self_ip_addresses }
           self_cidr_blocks:  { get_param: bigip_self_cidr_blocks}
-          self_port_lockdowns: { get_param: bigip_self_portlockdowns }
+          self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
           default_gateway: { get_param: bigip_default_gateway }
           wait_handle_curl: { get_param: wait_handle_curl}
 

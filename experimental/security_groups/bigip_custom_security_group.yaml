@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template deploys standard security group to be associated with a BIG-IP data VLAN.
+description: This template deploys a customized security group to be associated with a BIG-IP data VLAN.
 
 parameters:
   network_vlan_names:
@@ -24,7 +24,7 @@ resources:
         str_replace:
           template: <%vlan_name%>-secgroup
           params:
-            <%vlan_name%>: { get_param: [ network_vlan_names, security_group_index ] }
+            <%vlan_name%>: { get_param: [ network_vlan_names,{ get_param: security_group_index} ] }
       rules: { get_param: [security_group_rules, { get_param: security_group_index}, rules ]}
 
 outputs:

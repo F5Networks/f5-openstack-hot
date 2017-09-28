@@ -18,10 +18,20 @@ resources:
     type: OS::Heat::RandomString
     properties:
       length: 10
+      character_classes:
+        - class: letters
+          min: 3
+        - class: digits
+          min: 3
   random_password_root:
     type: OS::Heat::RandomString
     properties:
       length: 10
+      character_classes:
+        - class: letters
+          min: 1
+        - class: digits
+          min: 1
   override_default_config:
     type: OS::Heat::SoftwareConfig
     properties:

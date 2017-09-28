@@ -9,8 +9,11 @@ The **standalone** heat orchestration template incorporates existing networks de
 ## Prerequisites and Configuration Notes
   - Management Interface IP is determined via DHCP. 
   - Additional Network Interface static IP address must be provided. If DHCP is desired, the template can be modified to remove fixed_ips property for the port. 
-  - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is github and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
+  - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is GitHub and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
   - If you specify a value for f5_cloudlibs_url_override or f5_cloudlibs_tag, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+  - :exclamation:**Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Please take note of the following when supplying password values:
+      - The BIG-IP version and any default policies that may apply
+      - Any characters recommended that you avoid
 
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
@@ -44,9 +47,8 @@ The following parameters can be defined in your environment file.
 <br>
 
 #### BIG-IP General Provisioning
-
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_image | x | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
 | bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
@@ -56,33 +58,36 @@ The following parameters can be defined in your environment file.
 | bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
 | bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
 
-#### BIG-IP nNIC Provisioning
 
+#### BIG-IP nNIC Provisioning
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
-| bigip_nic_count | x | Number of additional NICs to attach to the BIG-IP. Note: exclude management nic from count.
-| bigip_last_nic_index | x | The 0-based index of the last NIC setup to wait to finish before performing post-onboard operations. This is usually bigip_nic_count minus 1.
+| --- | :---: | --- | --- |
+| bigip_nic_count | x | Number of additional NICs to attach to the BIG-IP. Note: exclude management nic from count. | min: 1 max: 10 |
+| bigip_last_nic_index | x | The 0-based index of the last NIC setup to wait to finish before performing post-onboard operations. This is usually bigip_nic_count minus 1. | min: 0 max: 9 |
+
 
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_os_ssh_key | x | Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
 | bigip_admin_pwd | x | Password for the BIG-IP admin user. |  |
 | bigip_root_pwd | x | Password for the BIG-IP root user. |  |
 
+
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
 | bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
+
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
 | mgmt_network | x | Network to which the BIG-IP management interface is attached. | Network must exist |
 | mgmt_security_group_name | x | Name to apply on the security group for the BIG-IP management network. |  |
@@ -90,10 +95,11 @@ The following parameters can be defined in your environment file.
 | network_vlan_names | x | OS Neutron Network to map to the BIG-IP VLANs | Networks must exist |
 | network_vlan_subnets | x | The Neutron Subnet for the corresponding BIG-IP VLANs.  | Subnet must exist |
 
+
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_default_gateway |  | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port |  | Default 443 |  |
 | bigip_vlan_names |  | Names of the VLAN to be created on the BIG-IP. |  |
@@ -102,6 +108,7 @@ The following parameters can be defined in your environment file.
 | bigip_self_ip_addresses | x | Self-IP addresses to associate with the BIG-IP VLAN.  | A static value must be supplied. |
 | bigip_self_cidr_blocks | x | CIDR Blocks for the BIG-IP SelfIP address. |  |
 | bigip_self_port_lockdowns |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
+
 
 <br>
 

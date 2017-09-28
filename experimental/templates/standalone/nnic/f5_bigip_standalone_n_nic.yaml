@@ -62,18 +62,20 @@ parameters:
     description: A list of DNS servers to configure on the BIG-IP.
     default:
       -
+
+   #bigip nnic provisioning
   bigip_nic_count:
     type: number
     label: f5 BIG-IP NIC count
     description: Number of additional NICs to attach to the BIG-IP. Note - exclude management nic from count.
     constraints:
-      - range: { min: 1 }
+      - range: { min: 1, max: 10 }
   bigip_last_nic_index:
     type: number
     label: f5 BIG-IP last NIC index (0-based)
     description: Index of the last NIC setup to wait to finish. This is usually bigip_nic_count minus 1. Since there are no intrinsic math functions currently supported in heat, this parameter is required.
     constraints:
-      - range: { min: 0 }
+      - range: { min: 0, max: 9 }
 
   #bigip credentials
   bigip_os_ssh_key:
@@ -195,6 +197,10 @@ parameter_groups:
   - f5_cloudlibs_verify_hash_url_override
   - bigip_servers_ntp
   - bigip_servers_dns
+- label: BIG-IP nNIC Provisioning
+  parameters:
+  - bigip_os_ssh_key
+  - bigip_admin_pwd
 - label: BIG-IP Credentials
   parameters:
   - bigip_os_ssh_key
@@ -229,7 +235,7 @@ resources:
     type: OS::Heat::WaitCondition
     properties:
       handle: {get_resource: wait_handle_onboard}
-      count: 2
+      count: 3
       timeout: 1800
   wait_handle_onboard:
     type: OS::Heat::WaitConditionHandle
@@ -269,7 +275,7 @@ resources:
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
       bigip_vlan_mtus: { get_param: bigip_vlan_mtus }
       bigip_self_cidr_blocks:  { get_param: bigip_self_cidr_blocks}
-      bigip_self_port_lockdowns: { get_param: bigip_self_portlockdowns }
+      bigip_self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
       bigip_default_gateway: { get_param: bigip_default_gateway }
       wait_handle_curl: { get_attr: [wait_handle_onboard_network, curl_cli]}
   init_1_override_default_config:
