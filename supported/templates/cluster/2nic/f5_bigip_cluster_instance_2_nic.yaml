@@ -1,0 +1,407 @@
+heat_template_version: 2016-04-08
+
+description: This template deploys a standard f5 BIG-IP VE - 2NIC ready for clustering. The HA self-ip is configured on the data VLAN. 
+
+parameters:
+  bigip_image:
+    type: string
+    label: f5 BIG-IP VE Image
+    description: The BIG-IP VE image to be used on the compute instance.
+    constraints:
+      - custom_constraint: glance.image
+  bigip_flavor:
+    type: string
+    label: f5 BIG-IP VE Flavor
+    description: Type of instance (flavor) to be used for the VE.
+    default: m1.medium
+    constraints:
+      - custom_constraint: nova.flavor
+  use_config_drive:
+    type: boolean
+    label: Use Config Drive
+    description: Use config drive to provide meta and user data.
+    default: false
+  f5_cloudlibs_tag:
+    type: string
+    label: f5 CloudLibs Tag
+    description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: v3.3.0
+  f5_cloudlibs_url_override:
+    type: string
+    label: f5 cloud-libs URL Override
+    description: Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: None
+  f5_cloudlibs_verify_hash_url_override:
+    type: string
+    label: f5 cloud-libs verifyHash URL Override
+    description: Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
+    default: None
+  bigip_servers_ntp:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE NTP servers
+    description: A list of NTP servers to configure on the BIG-IP.
+    default:
+      - 0.us.pool.ntp.org
+      - 1.us.pool.ntp.org
+  bigip_servers_dns:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE Domain Name Servers
+    description: A list of DNS servers to configure on the BIG-IP.
+    default:
+      -
+  #bigip credentials
+  bigip_os_ssh_key:
+    type: string
+    label: f5 BIG-IP VE Root SSH Key Name
+    description: Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access.
+    constraints:
+      - custom_constraint: nova.keypair
+  bigip_admin_pwd:
+    type: string
+    label: f5 BIG-IP VE Admin User Password
+    description: Password for the BIG-IP admin user.
+    hidden: true
+  bigip_root_pwd:
+    type: string
+    label: f5 BIG-IP VE Root User Password
+    description: Password for the BIG-IP root user.
+    hidden: true
+  #bigip licensing
+  bigip_license_keys:
+    type: comma_delimited_list
+    label: Primary BIG-IP VE License Base Keys
+    description: f5 BIG-IP List of License Base Keys.
+  bigip_addon_license_keys:
+    type: comma_delimited_list
+    label: Additional BIG-IP VE License Keys
+    description: f5 BIG-IP List of License Add-On Keys.
+    default:
+      -
+  bigip_modules:
+    type: comma_delimited_list
+    label: Modules to provision on the BIG-IP.
+    description: A list modules to provision and their level. <module_name:level>
+    default:
+      - ltm:nominal
+  #os network
+  external_network:
+    type: string
+    label: External Network Name
+    description: Name of external network where floating IP resides.
+    constraints:
+      - custom_constraint: neutron.network
+  mgmt_network:
+    type: string
+    label: Management Network
+    description: Network to which the BIG-IP management interface is attached.
+    constraints:
+      - custom_constraint: neutron.network
+  network_vlan_security_group_id:
+    type: string
+    label: Network vlan Security Group ID
+    description: Neutron Security Group ID for the BIG-IP VLAN.
+  network_vlan_name:
+    type: string
+    label: OS Neutron Network to map to the BIG-IP VLAN
+    description: The Neutron Network for the corresponding BIG-IP VLAN.
+    constraints:
+      - custom_constraint: neutron.network
+  network_vlan_subnet:
+    type: string
+    label: OS Neutron Subnet to map to the BIG-IP VLAN
+    description: The Neutron Subnet for the corresponding BIG-IP VLAN.
+    constraints:
+      - custom_constraint: neutron.subnet
+  mgmt_network_ips:
+    type: comma_delimited_list
+    label: Management IP Addresses
+  mgmt_network_portids:
+    type: comma_delimited_list
+    label: Created OS Neutron Ports
+  #bigip network
+  bigip_default_gateway:
+    type: string
+    label: Default Gateway IP
+    description: Upstream Gateway IP Address for BIG-IP instances.
+    default: None
+  bigip_mgmt_port:
+    type: number
+    label: Management port
+    description: Port for the BIG-IP Management uri
+    default: 443
+  bigip_vlan_name:
+    type: string
+    label: f5 BIG-IP VE VLAN name
+    description: Name of the VLAN to be created on the BIG-IP.
+    default: data
+  bigip_vlan_mtu:
+    type: number
+    label: f5 BIG-IP VE VLAN MTU
+    description: MTU value of the VLAN on the BIG-IP.
+    default: 1400
+  bigip_vlan_tag:
+    type: string
+    label: f5 BIG-IP VE VLAN tag
+    description: Tag to apply on the VLAN on the BIG-IP. Use default value "None" for untagged.
+    default: None
+  bigip_vlan_nic:
+    type: string
+    label: f5 BIG-IP VE VLAN NIC
+    description: The NIC associated with the BIG-IP VLAN.
+    default: 1.1
+  bigip_self_ip_addresses:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN SelfIP Address
+    description: Self-IP address to associate with the BIG-IP VLAN.
+  bigip_self_cidr_block:
+    type: string
+    label: f5 BIG-IP VE VLAN CIDR Block
+    description: CIDR Block for the BIG-IP SelfIP address.
+  bigip_self_port_lockdown:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN Allow Services
+    description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default is used.
+    default:
+      -
+  #bigip cluster
+  bigip_instance_num:
+    type: number
+    label: The instance index of the BIG-IP that belongs in the cluster / resource group.
+  bigip_device_group:
+    type: string
+    label: f5 BIG-IP Device Group Name
+    description: Name of the BIG-IP Group to create or join
+    default: Sync
+  bigip_sync_type:
+    type: string
+    label: f5 BIG-IP Cluster Sync Type
+    description: Sync type for clustering
+    default: sync-failover
+  bigip_auto_sync:
+    type: boolean
+    label: f5 BIG-IP Cluster Auto Sync
+    description: Enable config-sync auto-sync 
+    default: true
+  bigip_save_on_auto_sync:
+    type: boolean
+    default: true
+    label: f5 BIG-IP Cluster Save On Auto Sync
+    description: Enable saving on config-sync auto-sync
+  bigip_cluster_self_ip_addresses:
+    type: comma_delimited_list
+    label: f5 BIG-IP Cluster Self-IP Addresses
+    description: Non-floating SelfIP Addresses for clustering
+  bigip_device_names:
+    type: comma_delimited_list
+    label: f5 BIG-IP Host Names
+    description: List of host names for the BIG-IPs
+
+parameter_groups:
+- label: BIG-IP General Provisioning
+  parameters:
+  - bigip_image
+  - bigip_flavor
+  - use_config_drive
+  - f5_cloudlibs_tag
+  - f5_cloudlibs_url_override
+  - f5_cloudlibs_verify_hash_url_override
+  - bigip_servers_ntp
+  - bigip_servers_dns
+- label: BIG-IP Credentials
+  parameters:
+  - bigip_os_ssh_key
+  - bigip_admin_pwd
+  - bigip_root_pwd
+- label: BIG-IP Licensing and Modules
+  parameters:
+  - bigip_license_keys
+  - bigip_addon_license_keys
+  - bigip_modules
+- label: OS Network
+  parameters:
+  - external_network
+  - mgmt_network
+  - network_vlan_name
+  - network_vlan_subnet
+- label: BIG-IP Network
+  parameters:
+  - bigip_default_gateway
+  - bigip_mgmt_port
+  - bigip_vlan_name
+  - bigip_vlan_mtu
+  - bigip_vlan_tag
+  - bigip_vlan_nic
+  - bigip_self_ip_addresses
+  - bigip_self_cidr_block
+  - bigip_self_port_lockdown
+- label: BIG-IP Cluster
+  parameters:
+  - bigip_instance_num
+  - bigip_device_group
+  - bigip_sync_type
+  - bigip_auto_sync
+  - bigip_save_on_auto_sync
+  - bigip_device_names
+
+resources:
+  wait_condition_onboard_complete:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle_onboard}
+      count: 3
+      timeout: 1800
+  wait_handle_onboard:
+    type: OS::Heat::WaitConditionHandle
+  wait_condition_onboard_network_complete:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle_onboard_network}
+      count: 2
+      timeout: 1800
+  wait_handle_onboard_network:
+    type: OS::Heat::WaitConditionHandle
+  wait_condition_onboard_cluster_complete:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle_onboard_cluster}
+      count: 1
+      timeout: 1800
+  wait_handle_onboard_cluster:
+    type: OS::Heat::WaitConditionHandle
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: external_network }
+      port_id: {get_param: [mgmt_network_portids, {get_param: bigip_instance_num}]}
+  network_vlan_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: network_vlan_name }
+      security_groups: [{get_param: network_vlan_security_group_id}]
+      admin_state_up: true
+      fixed_ips:
+        - subnet: { get_param: network_vlan_subnet }
+          ip_address: { get_param: [bigip_cluster_self_ip_addresses,  {get_param: bigip_instance_num}] }
+        - subnet: { get_param: network_vlan_subnet}
+          ip_address: { get_param: [bigip_self_ip_addresses,  {get_param: bigip_instance_num}] }
+  init_1_override_default_config:
+    type: F5::BigIP::OverrideDefaultConfig
+    properties:
+      admin_password: { get_param: bigip_admin_pwd }
+      root_password: { get_param: bigip_root_pwd }
+  init_2_onboard_libs:
+    type: F5::BigIP::OnboardingLibs
+    properties:
+      cloudlibs_tag: { get_param: f5_cloudlibs_tag }
+      cloudlibs_url_override: { get_param: f5_cloudlibs_url_override }
+  init_3_onboard_scripts:
+    type: F5::BigIP::OnboardingScripts
+    properties:
+      verify_hash_url_override: { get_param: f5_cloudlibs_verify_hash_url_override}
+      bigip_addon_licenses:
+        str_split:
+        - ';'
+        - { get_param: [bigip_addon_license_keys, {get_param: bigip_instance_num}]}
+      bigip_license: { get_param: [bigip_license_keys, {get_param: bigip_instance_num}] }
+      modules: { get_param: bigip_modules }
+      ntp: { get_param: bigip_servers_ntp }
+      dns: { get_param: bigip_servers_dns }
+      host_name: { get_param: [bigip_device_names, { get_param: bigip_instance_num}] }
+      management_ip: { get_param: [mgmt_network_ips, { get_param: bigip_instance_num }]}
+      management_port: { get_param: bigip_mgmt_port }
+      ssh_key_name: { get_param: bigip_os_ssh_key }
+      use_config_drive: { get_param: use_config_drive }
+      wait_handle_curl: { get_attr: [wait_handle_onboard, curl_cli] }
+  init_4_1_onboard_network_config:
+    type: F5::BigIP::OnboardNetworkConfig
+    properties:
+      vlan_name: { get_param: bigip_vlan_name }
+      vlan_tag: { get_param: bigip_vlan_tag }
+      vlan_mtu: { get_param: bigip_vlan_mtu }
+      vlan_nic: { get_param: bigip_vlan_nic }
+      self_name: cluster_self_ip
+      self_ip_addr: { get_param: [bigip_cluster_self_ip_addresses, { get_param: bigip_instance_num }] }
+      self_cidr_block: { get_param: bigip_self_cidr_block }
+      self_port_lockdown:
+          - tcp:4353
+          - udp:1026
+          - tcp:443
+      default_gateway: { get_param: bigip_default_gateway }
+      wait_handle_curl: { get_attr: [wait_handle_onboard_network, curl_cli]}
+  init_4_2_onboard_network_config:
+    type: F5::BigIP::OnboardNetworkConfig
+    properties:
+      script_path: /config/onboard-network-2.sh
+      vlan_create_new: false
+      vlan_name: { get_param: bigip_vlan_name }
+      self_name: data_self_ip
+      self_ip_addr: { get_param: [bigip_self_ip_addresses, { get_param: bigip_instance_num }] }
+      self_cidr_block: { get_param: bigip_self_cidr_block }
+      self_port_lockdown: { get_param: bigip_self_port_lockdown }
+      wait_handle_curl: { get_attr: [wait_handle_onboard_network, curl_cli]}
+  init_5_onboard_cluster_config:
+    type: F5::BigIP::OnboardClusterConfig
+    properties:
+      mgmt_ip: { get_param: [mgmt_network_ips, { get_param: bigip_instance_num }]}
+      master_mgmt_ip: { get_param: [mgmt_network_ips, 0]}
+      mgmt_port: { get_param: bigip_mgmt_port }
+      device_group: { get_param: bigip_device_group }
+      sync_type: { get_param: bigip_sync_type }
+      auto_sync: { get_param: bigip_auto_sync }
+      save_on_auto_sync: { get_param: bigip_save_on_auto_sync }
+      host_name: { get_param: [bigip_device_names, { get_param: bigip_instance_num}] }
+      config_sync_ip: { get_param: [bigip_cluster_self_ip_addresses, {get_param: bigip_instance_num}]}
+      use_config_drive: { get_param: use_config_drive }
+      wait_handle_curl: { get_attr: [wait_handle_onboard_cluster, curl_cli]}
+  init_6_run_commands:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        runcmd:
+          - nohup /config/preOnboard.sh &>> /var/log/preOnboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK1_DONE' &>> /var/log/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-2.sh --wait-for ONBOARD_NETWORK1_DONE --signal ONBOARD_NETWORK2_DONE' &>> /var/log/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-cluster.sh --wait-for ONBOARD_NETWORK2_DONE --signal ONBOARD_CLUSTER_DONE' &>> /var/log/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_CLUSTER_DONE -o /var/log/postOnboard.log' &>> /var/log/runScript.log < /dev/null &
+  bigip_provision:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: init_1_override_default_config}
+      - config: {get_resource: init_2_onboard_libs}
+      - config: {get_resource: init_3_onboard_scripts}
+      - config: {get_resource: init_4_1_onboard_network_config}
+      - config: {get_resource: init_4_2_onboard_network_config}
+      - config: {get_resource: init_5_onboard_cluster_config}
+      - config: {get_resource: init_6_run_commands}
+  bigip_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: bigip_image }
+      flavor: { get_param: bigip_flavor }
+      key_name: { get_param: bigip_os_ssh_key }
+      admin_user: root
+      config_drive: { get_param: use_config_drive }
+      networks:
+        - port: {get_param: [mgmt_network_portids, {get_param: bigip_instance_num}]}
+        - port: {get_resource: network_vlan_port}
+      user_data_format: RAW
+      user_data: {get_resource: bigip_provision}
+outputs:
+  bigip_instance_id:
+    description: ID of the BIG-IP instance
+    value: { get_resource: bigip_instance }
+  bigip_instance_name:
+    description: Name of the BIG-IP instance
+    value: { get_attr: [bigip_instance, name] }
+  bigip_instance_networks:
+    description: Management IP of the BIG-IP instance
+    value: { get_attr: [bigip_instance, networks]}
+  bigip_instance_addresses:
+    description: Cluster and Data SelfIPs of the BIG-IP instance
+    value: { get_attr: [bigip_instance, addresses]}
+  bigip_instance_floating_ip:
+    description: Management Floating IP of the BIG-IP Instance
+    value: { get_attr: [floating_ip, floating_ip_address] }

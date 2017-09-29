@@ -1,0 +1,312 @@
+heat_template_version: 2016-04-08
+
+description: This template deploys standard f5 BIG-IP VE - 2NIC instances in an active/standby cluster.
+
+parameters:
+  bigip_image:
+    type: string
+    label: f5 BIG-IP VE Image
+    description: The BIG-IP VE image to be used on the compute instance.
+    constraints:
+      - custom_constraint: glance.image
+  bigip_flavor:
+    type: string
+    label: f5 BIG-IP VE Flavor
+    description: Type of instance (flavor) to be used for the VE.
+    default: m1.medium
+    constraints:
+      - custom_constraint: nova.flavor
+  use_config_drive:
+    type: boolean
+    label: Use Config Drive
+    description: Use config drive to provide meta and user data.
+    default: false
+  f5_cloudlibs_tag:
+    type: string
+    label: f5 CloudLibs Tag
+    description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: v3.3.0
+  f5_cloudlibs_url_override:
+    type: string
+    label: f5 cloud-libs URL Override
+    description: Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: None
+  f5_cloudlibs_verify_hash_url_override:
+    type: string
+    label: f5 cloud-libs verifyHash URL Override  
+    description: Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
+    default: None
+  bigip_servers_ntp:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE NTP servers
+    description: A list of NTP servers to configure on the BIG-IP.
+    default:
+      - 0.us.pool.ntp.org
+      - 1.us.pool.ntp.org
+  bigip_servers_dns:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE Domain Name Servers
+    description: A list of DNS servers to configure on the BIG-IP.
+    default:
+      -
+  #bigip credentials
+  bigip_os_ssh_key:
+    type: string
+    label: f5 BIG-IP VE Root SSH Key Name
+    description: Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access.
+    constraints:
+      - custom_constraint: nova.keypair
+  bigip_admin_pwd:
+    type: string
+    label: f5 BIG-IP VE Admin User Password
+    description: Password for the BIG-IP admin user.
+    hidden: true
+  bigip_root_pwd:
+    type: string
+    label: f5 BIG-IP VE Root User Password
+    description: Password for the BIG-IP root user.
+    hidden: true
+  #bigip licensing
+  bigip_license_keys:
+    type: comma_delimited_list
+    label: Primary BIG-IP VE License Base Keys
+    description: f5 BIG-IP List of License Base Keys.
+  bigip_addon_license_keys:
+    type: comma_delimited_list
+    label: Additional BIG-IP VE License Keys
+    description: f5 BIG-IP List of License Add-On Keys. Each list item consists of add-on keys separated by a semicolon <addonKey1;addonKey2> 
+    default: 
+      - 
+  bigip_modules:
+    type: comma_delimited_list
+    label: Modules to provision on the BIG-IP.
+    description: A list modules to provision and their level. <module_name:level>
+    default:
+      - ltm:nominal
+  #os network
+  external_network:
+    type: string
+    label: External Network Name
+    description: Name of external network where floating IP resides.
+    constraints:
+      - custom_constraint: neutron.network
+  mgmt_network:
+    type: string
+    label: Management Network
+    description: Network to which the BIG-IP management interface is attached.
+    constraints:
+      - custom_constraint: neutron.network
+  mgmt_security_group_name:
+    type: string
+    label: Management Security Group Name
+    description: Name to apply on the security group for the BIG-IP management network.
+  network_vlan_security_group_name:
+    type: string
+    label: Network <No.> Security Group Name
+    description: Name to apply on the security group for BIG-IP VLAN.
+  network_vlan_name:
+    type: string
+    label: OS Neutron Network to map to the BIG-IP VLAN
+    description: The Neutron Network for the corresponding BIG-IP VLAN.
+    constraints:
+      - custom_constraint: neutron.network
+  network_vlan_subnet:
+    type: string
+    label: OS Neutron Subnet to map to the BIG-IP VLAN
+    description: The Neutron Subnet for the corresponding BIG-IP VLAN.
+    constraints:
+      - custom_constraint: neutron.subnet
+  #bigip network
+  bigip_default_gateway:
+    type: string
+    label: Default Gateway IP
+    description: Upstream Gateway IP Address for BIG-IP instances.
+    default: None
+  bigip_mgmt_port:
+    type: number
+    label: Management port
+    description: Port for the BIG-IP Management uri
+    default: 443
+  bigip_vlan_name:
+    type: string
+    label: f5 BIG-IP VE VLAN name
+    description: Name of the VLAN to be created on the BIG-IP.
+    default: data
+  bigip_vlan_mtu:
+    type: number
+    label: f5 BIG-IP VE VLAN MTU
+    description: MTU value of the VLAN on the BIG-IP.
+    default: 1400
+  bigip_vlan_tag:
+    type: string
+    label: f5 BIG-IP VE VLAN tag
+    description: Tag to apply on the VLAN on the BIG-IP. Use default value "None" for untagged.
+    default: None
+  bigip_vlan_nic:
+    type: string
+    label: f5 BIG-IP VE VLAN NIC
+    description: The NIC associated with the BIG-IP VLAN.
+    default: 1.1
+  bigip_self_ip_addresses:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN SelfIP Address
+    description: List of self-IP address to associate with the BIG-IP VLAN.
+  bigip_self_cidr_block:
+    type: string
+    label: f5 BIG-IP VE VLAN CIDR Block
+    description: CIDR Block for the BIG-IP SelfIP address.
+  bigip_self_port_lockdown:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN Allow Services
+    description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default is used.
+    default:
+      - 
+  #bigip cluster
+  bigip_device_group:
+    type: string
+    label: f5 BIG-IP Device Group Name
+    description: Name of the BIG-IP Device Group to create or join
+    default: Sync
+  bigip_sync_type:
+    type: string
+    label: f5 BIG-IP Cluster Sync Type
+    description: Sync type for clustering
+    default: sync-failover
+  bigip_auto_sync:
+    type: boolean
+    label: f5 BIG-IP Cluster Auto Sync
+    description: Enable config-sync auto-sync 
+    default: true
+  bigip_save_on_auto_sync:
+    type: boolean
+    default: true
+    label: f5 BIG-IP Cluster Save On Auto Sync
+    description: Enable saving on config-sync auto-sync
+  bigip_cluster_self_ip_addresses:
+    type: comma_delimited_list
+    label: f5 BIG-IP Cluster Self-IP Addresses
+    description: Non-floating SelfIP Addresses for clustering
+
+parameter_groups:
+- label: BIG-IP General Provisioning
+  parameters:
+  - bigip_image
+  - bigip_flavor
+  - use_config_drive
+  - f5_cloudlibs_tag
+  - f5_cloudlibs_url_override
+  - f5_cloudlibs_verify_hash_url_override
+  - bigip_servers_ntp
+  - bigip_servers_dns
+- label: BIG-IP Credentials
+  parameters:
+  - bigip_os_ssh_key
+  - bigip_admin_pwd
+  - bigip_root_pwd
+- label: BIG-IP Licensing and Modules
+  parameters:
+  - bigip_license_keys
+  - bigip_addon_license_keys
+  - bigip_modules
+- label: OS Network
+  parameters:
+  - external_network
+  - mgmt_network
+  - mgmt_security_group_name
+  - network_vlan_security_group_name
+  - network_vlan_name
+  - network_vlan_subnet
+- label: BIG-IP Network
+  parameters:
+  - bigip_default_gateway
+  - bigip_mgmt_port
+  - bigip_vlan_name
+  - bigip_vlan_mtu
+  - bigip_vlan_tag
+  - bigip_vlan_nic
+  - bigip_self_ip_addresses
+  - bigip_self_cidr_block
+  - bigip_self_port_lockdown
+- label: BIG-IP Cluster
+  parameters:
+  - bigip_device_group
+  - bigip_sync_type
+  - bigip_auto_sync
+  - bigip_save_on_auto_sync
+  - bigip_cluster_self_ip_addresses
+
+resources:
+  mgmt_security_group:
+    type: F5::BigIP::ManagementSecurityGroup
+    properties:
+      security_group_name: { get_param: mgmt_security_group_name }
+      management_port: { get_param: bigip_mgmt_port }
+  network_vlan_security_group:
+    type: F5::BigIP::DataSecurityGroup
+    properties:
+      security_group_name: { get_param: network_vlan_security_group_name }
+  device_mgmt_ports:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: OS::Neutron::Port
+        properties:
+          network: { get_param: mgmt_network }
+          security_groups: [{ get_attr: [mgmt_security_group, mgmt_security_group_id] }]
+  device_cluster:
+    type: OS::Heat::ResourceGroup
+    depends_on: device_mgmt_ports
+    properties:
+      count: 2
+      resource_def: 
+        type: F5::BigIP::ClusterInstance2Nic
+        properties:
+          bigip_instance_num: "%index%"
+          bigip_image: { get_param: bigip_image }
+          bigip_flavor: { get_param: bigip_flavor }
+          use_config_drive: { get_param: use_config_drive }
+          f5_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
+          f5_cloudlibs_url_override: { get_param: f5_cloudlibs_url_override }
+          f5_cloudlibs_verify_hash_url_override: { get_param: f5_cloudlibs_verify_hash_url_override}
+          bigip_servers_ntp: { get_param: bigip_servers_ntp }
+          bigip_servers_dns: { get_param: bigip_servers_dns }
+          bigip_os_ssh_key: { get_param: bigip_os_ssh_key }
+          bigip_admin_pwd: { get_param: bigip_admin_pwd }
+          bigip_root_pwd: { get_param: bigip_root_pwd }
+          bigip_license_keys: { get_param: bigip_license_keys }
+          bigip_addon_license_keys: { get_param: bigip_addon_license_keys }
+          bigip_modules: { get_param: bigip_modules }
+          external_network: { get_param: external_network }
+          mgmt_network: { get_param: mgmt_network }
+          mgmt_network_ips: { get_attr: [device_mgmt_ports, show, fixed_ips, 0, ip_address] }
+          mgmt_network_portids: { get_attr: [device_mgmt_ports, show, id] }
+          network_vlan_security_group_id: { get_attr: [network_vlan_security_group, data_security_group_id] }
+          network_vlan_name: { get_param: network_vlan_name }
+          network_vlan_subnet: { get_param: network_vlan_subnet }
+          bigip_mgmt_port: { get_param: bigip_mgmt_port }
+          bigip_vlan_name: { get_param: bigip_vlan_name }
+          bigip_vlan_mtu: { get_param: bigip_vlan_mtu }
+          bigip_vlan_tag: { get_param: bigip_vlan_tag }
+          bigip_vlan_nic: { get_param: bigip_vlan_nic }
+          bigip_self_ip_addresses: { get_param: bigip_self_ip_addresses }
+          bigip_self_cidr_block: { get_param: bigip_self_cidr_block }
+          bigip_self_port_lockdown: { get_param: bigip_self_port_lockdown }
+          bigip_default_gateway: { get_param: bigip_default_gateway }
+          bigip_device_names: { get_attr: [device_mgmt_ports, show, dns_assignment, 0, fqdn] }
+          bigip_cluster_self_ip_addresses: { get_param: bigip_cluster_self_ip_addresses }
+          bigip_auto_sync : { get_param: bigip_auto_sync }
+          bigip_save_on_auto_sync : { get_param: bigip_save_on_auto_sync }
+outputs:
+  bigip_active_instance_id:
+    value: { get_attr: [device_cluster, resource.0.bigip_instance_id] }
+  bigip_active_instance_name:
+    value: { get_attr: [device_cluster, resource.0.bigip_instance_name] }
+  bigip_active_floating_ip:
+    value: { get_attr: [device_cluster, resource.0.bigip_instance_floating_ip] }
+  bigip_standby_instance_id:
+    value: { get_attr: [device_cluster, resource.1.bigip_instance_id] }
+  bigip_standby_instance_name:
+    value: { get_attr: [device_cluster, resource.1.bigip_instance_name] }
+  bigip_standby_floating_ip:
+    value: { get_attr: [device_cluster, resource.1.bigip_instance_floating_ip] }

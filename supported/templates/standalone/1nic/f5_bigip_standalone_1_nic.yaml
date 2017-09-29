@@ -1,0 +1,236 @@
+heat_template_version: 2016-04-08
+
+description: This template deploys a standard f5 standalone BIG-IP VE - 1NIC.
+
+parameters:
+  bigip_image:
+    type: string
+    label: f5 BIG-IP VE Image
+    description: The BIG-IP VE image to be used on the compute instance.
+    constraints:
+      - custom_constraint: glance.image
+  bigip_flavor:
+    type: string
+    label: f5 BIG-IP VE Flavor
+    description: Type of instance (flavor) to be used for the VE.
+    default: m1.medium
+    constraints:
+      - custom_constraint: nova.flavor
+  use_config_drive:
+    type: boolean
+    label: Use Config Drive
+    description: Use config drive to provide meta and user data.
+    default: false
+  f5_cloudlibs_tag:
+    type: string
+    label: f5 CloudLibs Tag
+    description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: v3.3.0
+  f5_cloudlibs_url_override:
+    type: string
+    label: f5 cloud-libs URL Override
+    description: Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: None
+  f5_cloudlibs_verify_hash_url_override:
+    type: string
+    label: f5 cloud-libs verifyHash URL Override
+    description: Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
+    default: None
+  bigip_servers_ntp:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE NTP servers
+    description: A list of NTP servers to configure on the BIG-IP.
+    default:
+      - 0.us.pool.ntp.org
+      - 1.us.pool.ntp.org
+  bigip_servers_dns:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE Domain Name Servers
+    description: A list of DNS servers to configure on the BIG-IP.
+    default:
+      -
+  #bigip credentials
+  bigip_os_ssh_key:
+    type: string
+    label: f5 BIG-IP VE Root SSH Key Name
+    description: Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access.
+    constraints:
+      - custom_constraint: nova.keypair
+  bigip_admin_pwd:
+    type: string
+    label: f5 BIG-IP VE Admin User Password
+    description: Password for the BIG-IP admin user.
+    hidden: true
+  bigip_root_pwd:
+    type: string
+    label: f5 BIG-IP VE Root User Password
+    description: Password for the BIG-IP root user.
+    hidden: true
+  #bigip licensing
+  bigip_license_key:
+    type: string
+    label: Primary BIG-IP VE License Base Key
+    description: f5 BIG-IP License Base Key.
+  bigip_addon_license_keys:
+    type: comma_delimited_list
+    label: Additional BIG-IP VE License Keys
+    description: f5 BIG-IP License Add-On Keys.
+    default:
+      -
+  bigip_modules:
+    type: comma_delimited_list
+    label: Modules to provision on the BIG-IP.
+    description: A list modules to provision and their level. <module_name:level>
+    default:
+      - ltm:nominal
+  #os network
+  external_network:
+    type: string
+    label: External Network Name
+    description: Name of external network where floating IP resides.
+    constraints:
+      - custom_constraint: neutron.network
+  mgmt_network:
+    type: string
+    label: Management Network
+    description: Network to which the BIG-IP management interface is attached.
+    constraints:
+      - custom_constraint: neutron.network
+  mgmt_security_group_name:
+    type: string
+    label: Management Security Group Name
+    description: Name to apply on the security group for the BIG-IP management network.
+  #bigip network
+  bigip_mgmt_port:
+    type: number
+    label: Management port
+    description: Port for the BIG-IP Management uri
+    default: 8443
+
+parameter_groups:
+- label: BIG-IP General Provisioning
+  parameters:
+  - bigip_image
+  - bigip_flavor
+  - use_config_drive
+  - f5_cloudlibs_tag
+  - f5_cloudlibs_url_override
+  - f5_cloudlibs_verify_hash_url_override
+  - bigip_servers_ntp
+  - bigip_servers_dns
+- label: BIG-IP Credentials
+  parameters:
+  - bigip_os_ssh_key
+  - bigip_admin_pwd
+  - bigip_root_pwd
+- label: BIG-IP Licensing and Modules
+  parameters:
+  - bigip_license_key
+  - bigip_addon_license_keys
+  - bigip_modules
+- label: OS Network
+  parameters:
+  - external_network
+  - mgmt_network
+  - mgmt_security_group_name
+- label: BIG-IP Network
+  parameters:
+  - bigip_mgmt_port
+
+resources:
+  wait_condition_onboard_complete:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle_onboard}
+      count: 3
+      timeout: 1800
+  wait_handle_onboard:
+    type: OS::Heat::WaitConditionHandle
+  mgmt_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: mgmt_network }
+      security_groups: [{ get_attr: [mgmt_security_group, mgmt_security_group_id] }]
+  mgmt_security_group:
+    type: F5::BigIP::ManagementSecurityGroup
+    properties:
+      security_group_name: { get_param: mgmt_security_group_name }
+      management_port: { get_param: bigip_mgmt_port }
+  floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: external_network }
+      port_id: { get_resource: mgmt_port }
+  init_1_override_default_config:
+    type: F5::BigIP::OverrideDefaultConfig
+    properties:
+      admin_password: { get_param: bigip_admin_pwd }
+      root_password: { get_param: bigip_root_pwd }
+  init_2_onboard_libs:
+    type: F5::BigIP::OnboardingLibs
+    properties:
+      cloudlibs_tag: { get_param: f5_cloudlibs_tag }
+      cloudlibs_url_override: { get_param: f5_cloudlibs_url_override }
+  init_3_onboard_scripts:
+    type: F5::BigIP::OnboardingScripts
+    properties:
+      verify_hash_url_override: { get_param: f5_cloudlibs_verify_hash_url_override}
+      bigip_addon_licenses: { get_param: bigip_addon_license_keys }
+      bigip_license: { get_param: bigip_license_key }
+      modules: { get_param: bigip_modules }
+      ntp: { get_param: bigip_servers_ntp }
+      dns: { get_param: bigip_servers_dns }
+      host_name: { get_attr: [mgmt_port, show, dns_assignment, 0, fqdn] }
+      management_ip: { get_attr: [mgmt_port, fixed_ips, 0, ip_address] }
+      management_port: { get_param: bigip_mgmt_port }
+      ssh_key_name: { get_param: bigip_os_ssh_key }
+      use_config_drive: { get_param: use_config_drive }
+      wait_handle_curl: { get_attr: [wait_handle_onboard, curl_cli] }
+  init_4_run_commands:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        runcmd:
+          - nohup /config/preOnboard.sh &>> /var/log/preOnboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_DONE -o /var/log/postOnboard.log' &>> /var/log/runScript.log < /dev/null &
+  bigip_provision:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: init_1_override_default_config}
+      - config: {get_resource: init_2_onboard_libs}
+      - config: {get_resource: init_3_onboard_scripts}
+      - config: {get_resource: init_4_run_commands}
+  bigip_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: bigip_image }
+      flavor: { get_param: bigip_flavor }
+      key_name: { get_param: bigip_os_ssh_key }
+      #admin_user: root
+      config_drive: { get_param: use_config_drive }
+      networks:
+        - port: {get_resource: mgmt_port}
+      user_data_format: RAW
+      user_data: {get_resource: bigip_provision}
+outputs:
+  bigip_instance_id:
+    description: ID of the BIG-IP instance
+    value: { get_resource: bigip_instance }
+  bigip_instance_name:
+    description: Name of the BIG-IP instance
+    value: { get_attr: [bigip_instance, name] }
+  floating_ip:
+    description: The Floating IP address of the BIG-IP instance
+    value: { get_attr: [floating_ip, floating_ip_address] }
+  mgmt_ip:
+    description: The mgmt IP address of BIG-IP instance
+    value: { get_attr: [mgmt_port, fixed_ips, 0, ip_address] }
+  mgmt_mac:
+    description: The mgmt MAC address of BIG-IP instance
+    value: { get_attr: [mgmt_port, mac_address] }
+  mgmt_port_id:
+    description: The port id of the BIG-IP mgmt interface
+    value: { get_resource: mgmt_port }

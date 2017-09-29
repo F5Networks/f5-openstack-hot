@@ -1,0 +1,140 @@
+heat_template_version: 2016-04-08
+
+description: This template creates additional scripts required to provision a Big-IP.
+
+parameters:
+  verify_hash_url_override:
+    type: string
+    label: Script verifyHash override source URL
+    description: The URL to the source of verifyHash script override
+    default: None
+  bigip_addon_licenses:
+    type: comma_delimited_list
+    label: Additional VE License Keys
+    description: f5 TMOS License Add-On Keys.
+    default:
+      - 
+  bigip_license:
+    type: string
+    label: Primary VE License Base Key
+    description: f5 TMOS License Basekey
+  modules:
+    type: json
+    label: Modules to provision on the BIG-IP.
+    description: A list of modules to provision and their respective levels. <module_name:level>
+  ntp:
+    type: comma_delimited_list
+    label: NTP servers
+    description: A list of NTP servers
+  dns:
+    type: comma_delimited_list
+    label: Domain Name Servers
+    description: A list of Domain Name Servers
+  host_name:
+    type: string
+    label: Host Name
+    description: BIG-IP Host Name
+  management_ip:
+    type: string
+    label: Management IP
+    description: BIG-IP Management IP address
+  management_port:
+    type: number
+    label: Management Port
+    description: Management port for the BIG-IP admin
+  ssh_key_name:
+    type: string
+    label: SSH Key Name
+    description: SSH Key Name to inject for Big-IP Access. 
+  use_config_drive:
+    type: boolean
+    label: Enable Config Drive
+    description: Determines if cloud init data is polled from config drive instead of metadata service. 
+    default: false
+  wait_handle_curl:
+    type: string
+    label: Wait Handle 
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+resources:
+  onboarding_scripts:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+        - path: /config/verifyHash
+          permissions: 0755
+          owner: root:root
+          content: { get_file: ../scripts/verifyHash }
+        - path: /config/preOnboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __ssh_key_name__: { get_param: ssh_key_name }
+                  __use_config_drive__: { get_param: use_config_drive }
+                  __verify_hash_override__: { get_param: verify_hash_url_override }
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/preOnboard.sh }
+        - path: /config/wait_cloudlibs_install.sh
+          permissions: 0755
+          owner: root:root
+          content: { get_file: ../scripts/wait_cloudlibs_install.sh }
+        - path: /config/postOnboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/postOnboard.sh }
+        - path: /config/onboard.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                  __license__: { get_param: bigip_license }
+                  __host_name__: { get_param: host_name }
+                  __mgmt_ip__: { get_param: management_ip }
+                  __mgmt_port__: { get_param: management_port }
+                  __add_on_licenses__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --add-on "addon"
+                          for_each:
+                            addon: {get_param: bigip_addon_licenses}
+                  __dns__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --dns server_dns
+                          for_each:
+                            server_dns: {get_param: dns}
+                  __modules__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --module bigip_module
+                          for_each:
+                            bigip_module: {get_param: modules}
+                  __ntp__:
+                    list_join:
+                      - ' '
+                      - 
+                        repeat:
+                          template: --ntp server_ntp
+                          for_each:
+                            server_ntp: {get_param: ntp}
+                  wc_notify: { get_param: wait_handle_curl}
+              template: { get_file: ../scripts/onboard.sh }
+
+outputs:
+  OS::stack_id:
+    description: The F5::BigIP::OnboardingScripts resource.
+    value:
+      get_resource: onboarding_scripts

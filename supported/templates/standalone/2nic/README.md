@@ -1,8 +1,8 @@
-# Deploying the BIG-IP in OpenStack - n-NIC
+# Deploying the BIG-IP in OpenStack - 2 NIC
 
 ## Introduction
  
-This solution uses a Heat Orchestration Template to launch a n-NIC deployment of a BIG-IP VE in an Openstack Private Cloud. In a n-NIC implementation, one interface is for management and data-plane traffic from the Internet, and the user-provided NIC count determines the number of additional NICs. 
+This solution uses a Heat Orchestration Template to launch a 2-NIC deployment of a BIG-IP VE in an Openstack Private Cloud. In a 2-NIC implementation, one interface is for management and data-plane traffic from the Internet, and the second interface is connected into the networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
 
 The **standalone** heat orchestration template incorporates existing networks defined in Neutron. 
 
@@ -46,7 +46,7 @@ We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.c
 
 #### CLI Example
 ```
-openstack stack create stack-nnic-test -t src/f5-openstack-hot/experimental/templates/standalone/nnic/f5_bigip_standalone_n_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/nnic/f5_bigip_standalone_n_nic_env.yaml
+openstack stack create stack-2NIC-test -t src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic.yaml -e src/f5-openstack-hot/experimental/templates/standalone/2nic/f5_bigip_standalone_2_nic_env.yaml
 ```
 
 ### Parameters
@@ -54,68 +54,57 @@ The following parameters can be defined in your environment file.
 <br>
 
 #### BIG-IP General Provisioning
+
 | Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
+| --- | --- | --- | --- |
 | bigip_image | x | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
 | bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
 | f5_cloudlibs_tag |  | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
 | f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
-| f5_cloudlibs_verify_hash_url_override |  | Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
 | bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
 | bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
-
-
-#### BIG-IP nNIC Provisioning
-| Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
-| bigip_nic_count | x | Number of additional NICs to attach to the BIG-IP. Note: exclude management nic from count. | min: 1 max: 10 |
-| bigip_last_nic_index | x | The 0-based index of the last NIC setup to wait to finish before performing post-onboard operations. This is usually bigip_nic_count minus 1. | min: 0 max: 9 |
-
 
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
+| --- | --- | --- | --- |
 | bigip_os_ssh_key | x | Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
 | bigip_admin_pwd | x | Password for the BIG-IP admin user. |  |
 | bigip_root_pwd | x | Password for the BIG-IP root user. |  |
 
-
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
+| --- | --- | --- | --- |
 | bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
 | bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
-
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
+| --- | --- | --- | --- |
 | external_network | x | Name of external network where floating IP resides. | Network must exist |
 | mgmt_network | x | Network to which the BIG-IP management interface is attached. | Network must exist |
 | mgmt_security_group_name | x | Name to apply on the security group for the BIG-IP management network. |  |
-| network_vlan_security_group_rules | x | The rules to apply to the security group | OS::Neutron::SecurityGroup rules |
-| network_vlan_names | x | OS Neutron Network to map to the BIG-IP VLANs | Networks must exist |
-| network_vlan_subnets | x | The Neutron Subnet for the corresponding BIG-IP VLANs.  | Subnet must exist |
-
+| network_vlan_security_group_name | x | Name to apply on the security group for BIG-IP VLAN. |  |
+| network_vlan_name | x | OS Neutron Network to map to the BIG-IP VLAN | Network must exist |
+| network_vlan_subnet | x | The Neutron Subnet for the corresponding BIG-IP VLAN.  | Subnet must exist |
 
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
-| --- | :---: | --- | --- |
+| --- | --- | --- | --- |
 | bigip_default_gateway |  | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port |  | Default 443 |  |
-| bigip_vlan_names |  | Names of the VLAN to be created on the BIG-IP. |  |
-| bigip_vlan_mtus |  | MTU values of the VLAN on the BIG-IP. Default 1400 |  |
-| bigip_vlan_tags |  | Tag to apply on the VLAN on the BIG-IP. Use default value "None" for untagged |  |
-| bigip_self_ip_addresses | x | Self-IP addresses to associate with the BIG-IP VLAN.  | A static value must be supplied. |
-| bigip_self_cidr_blocks | x | CIDR Blocks for the BIG-IP SelfIP address. |  |
-| bigip_self_port_lockdowns |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
-
+| bigip_vlan_name |  | Name of the VLAN to be created on the BIG-IP. Default "data" |  |
+| bigip_vlan_mtu |  | MTU value of the VLAN on the BIG-IP. Default 1400 |  |
+| bigip_vlan_tag |  | Tag to apply on the VLAN on the BIG-IP. Use default value "None" for untagged |  |
+| bigip_vlan_nic |  | The NIC associated with the BIG-IP VLAN. For 2-NIC this defaults to 1.1 |  |
+| bigip_self_ip_addr | x | Self-IP address to associate with the BIG-IP VLAN.  | A static value must be supplied. |
+| bigip_self_cidr_block | x | CIDR Block for the BIG-IP SelfIP address. |  |
+| bigip_self_port_lockdown |  | Optional list of service:port lockdown settings for the VLAN. If no value is supplied, default is used.  |  Syntax: List of `service:port` example: `[tcp:443, tcp:22]` |
 
 <br>
 

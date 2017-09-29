@@ -1,0 +1,42 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_license_keys:
+    - bigip1baseLicenseKey
+    - bigip2baseLicenseKey
+  bigip_addon_license_keys: 
+    - bigip1addonKey1;bigip1addonKey2;bigip1addonKey3
+    - bigip2addonKey1;bigip1addonKey2;bigip2addonKey3
+  bigip_modules:
+    - ltm:nominal
+    - ilx:minimum
+  external_network: external_net
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: Mgmt_secgroup_2_NIC_cluster
+  network_vlan_name: data_net
+  network_vlan_subnet: data_subnet
+  network_vlan_security_group_name: Data_secgroup_2_NIC_cluster
+  bigip_vlan_nic: "1.1"
+  bigip_self_ip_addresses:
+    - 10.1.9.155
+    - 10.1.9.154
+  bigip_self_cidr_block: 10.1.9.0/24
+  bigip_vlan_mtu: 1400
+  bigip_cluster_self_ip_addresses:
+    - 10.1.9.145
+    - 10.1.9.144
+
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfig: ../../../configs/onboarding_network_config.yaml
+  F5::BigIP::OnboardClusterConfig: ../../../configs/onboarding_cluster_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::ClusterInstance2Nic: ../../../templates/cluster/2nic/f5_bigip_cluster_instance_2_nic.yaml

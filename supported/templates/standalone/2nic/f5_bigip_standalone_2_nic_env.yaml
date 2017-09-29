@@ -1,0 +1,33 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_license_key: baseLicenseKey
+  bigip_addon_license_keys: 
+    - addonKey1
+    - addonKey2
+  bigip_modules:
+    - ltm:nominal
+  external_network: external_net
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: Mgmt_secgroup_2_NIC
+  network_vlan_name: data_net
+  network_vlan_subnet: data_subnet
+  network_vlan_security_group_name: Data_secgroup_2_NIC
+  bigip_self_ip_addr: 10.1.9.70
+  bigip_self_cidr_block: 10.1.9.0/24
+  bigip_self_port_lockdown: 
+    - tcp:4353
+    - tcp:22
+    - tcp:443
+  bigip_default_gateway: 10.1.9.1
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfig: ../../../configs/onboarding_network_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../security_groups/bigip_data_security_group.yaml

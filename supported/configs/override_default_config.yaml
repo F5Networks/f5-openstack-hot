@@ -1,0 +1,77 @@
+heat_template_version: 2016-04-08
+
+description: This template performs overrides of defaults for a standard f5 standalone VE image.  
+
+parameters:
+  admin_password:
+    type: string
+    label: f5 VE Admin User Password
+    description: Password used to perform image import services.
+    hidden: true  
+  root_password:
+    type: string
+    label: f5 VE Root User Password
+    description: Password used to perform image import services.
+    hidden: true
+resources:
+  random_password_admin:
+    type: OS::Heat::RandomString
+    properties:
+      length: 10
+      character_classes:
+        - class: letters
+          min: 3
+        - class: digits
+          min: 3
+  random_password_root:
+    type: OS::Heat::RandomString
+    properties:
+      length: 10
+      character_classes:
+        - class: letters
+          min: 1
+        - class: digits
+          min: 1
+  override_default_config:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: 
+        str_replace:
+          params:
+              __admin_password_random__: { get_attr: [random_password_admin, value] }
+              __root_password_random__: { get_attr: [random_password_root, value] }
+              __admin_password__: { get_param: admin_password }
+              __root_password__: { get_param: root_password }
+          template: |
+              #!/bin/bash
+              echo '******Overriding Default Configuration******'
+              /usr/bin/setdb provision.1nicautoconfig disable
+              /usr/bin/passwd admin __admin_password_random__ >/dev/null 2>&1
+              /usr/bin/passwd root __root_password_random__ >/dev/null 2>&1
+
+              echo "" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "********************************************************" >> /dev/kmsg
+              echo "*                                                      *" >> /dev/kmsg
+              echo "* random root password = __root_password_random__      *" >> /dev/kmsg
+              echo "* random admin password = __admin_password_random__    *" >> /dev/kmsg
+              echo "*                                                      *" >> /dev/kmsg
+              echo "********************************************************" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "" >> /dev/kmsg
+              echo "    r=__root_password_random__  a=__admin_password_random__" >> /etc/issue
+              echo "" >> /etc/issue
+
+              mkdir -m 0755 -p /config/cloud/openstack
+              cd /config/cloud/openstack
+              echo __admin_password__ >> /config/cloud/openstack/adminPwd
+              echo __admin_password_random__ >> /config/cloud/openstack/adminPwdRandom
+              echo __root_password__ >> /config/cloud/openstack/rootPwd
+              echo __root_password_random__ >> /config/cloud/openstack/rootPwdRandom
+
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::PasswordConfig resource.
+    value:
+      get_resource: override_default_config

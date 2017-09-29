@@ -147,12 +147,12 @@ parameters:
   # f5_cloudlibs_verify_hash_url_override: https://raw.githubusercontent.com/F5Networks/f5-cloud-libs/v3.3.2/dist/verifyHash
 
 resource_registry:
-  F5::BigIP::OverrideDefaultConfig: ../../../experimental/configs/override_default_config.yaml
-  F5::BigIP::OnboardingLibs: ../../../experimental/configs/onboarding_libs.yaml
-  F5::BigIP::OnboardingScripts: ../../../experimental/configs/onboarding_scripts.yaml
-  F5::BigIP::OnboardNetworkConfigIndexed: ../../../experimental/configs/onboarding_network_config_indexed.yaml
-  F5::BigIP::ManagementSecurityGroup: ../../../experimental/security_groups/bigip_mgmt_security_group.yaml
-  F5::BigIP::CustomSecurityGroup: ../../../experimental/security_groups/bigip_custom_security_group.yaml
-  F5::BigIP::NeutronPort: ../../../experimental/networks/bigip_neutron_port.yaml
-  F5::BigIP::NNicHandler: ../../../experimental/networks/bigip_nnic_handler.yaml
-  F5::BigIP::RunOnboardNetworkConfigs: ../../../experimental/configs/run_onboard_network_configs.yaml
+  F5::BigIP::OverrideDefaultConfig: ../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfigIndexed: ../../../configs/onboarding_network_config_indexed.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::CustomSecurityGroup: ../../../security_groups/bigip_custom_security_group.yaml
+  F5::BigIP::NeutronPort: ../../../networks/bigip_neutron_port.yaml
+  F5::BigIP::NNicHandler: ../../../networks/bigip_nnic_handler.yaml
+  F5::BigIP::RunOnboardNetworkConfigs: ../../../configs/run_onboard_network_configs.yaml

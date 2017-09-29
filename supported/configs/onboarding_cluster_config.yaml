@@ -1,0 +1,84 @@
+heat_template_version: 2016-04-08
+
+description: This template configures clustering components for a standard f5 VE image in an active/standby group.  
+
+parameters:
+  mgmt_ip:
+    type: string
+    label: f5 BIG-IP Management IP address
+    description: Management IP address of the BIG-IP.
+  mgmt_port:
+    type: number
+    label: f5 BIG-IP Management Port
+    description: Management port of the BIG-IP.
+  master_mgmt_ip:
+    type: string
+    label: f5 BIG-IP Master Management IP
+    description: Management IP Address of the master BIG-IP.
+  config_sync_ip:
+    type: string
+    label: f5 BIG-IP Cluster Self-IP 
+    description: ConfigSync IP Address of this BIG-IP.
+  device_group:
+    type: string
+    label: f5 BIG-IP Device Group Name
+    description: Name of the BIG-IP Group to create or join.
+    default: Sync
+  sync_type:
+    type: string
+    label: f5 BIG-IP Cluster Sync Type
+    description: Sync type for clustering.
+    default: sync-failover
+  auto_sync:
+    type: boolean
+    label: f5 BIG-IP Cluster Auto Sync
+    description: Enable config-sync auto-sync.
+    default: true
+  save_on_auto_sync:
+    type: boolean
+    label: f5 BIG-IP Cluster Save On Auto Sync
+    description: Enable config-sync auto-sync.
+    default: true
+  host_name:
+    type: string
+    label: f5 BIG-IP Host Name
+    description: Device Name for the BIG-IP. 
+  use_config_drive:
+    type: boolean
+    label: Use Config Drive
+    description: Use config drive to provide meta and user data.
+  wait_handle_curl:
+    type: string
+    label: Wait Handle 
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+
+resources:
+  onboard_cluster_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        write_files:
+        - path: /config/onboard-cluster.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                __mgmt_ip__: { get_param: mgmt_ip}
+                __mgmt_port__: { get_param: mgmt_port }
+                __master_mgmt_ip__: { get_param: master_mgmt_ip}
+                __device_group__: { get_param: device_group }
+                __sync_type__: { get_param: sync_type }
+                __auto_sync__: { get_param: auto_sync }
+                __host_name__: { get_param: host_name }
+                __save_on_auto_sync__: { get_param: save_on_auto_sync }
+                __config_sync_ip__: { get_param: config_sync_ip }
+                __use_config_drive__: { get_param: use_config_drive }
+                wc_notify: { get_param: wait_handle_curl }
+              template: { get_file: ../scripts/onboard-cluster.sh}
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::OnboardClusterConfig resource.
+    value:
+      get_resource: onboard_cluster_config
