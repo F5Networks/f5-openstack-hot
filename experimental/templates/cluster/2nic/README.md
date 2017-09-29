@@ -20,9 +20,17 @@ The **cluster** heat orchestration template incorporates existing networks defin
   - :exclamation:**Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Please take note of the following when supplying password values:
       - The BIG-IP version and any default policies that may apply
       - Any characters recommended that you avoid
+  - This template leverages the built in heat resource type *OS::Heat::WaitCondition* to track status of onboarding by sending signals to the orchestration API.
 
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of verifyHash file in /scripts/verifyHash.
+
+Instance configuration data is retrieved from metadata service. OpenStack supports encrypting the metadata traffic.
+If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
+For more information, please refer to:
+- https://docs.openstack.org/heat/latest/template_guide/software_deployment.html
+- https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic
+
 
 ## Supported instance types and OpenStack versions:
  - BIG-IP Virtual Edition Image Version 13.0 or later

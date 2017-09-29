@@ -23,7 +23,7 @@ function run_custom_config() {
 
 function send_heat_signal() {
     echo "$msg"
-    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --insecure  --retry-max-time 300 --retry-delay 30
+    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
 }
 
 function main() {

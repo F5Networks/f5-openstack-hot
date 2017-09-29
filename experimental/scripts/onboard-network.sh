@@ -128,7 +128,7 @@ else
 fi
 
 echo "$msg"
-wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --insecure  --retry-max-time 300 --retry-delay 30
+wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
 
 if [[ "$vlan_nic_index" == "" || "$vlan_nic_index" == "None" || "$vlan_nic_index" == "$vlan_last_nic_index" ]]; then
     echo "Disabling dhclient for mgmt nic"

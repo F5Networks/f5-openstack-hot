@@ -199,8 +199,8 @@ parameter_groups:
   - bigip_servers_dns
 - label: BIG-IP nNIC Provisioning
   parameters:
-  - bigip_os_ssh_key
-  - bigip_admin_pwd
+  - bigip_nic_count
+  - bigip_last_nic_index
 - label: BIG-IP Credentials
   parameters:
   - bigip_os_ssh_key
