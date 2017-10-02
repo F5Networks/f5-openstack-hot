@@ -27,7 +27,7 @@ package:
         - cd dist
         - openssl dgst -sha512 f5-openstack-hot-supported.tar.gz | cut -d ' ' -f 2
     artifacts:
-        name: f5-openstack-hot-supported-$CI_BUILD_REF
+        name: f5-openstack-hot-supported-$CI_COMMIT_SHA
         paths:
             - dist/
 
