@@ -1,20 +1,7 @@
 image: node:4
 
 stages:
-    - build
     - package
-
-build:
-    tags:
-        - docker-executor
-    stage: build
-    only: 
-        - /^build-hash*/
-        - /^release-.*/
-        - triggers
-    script:
-        - tar -zcvf dist/f5-openstack-hot-supported.tar.gz supported
-
 package:
     tags:
         - docker-executor
@@ -24,6 +11,7 @@ package:
         - /^release-.*/
         - triggers
     script:
+        - tar -zcvf dist/f5-openstack-hot-supported.tar.gz supported
         - cd dist
         - openssl dgst -sha512 f5-openstack-hot-supported.tar.gz | cut -d ' ' -f 2
     artifacts:
