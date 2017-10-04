@@ -11,7 +11,7 @@ Welcome to the GitHub repository for F5's Heat Orchestration Templates for deplo
   The *experimental* directory also contains heat templates that have been created by F5 Networks. However, these templates have not completed full testing and are subject to change. F5 Networks does not offer technical support for templates in the experimental directory, so use these templates with caution.
 
 ## Template information
-These templates employ similar pattern as Openstack TripleO wherein the common/reusable templates and components such as software configs and scripts are referenced by parent templates. When launching a stack, you only need to specify the parent template as the template param, and Heat engine automatically takes care of the dependencies. 
+These templates employ similar pattern as OpenStack TripleO wherein the common/reusable templates and components such as software configs and scripts are referenced by parent templates. When launching a stack, you only need to specify the parent template as the template param, and Heat engine automatically takes care of the dependencies. 
 
 Descriptions for each template are contained at the top of each template in the *Description* key.
 For additional information, and assistance in deploying a template, see the README file on the individual template pages.
@@ -26,10 +26,10 @@ Please refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-h
 
 ### OpenStack
 The templates are developed on an operational OpenStack Mitaka deployment. 
-For additional resources on configuring environments with F5 Integration for OpenStack Neutron LBaaS, please refer to this [configuration guide](http://clouddocs.f5.com/cloud/openstack/v1/lbaas/index.html) 
+For additional resources on configuring environments with F5 Integration for OpenStack Neutron LBaaS, refer to this [configuration guide](http://clouddocs.f5.com/cloud/openstack/v1/lbaas/index.html) 
 
 ## Prerequisites
-The following is a summary of prerequisites for sucessfully launching templates from this repo:
+The following is a summary of prerequisites for successfully launching templates from this repo:
   - Neutron Components:
     - Management network and subnet (where management UI can be accessed)
     - External network and subnet (where floating IP resides)
@@ -50,8 +50,8 @@ Copyright 2014-2017 F5 Networks Inc.
 ### License
 
 
-Apache V2.0
-~~~~~~~~~~~
+### Apache V2.0
+
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
 License at:
@@ -65,7 +65,7 @@ See the License for the specific language governing permissions and limitations
 under the License.
 
 
-Contributor License Agreement
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Contributor License Agreement
+
 Individuals or business entities who contribute to this project must have
 completed and submitted the `F5 Contributor License Agreement`
