@@ -13,9 +13,9 @@ package:
     script:
         - tar -zcvf dist/f5-openstack-hot-supported.tar.gz supported
         - cd dist
-        - openssl dgst -sha512 f5-openstack-hot-supported.tar.gz | cut -d ' ' -f 2
+        - openssl dgst -sha512 f5-openstack-hot-supported.tar.gz | cut -d ' ' -f 2 >> hashes
     artifacts:
-        name: f5-openstack-hot-supported-$CI_COMMIT_SHA
+        name: f5-openstack-hot-supported-$CI_BUILD_REF
         paths:
             - dist/
 
