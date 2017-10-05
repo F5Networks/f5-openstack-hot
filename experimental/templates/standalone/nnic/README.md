@@ -1,5 +1,9 @@
 # Deploying the BIG-IP in OpenStack - nNIC
 
+[![Slack Status](https://f5cloudsolutions.herokuapp.com/badge.svg)](https://f5cloudsolutions.herokuapp.com)
+[![Releases](https://img.shields.io/github/release/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/releases)
+[![Issues](https://img.shields.io/github/issues/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/issues)
+
 ## Introduction
  
 This solution uses a Heat Orchestration Template to launch a nNIC (multi NIC) deployment of a BIG-IP VE in an Openstack Private Cloud. In a nNIC implementation, one interface is for management and data-plane traffic from the Internet, and the user-provided NIC count determines the number of additional NICs. 

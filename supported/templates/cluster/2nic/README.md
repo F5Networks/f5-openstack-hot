@@ -1,5 +1,9 @@
 # Deploying the BIG-IP in OpenStack - Clustered 2 NIC
 
+[![Slack Status](https://f5cloudsolutions.herokuapp.com/badge.svg)](https://f5cloudsolutions.herokuapp.com)
+[![Releases](https://img.shields.io/github/release/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/releases)
+[![Issues](https://img.shields.io/github/issues/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/issues)
+
 ## Introduction
  
 This solution uses a Heat Orchestration Template to launch and configure two BIG-IP 2-NIC VEs in a clustered, highly available configuration in an Openstack Private Cloud.  When you deploy your applications behind a HA pair of F5 BIG-IP VEs, the BIG-IP VE instances are all in Active-Standby, and are used as a single device for failover. If one device becomes unavailable, the standby takes over traffic management duties, ensuring you have the highest level of availability for your applications. You can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
