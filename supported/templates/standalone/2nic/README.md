@@ -56,7 +56,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP General Provisioning
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_image | Yes | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
 | bigip_flavor | Yes | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive | No | Use config drive to provide meta and user data. With the default value of false, the metadata service is used instead. |  |
@@ -68,7 +68,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_os_ssh_key | Yes | Name of the key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
 | bigip_admin_pwd | Yes | Password for the BIG-IP admin user. |  |
 | bigip_root_pwd | Yes | Password for the BIG-IP root user. |  |
@@ -76,7 +76,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_license_key | Yes | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys | No | Additional BIG-IP VE License Keys |  |
 | bigip_modules | No | Modules to provision on the BIG-IP VE.  The default is `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
@@ -84,7 +84,7 @@ The following parameters can be defined in your environment file.
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | external_network | Yes | Name of the external network where the floating IP resides. | Network must exist |
 | mgmt_network | Yes | Network to which the BIG-IP management interface is attached. | Network must exist |
 | mgmt_security_group_name | Yes | Name to apply on the security group for the BIG-IP management network. |  |
@@ -95,7 +95,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_default_gateway | No | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port | No | The default is **443** |  |
 | bigip_vlan_name | No | Name of the VLAN to be created on the BIG-IP. The default is **data** |  |

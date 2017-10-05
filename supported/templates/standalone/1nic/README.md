@@ -8,8 +8,8 @@ The **standalone** heat orchestration template incorporates existing networks de
 
 ## Prerequisites and configuration notes
   - Management Interface IP is determined via DHCP. 
-  - If you do not specify a URL override (the parameter name is f5_cloudlibs_url_override), the default location is GitHub and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
-  - If you specify a value for f5_cloudlibs_url_override or f5_cloudlibs_tag, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+  - If you do not specify a URL override (the parameter name is **f5_cloudlibs_url_override**), the default location is GitHub and the subnet for the management network requires a route and access to Internet for the initial configuration to download the BIG-IP cloud library.
+  - If you specify a value for **f5_cloudlibs_url_override** or **f5_cloudlibs_tag**, ensure that corresponding hashes are valid by either updating **scripts/verifyHash** or by providing a **f5_cloudlibs_verify_hash_url_override** value.
   - **Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Please take note of the following when supplying password values:
       - The BIG-IP version and any default policies that may apply
       - Any characters you should avoid
@@ -57,10 +57,10 @@ The following parameters can be defined in your environment file.
 #### BIG-IP General Provisioning
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_image | Yes | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
 | bigip_flavor | Yes | Type of instance (flavor) to be used for the VE. |  |
-| use_config_drive | No | Use config drive to provide meta and user data. With the default value of false, the metadata service will be used instead. |  |
+| use_config_drive | No | Use config drive to provide meta and user data. With the default value of false, the metadata service is used instead. |  |
 | f5_cloudlibs_tag | No | Tag that determines version of F5 cloudlibs to use for provisioning (onboard helper).  |  |
 | f5_cloudlibs_url_override | No | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
 | bigip_servers_ntp | No | A list of NTP servers to configure on the BIG-IP. |  |
@@ -69,7 +69,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_os_ssh_key | Yes | Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
 | bigip_admin_pwd | Yes | Password for the BIG-IP admin user. |  |
 | bigip_root_pwd | Yes | Password for the BIG-IP root user. |  |
@@ -77,7 +77,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_license_key | Yes | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys | No | Additional BIG-IP VE License Keys |  |
 | bigip_modules | No | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
@@ -85,7 +85,7 @@ The following parameters can be defined in your environment file.
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | external_network | Yes | Name of the external network where the floating IP resides. | Network must exist |
 | mgmt_network | Yes | Network to which the BIG-IP management interface is attached. | Network must exist |
 | mgmt_security_group_name | Yes | Name to apply on the security group for the BIG-IP management network. |  |
@@ -93,7 +93,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_mgmt_port | No | The default is **8443** |  |
 
 <br>

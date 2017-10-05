@@ -64,7 +64,7 @@ echo 'Master device'
     "$autoSync" \
     "$saveOnAutoSync"
 else
-echo 'Slave device'
+echo 'Standby device'
     f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/cluster.js \
     -o /var/log/onboard-cluster.log \
     --log-level debug \

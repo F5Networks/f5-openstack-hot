@@ -9,7 +9,6 @@ In a 2-NIC implementation, each BIG-IP VE has one interface used for management 
 The **cluster** heat orchestration template incorporates existing networks defined in Neutron. 
 
 ## Prerequisites and Configuration Notes
-# Prerequisites and configuration notes
   - The HA (Highly Available) solution consists of two templates that configure clustering:
     - *f5_bigip_cluster_2_nic.yaml*, the parent template that needs to be specified as the template parameter.
     - *f5_bigip_cluster_instance_2_nic.yaml*, the BIG-IP instance-specific template referenced by the parent template.
@@ -64,7 +63,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP General Provisioning 
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_image | Yes | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
 | bigip_flavor | Yes | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive | No | Use config drive to provide meta and user data. With the default value of false, the metadata service is used instead. |  |
@@ -76,7 +75,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_os_ssh_key | Yes | Name of the key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
 | bigip_admin_pwd | Yes | Password for the BIG-IP admin user. |  |
 | bigip_root_pwd | Yes | Password for the BIG-IP root user. |  |
@@ -84,7 +83,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_license_keys | Yes | List of Primary BIG-IP VE License Base Keys | Syntax: List of Base License Keys |
 | bigip_addon_license_keys | No | Additional BIG-IP VE License Keys | Syntax: List of AddOn License Keys. One list item per BIG-IP instance. Each list item consists of add-on keys separated by a semicolon `addonKey1;addonKey2` |
 | bigip_modules | No | Modules to provision on the BIG-IP VE.  The default is `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
@@ -92,7 +91,7 @@ The following parameters can be defined in your environment file.
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | external_network | Yes | Name of the external network where the floating IP resides. | Network must exist |
 | mgmt_network | Yes | Network to which the BIG-IP management interface is attached. | Network must exist |
 | mgmt_security_group_name | Yes | Name to apply on the security group for the BIG-IP management network. |  |
@@ -103,7 +102,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_default_gateway | No | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port | No | The default is 443 |  |
 | bigip_vlan_name | No | Name of the VLAN to be created on the BIG-IP. The default is **data**. |  |
@@ -118,7 +117,7 @@ The following parameters can be defined in your environment file.
 #### BIG-IP Cluster
 
 | Parameter | Required | Description | Constraints |
-| --- | --- | --- | --- |
+| --- | :---: | --- | --- |
 | bigip_device_group | No | Name of the BIG-IP Device Group to create or join. The default is **Sync**  |  |
 | bigip_auto_sync | No | Toggles flag for enabling BIG-IP Cluster Auto Sync. The default is **true**.  |  |
 | bigip_save_on_auto_sync | No | Toggles flag for enabling saving on config-sync auto-sync . The default is **true**.  |  |
