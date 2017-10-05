@@ -19,6 +19,8 @@ The **standalone** heat orchestration template incorporates existing networks de
 ## Security
 This Heat Orchestration Template downloads helper code to configure the BIG-IP system. If you want to verify the integrity of the template, you can open and modify definition of **verifyHash** file in **/scripts/verifyHash**.
 
+Additionally, F5 provides checksums for all of our supported OpenStack heat templates. For instructions and the checksums to compare against, see this [DevCentral link](https://devcentral.f5.com/codeshare/checksums-for-f5-supported-cft-and-arm-templates-on-github-1014) .
+
 Instance configuration data is retrieved from metadata service. OpenStack supports encrypting the metadata traffic.
 If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
 For more information, please refer to:
