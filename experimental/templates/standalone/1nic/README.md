@@ -58,43 +58,43 @@ The following parameters can be defined in your environment file.
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_image | x | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
-| bigip_flavor | x | Type of instance (flavor) to be used for the VE. |  |
-| use_config_drive |  | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
-| f5_cloudlibs_tag |  | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
-| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
-| bigip_servers_ntp |  | A list of NTP servers to configure on the BIG-IP. |  |
-| bigip_servers_dns |  | A list of DNS servers to configure on the BIG-IP. |  |
+| bigip_image | Yes | The BIG-IP VE image to be used on the compute instance. | BIG-IP VE must be 13.0 or later |
+| bigip_flavor | Yes | Type of instance (flavor) to be used for the VE. |  |
+| use_config_drive | No | Use config drive to provide meta and user data. With default value of false, the metadata service will be used instead. |  |
+| f5_cloudlibs_tag | No | Tag that determines version of f5 cloudlibs to use for provisioning (onboard helper).  |  |
+| f5_cloudlibs_url_override | No | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
+| bigip_servers_ntp | No | A list of NTP servers to configure on the BIG-IP. |  |
+| bigip_servers_dns | No | A list of DNS servers to configure on the BIG-IP. |  |
 
 #### BIG-IP Credentials
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_os_ssh_key | x | Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
-| bigip_admin_pwd | x | Password for the BIG-IP admin user. |  |
-| bigip_root_pwd | x | Password for the BIG-IP root user. |  |
+| bigip_os_ssh_key | Yes | Name of key-pair to be installed on the BIG-IP VE instance to allow root SSH access. |  |
+| bigip_admin_pwd | Yes | Password for the BIG-IP admin user. |  |
+| bigip_root_pwd | Yes | Password for the BIG-IP root user. |  |
 
 #### BIG-IP Licensing and Modules
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_license_key | x | Primary BIG-IP VE License Base Key |  |
-| bigip_addon_license_keys |  | Additional BIG-IP VE License Keys |  |
-| bigip_modules |  | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
+| bigip_license_key | Yes | Primary BIG-IP VE License Base Key |  |
+| bigip_addon_license_keys | No | Additional BIG-IP VE License Keys |  |
+| bigip_modules | No | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
 #### OS Network
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| external_network | x | Name of external network where floating IP resides. | Network must exist |
-| mgmt_network | x | Network to which the BIG-IP management interface is attached. | Network must exist |
-| mgmt_security_group_name | x | Name to apply on the security group for the BIG-IP management network. |  |
+| external_network | Yes | Name of external network where floating IP resides. | Network must exist |
+| mgmt_network | Yes | Network to which the BIG-IP management interface is attached. | Network must exist |
+| mgmt_security_group_name | Yes | Name to apply on the security group for the BIG-IP management network. |  |
 
 #### BIG-IP Network
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_mgmt_port |  | Default 8443 |  |
+| bigip_mgmt_port | No | Default 8443 |  |
 
 <br>
 

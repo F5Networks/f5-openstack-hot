@@ -61,7 +61,7 @@ The following parameters can be defined in your environment file.
 | bigip_flavor | Yes | Type of instance (flavor) to be used for the VE. |  |
 | use_config_drive | No | Use config drive to provide meta and user data. With the default value of false, the metadata service is used instead. |  |
 | f5_cloudlibs_tag | No | Tag that determines version of F5 cloudlibs to use for provisioning (onboard helper).  |  |
-| f5_cloudlibs_url_override |  | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
+| f5_cloudlibs_url_override | No | Alternate URL for f5-cloud-libs package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.  |  |
 | bigip_servers_ntp | No | A list of NTP servers to configure on the BIG-IP VE. |  |
 | bigip_servers_dns | No | A list of DNS servers to configure on the BIG-IP VE. |  |
 

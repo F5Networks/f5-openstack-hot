@@ -86,7 +86,7 @@ The following parameters can be defined in your environment file.
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
 | bigip_license_keys | Yes | List of Primary BIG-IP VE License Base Keys | Syntax: List of Base License Keys |
-| bigip_addon_license_keys | | Additional BIG-IP VE License Keys | Syntax: List of AddOn License Keys. One list item per BIG-IP instance. Each list item consists of add-on keys separated by a semicolon `addonKey1;addonKey2` |
+| bigip_addon_license_keys | No | Additional BIG-IP VE License Keys | Syntax: List of AddOn License Keys. One list item per BIG-IP instance. Each list item consists of add-on keys separated by a semicolon `addonKey1;addonKey2` |
 | bigip_modules | No | Modules to provision on the BIG-IP VE.  The default is `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
 #### OS Network
@@ -104,7 +104,7 @@ The following parameters can be defined in your environment file.
 
 | Parameter | Required | Description | Constraints |
 | --- | --- | --- | --- |
-| bigip_default_gateway |  | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
+| bigip_default_gateway | No | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port | No | The default is 443 |  |
 | bigip_vlan_name | No | Name of the VLAN to be created on the BIG-IP. The default is **data**. |  |
 | bigip_vlan_mtu | No | MTU value of the VLAN on the BIG-IP. The default is **1400**. |  |
