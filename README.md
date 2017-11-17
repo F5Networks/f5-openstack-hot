@@ -4,6 +4,20 @@
 [![Releases](https://img.shields.io/github/release/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/releases)
 [![Issues](https://img.shields.io/github/issues/f5networks/f5-openstack-hot.svg)](https://github.com/f5networks/f5-openstack-hot/issues)
 
+<table>
+ <tr>
+  <td align=center>:warning: <strong>CRITICAL<strong> :warning:  </td>
+ </tr>
+ <tr>
+  <td>BIG-IP virtual servers configured with a Client SSL profile may be vulnerable to an Adaptive Chosen Ciphertext attack (AKA Bleichenbacher attack). For complete information on this vulnerability, see https://support.f5.com/csp/article/K21905460. <br>F5 has released hotfixes for all vulnerable releases. <br>  
+   <ul>
+    <li><em>If you have an existing BIG-IP VE deployment in using an F5 OpenStack Heat Orchestration Template </em>  <br>See the <a href="https://support.f5.com/csp/article/K21905460">Security Advisory</a>, which contains information about upgrading your BIG-IP VE to a non-vulnerable version.</li>
+    <li><em>For <strong>new</strong> BIG-IP VE deployments in OpenStack</em><br> F5 has uploaded new, non-vulnerable BIG-IP versions to downloads.f5.com.  Ensure you download the latest HF version. See the <a href="https://support.f5.com/csp/article/K21905460">Security Advisory</a> for details.</li>
+    
+   </ul></td>
+ </tr>
+ </table>
+
 ## Introduction
  
 Welcome to the GitHub repository for F5's Heat Orchestration Templates for deploying F5 in OpenStack environments.  All of the templates in this repository have been developed by F5 Networks engineers. Across all branches in this repository, there are two directories: *supported* and *experimental*
