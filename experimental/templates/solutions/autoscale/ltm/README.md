@@ -6,9 +6,10 @@
 
 ## Introduction
 
-This solution uses a Heat template to launch the deployment of F5 BIG-IP Local Traffic Manager (LTM) Virtual Edition (VE) instances in **OS::Heat::AutoScalingGroup** that can scale arbitrary resources. As thresholds are met, the number of BIG-IP VE LTM instances automatically increases or decreases accordingly. Scaling thresholds are by default based on network.incoming.bytes.rate meter. The meter type can be changed by providing the parameter value. This solution is for BIG-IP LTM only.
+This solution uses a Heat template to launch the deployment of F5 Virtual Edition (VE) instances in **OS::Heat::AutoScalingGroup** that can scale arbitrary resources. The BIG-IP VEs have the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality.
+In this auto scale solution, as thresholds are met, the number of BIG-IP VE LTM instances automatically increases or decreases accordingly. Scaling thresholds are by default based on **network.incoming.bytes.rate** meter. The meter type can be changed by providing the parameter value. This solution is for BIG-IP LTM only.
 
-The BIG-IP VE(s) are configured in 2-NIC mode.In a 2-NIC implementation, each BIG-IP VE has one interface used for management and data-plane traffic from the Internet, and the second interface connected into the Neutron networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
+The BIG-IP VE(s) are configured in 2-NIC mode. In a 2-NIC implementation, each BIG-IP VE has one interface used for management and data-plane traffic from the Internet, and the second interface connected into the Neutron networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
 
 The **autoscale_ltm** heat orchestration template incorporates existing networks defined in Neutron.
 
@@ -16,10 +17,10 @@ The **autoscale_ltm** heat orchestration template incorporates existing networks
   - The autoscale ltm solution consists of two templates that configure clustering:
     - *f5_bigip_autoscale_ltm_2_nic.yaml*, the parent template that needs to be specified as the template parameter.
     - *f5_bigip_autoscale_ltm_instance_2_nic.yaml*, the BIG-IP instance-specific template referenced by the parent template.
-  - There are no fixed ip addresses for the interfaces. The addresses will be determined upon Neutron port creation.
+  - There are no fixed IP addresses for the interfaces. The addresses will be determined upon Neutron port creation.
   - If you do not specify a URL override (the parameter name is **f5_cloudlibs_url_override**), the default location is GitHub and the subnet for the management network requires a route and access to the Internet for the initial configuration to download the BIG-IP cloud library.
   - If you specify a value for **f5_cloudlibs_url_override** or **f5_cloudlibs_tag**, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a **f5_cloudlibs_verify_hash_url_override** value.
-  - **Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Please take note of the following when supplying password values:
+  - **Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Take note of the following when supplying password values:
       - The BIG-IP version and any default policies that may apply
       - Any characters recommended that you avoid
   - This template can send non-identifiable statistical information to F5 Networks to help us improve our templates. See [Sending statistical information to F5](#sending-statistical-information-to-f5).
@@ -50,7 +51,8 @@ For more information, please refer to:
 ### Help
 While this template has been created by F5 Networks, it is in the experimental directory and therefore has not completed full testing and is subject to change.  F5 Networks does not offer technical support for templates in the experimental directory. For supported templates, see the templates in the **supported** directory.
 
-We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on F5 Cloud templates.  This channel is typically monitored Monday-Friday 9-5 PST by F5 employees who will offer best-effort support.
+**Community Support**  
+We encourage you to use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on F5 OpenStack Heat Orchestration templates. There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance. This slack channel community support should **not** be considered a substitute for F5 Technical Support.
 
 ## Launching Stacks
 
@@ -144,7 +146,7 @@ The following parameters can be defined in your environment file.
 | Parameter | Required | Description | Constraints |
 | --- | :---: | --- | --- |
 | autoscale_group_tag | Yes | String value to attach as metadata to instance to help identify membership in the autoscaling group  | Must be unique for the tenant.  |
-| autoscale_meter_name | No | The meter to base the autoscale event on. | The default is **network.incoming.bytes.rate** . **NOTE: Ceilometer must be configured accordingly.**  |
+| autoscale_meter_name | No | The meter on which to base the autoscale event. | The default is **network.incoming.bytes.rate** . **NOTE: Ceilometer must be configured accordingly.**  |
 | autoscale_meter_stat | No | The meter statistic to evaluate. | Allowed values are [count, **avg**, sum, min] |
 | autoscale_adjustment_type | No | Type of adjustment for the scaling policy. | Allowed values are [ **change_in_capacity**, exact_capacity, percent_change_in_capacity] |
 | autoscale_policy_cooldown | No | The cooldown period for the scale up/down policy, in seconds |  |
@@ -192,6 +194,9 @@ This information is critical to the future improvements of templates, but should
 If you find an issue, we would love to hear about it.
 You have a choice when it comes to filing issues:
   - Use the **Issues** link on the GitHub menu bar in this repository for items such as enhancement or feature requests and non-urgent bug fixes. Tell us as much as you can about what you found and how you found it.
+  - Contact us at [solutionsfeedback@f5.com](mailto:solutionsfeedback@f5.com?subject=GitHub%20Feedback) for general feedback or enhancement requests. 
+  - Use our [Slack channel](https://f5cloudsolutions.herokuapp.com) for discussion and assistance on F5 cloud templates. There are F5 employees who are members of this community who typically monitor the channel Monday-Friday 9-5 PST and will offer best-effort assistance.
+  - For templates in the **supported** directory, contact F5 Technical support via your typical method for more time sensitive changes and other issues requiring immediate support.
 
 
 ## Copyright
