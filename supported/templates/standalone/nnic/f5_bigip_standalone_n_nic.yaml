@@ -83,13 +83,13 @@ parameters:
     label: f5 BIG-IP NIC count
     description: Number of additional NICs to attach to the BIG-IP. Note - exclude management nic from count.
     constraints:
-      - range: { min: 1, max: 10 }
+      - range: { min: 1, max: 9 }
   bigip_last_nic_index:
     type: number
     label: f5 BIG-IP last NIC index (0-based)
     description: Index of the last NIC setup to wait to finish. This is usually bigip_nic_count minus 1. Since there are no intrinsic math functions currently supported in heat, this parameter is required.
     constraints:
-      - range: { min: 0, max: 9 }
+      - range: { min: 0, max: 8 }
 
   #bigip credentials
   bigip_os_ssh_key:
