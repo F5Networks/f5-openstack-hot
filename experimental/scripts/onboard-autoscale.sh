@@ -79,6 +79,7 @@ function run_autoscale() {
     --cloud openstack \
     --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
     --device-group "$deviceGroup" \
+    --network-failover \
     --cluster-action "${clusterAction}" \
     "$addtlParam" \
     --license-pool \
@@ -114,6 +115,7 @@ function create_iCall() {
                 --cloud openstack \
                 --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
                 --device-group "$deviceGroup" \
+                --network-failover \
                 --cluster-action "$clusterAction" \
                     --license-pool \
                     --license-pool-name "$bigIqLicPool" \
@@ -182,21 +184,9 @@ function send_heat_signal() {
     wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
 }
 
-# function install_provider() {
-#     curl -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz https://192.168.22.222/cloudsolutions/f5-cloud-libs-openstack/raw/develop/dist/f5-cloud-libs-openstack.tar.gz -k
-#     tar --warning=no-unknown-keyword -zxf /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz -C /config/cloud/openstack/node_modules/f5-cloud-libs/node_modules > /dev/null
-# }
-
-# function temp_fix_cloudlibs() {
-#     # network failover is required to create the sync device group
-#     sed -i "s/autoSync: true/autoSync:true, networkFailover:'enabled'/" /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/autoscale.js
-# }
-
 function main() {
     local logMessage=""
     set_vars
-    # temp_fix_cloudlibs
-    # install_provider
     onboardErrorCount=$(tail /var/log/onboard.log -n 25 | grep "BIG-IP onboard failed" -i -c)
     if [[ "$onboardErrorCount" -gt 0 ]]; then
      logMessage="ERROR: Onboard command did not finish successfuly. Unable to proceed with autoscale set up."
