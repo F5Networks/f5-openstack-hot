@@ -7,6 +7,7 @@
 ## Introduction
 
 This solution uses a Heat template to launch the deployment of F5 Virtual Edition (VE) instances in **OS::Heat::AutoScalingGroup** that can scale arbitrary resources. The BIG-IP VEs have the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality.
+
 In this auto scale solution, as thresholds are met, the number of BIG-IP VE LTM instances automatically increases or decreases accordingly. Scaling thresholds are by default based on **network.incoming.bytes.rate** meter. The meter type can be changed by providing the parameter value. This solution is for BIG-IP LTM only.
 
 The BIG-IP VE(s) are configured in 2-NIC mode. In a 2-NIC implementation, each BIG-IP VE has one interface used for management and data-plane traffic from the Internet, and the second interface connected into the Neutron networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
