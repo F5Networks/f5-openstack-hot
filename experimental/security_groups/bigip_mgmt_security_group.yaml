@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template configures the security group for BIG-IP management VLAN.  
+description: This template configures the security group for BIG-IP management VLAN.
 
 parameters:
   security_group_name:

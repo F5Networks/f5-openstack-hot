@@ -3,6 +3,43 @@ heat_template_version: 2016-04-08
 description: This template creates additional scripts required to provision a Big-IP.
 
 parameters:
+  # Optional Usage Analytics
+  ua_allow:
+    type: boolean
+    label: Allow Usage Analytics
+    description: Toggles whether non-identifiable statistical information is sent to F5.
+    default: True
+  ua_template_name:
+    type: string
+    label: Template Name (Usage Analytics)
+    description: Name of the template used to launch the stack
+    default: None
+  ua_template_version:
+    type: string
+    label: Template Version (Usage Analytics)
+    description: Version of the template used to launch the stack
+    default: None
+  ua_cloudlibs_tag:
+    type: string
+    label: f5-cloud-libs Tag (Usage Analytics)
+    description: Tag that identifies cloudlibs version
+    default: None
+  ua_project_id:
+    type: string
+    label: Project ID (Usage Analytics)
+    description: ID of the template user
+    default: None
+  ua_region:
+    type: string
+    label: Region (Usage Analytics)
+    description: Region where template is launched
+    default: None
+  ua_stack_id:
+    type: string
+    label: Stack Id (Usage Analytics)
+    description: Stack Id or Name
+    default: None
+
   verify_hash_url_override:
     type: string
     label: Script verifyHash override source URL
@@ -13,11 +50,12 @@ parameters:
     label: Additional VE License Keys
     description: f5 TMOS License Add-On Keys.
     default:
-      - 
+      -
   bigip_license:
     type: string
     label: Primary VE License Base Key
     description: f5 TMOS License Basekey
+    default: None
   modules:
     type: json
     label: Modules to provision on the BIG-IP.
@@ -45,22 +83,76 @@ parameters:
   ssh_key_name:
     type: string
     label: SSH Key Name
-    description: SSH Key Name to inject for Big-IP Access. 
+    description: SSH Key Name to inject for Big-IP Access.
   use_config_drive:
     type: boolean
     label: Enable Config Drive
-    description: Determines if cloud init data is polled from config drive instead of metadata service. 
+    description: Determines if cloud init data is polled from config drive instead of metadata service.
     default: false
   wait_handle_curl:
     type: string
-    label: Wait Handle 
+    label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  keep_admin:
+    type: boolean
+    label: Keep Admin
+    description: Toggles removal of admin file after all onboard is done. Set to True if there is an ongoing process that needs access.
+    default: False
+  keep_bigiq:
+    type: boolean
+    label: Keep Big-IQ
+    description: Toggles removal of big-iq file after all onboard is done. Set to True if there is an ongoing process that needs access.
+    default: False
+  keep_config_drive:
+    type: boolean
+    label: Keep Config Drive
+    description: Toggles removal of config drive after initial onboard is done. Set to True if there is a process that needs access after initial onboard.
+    default: False
+  bigiq_use_alt_bigip_mgmt_ip:
+    type: boolean
+    label: Use BIG-IP Alternate Management IP Address for licensing
+    description: Determines whether to provide an alternate management ip address for licensing with BIG-IQ
+    default: false
+  bigiq_alt_bigip_mgmt_ip:
+    type: string
+    label: f5 BIG-IP Alternate License Management IP address
+    description: An alternate management IP address of the BIG-IP instance to use to receive responses for BIG-IQ licensing.
+    default: None
+  bigiq_alt_bigip_mgmt_port:
+    type: string
+    label: f5 BIG-IP Alternate License Management Port
+    description: An alternate management port of the BIG-IP instance to use to receive responses for BIG-IQ licensing.
+    default: None
+  bigiq_license_host_ip:
+    type: string
+    label: f5 BIG-IQ License Host IP Address
+    description: The IP address (or FQDN) for the existing BIG-IQ instance to be used when licensing the BIG-IP. The instance can exist in another cloud environment as long as it is network reachable.
+    default: None
+  bigiq_license_username:
+    type: string
+    label: f5 BIG-IQ UserName
+    description: The BIG-IQ username to use to license the BIG-IP instances.
+    default: None
+  bigiq_license_pwd:
+    type: string
+    label: f5 BIG-IQ Password
+    description: The BIG-IQ password to use to license the BIG-IP instances.
+    default: None
+  bigiq_license_pool:
+    type: string
+    label: f5 BIG-IQ License Pool Name
+    description: f5 BIG-IP License Pool to use to license the BIG-IP instances.
+    default: None
 resources:
   onboarding_scripts:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
         write_files:
+        - path: /config/cloud/openstack/bigIqPwd
+          permissions: 0755
+          owner: root:root
+          content: { get_param: bigiq_license_pwd }
         - path: /config/verifyHash
           permissions: 0755
           owner: root:root
@@ -87,6 +179,9 @@ resources:
             str_replace:
               params:
                   wc_notify: { get_param: wait_handle_curl}
+                  __keep_admin__: { get_param: keep_admin }
+                  __keep_bigiq__: { get_param: keep_bigiq }
+                  __keep_config_drive__ : { get_param: keep_config_drive }
               template: { get_file: ../scripts/postOnboard.sh }
         - path: /config/onboard.sh
           permissions: 0755
@@ -95,42 +190,55 @@ resources:
             str_replace:
               params:
                   __license__: { get_param: bigip_license }
+                  __bigiq_host__: { get_param: bigiq_license_host_ip }
+                  __bigiq_username__: { get_param: bigiq_license_username }
+                  __bigiq_lic_pool__: { get_param: bigiq_license_pool }
+                  __bigiq_use_alt_mgmt_ip__: { get_param: bigiq_use_alt_bigip_mgmt_ip }
+                  __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
+                  __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
                   __host_name__: { get_param: host_name }
                   __mgmt_ip__: { get_param: management_ip }
                   __mgmt_port__: { get_param: management_port }
                   __add_on_licenses__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --add-on "addon"
                           for_each:
-                            addon: {get_param: bigip_addon_licenses}
+                            addon: { get_param: bigip_addon_licenses }
                   __dns__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --dns server_dns
                           for_each:
-                            server_dns: {get_param: dns}
+                            server_dns: { get_param: dns }
                   __modules__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --module bigip_module
                           for_each:
-                            bigip_module: {get_param: modules}
+                            bigip_module: { get_param: modules }
                   __ntp__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --ntp server_ntp
                           for_each:
-                            server_ntp: {get_param: ntp}
-                  wc_notify: { get_param: wait_handle_curl}
+                            server_ntp: { get_param: ntp }
+                  __allow_ua__: { get_param: ua_allow }
+                  __template_name__: { get_param: ua_template_name }
+                  __template_version__: { get_param: ua_template_version }
+                  __cloudlibs_tag__: { get_param: ua_cloudlibs_tag }
+                  __cust_id__: { get_param: ua_project_id }
+                  __deploy_id__: { get_param: ua_stack_id }
+                  __region__: { get_param: ua_region }
+                  wc_notify: { get_param: wait_handle_curl }
               template: { get_file: ../scripts/onboard.sh }
 
 outputs:

@@ -1,0 +1,23 @@
+heat_template_version: 2016-04-08
+
+description: This template configures the run commands for onboard-network-<%nic_index%>.sh, which is used to configure network components for a standard f5 VE image.
+
+parameters:
+    nic_indexes:
+      type: comma_delimited_list
+
+resources:
+  run_commands:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        runcmd:
+          repeat:
+            template: "nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-<%nic_index%>.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_<%nic_index%>_DONE  -o /var/log/onboard-network-<%nic_index%>.log' &>> /var/log/runScript.log < /dev/null & "
+            for_each:
+              <%nic_index%>: { get_param: nic_indexes }
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::OnboardNetworkConfig resource.
+    value: { get_resource: run_commands}

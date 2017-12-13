@@ -3,14 +3,27 @@
 err=0
 msg="Post-onboard completed without error."
 stat="SUCCESS"
+keepAdmin="__keep_admin__"
+keepConfigDrive="__keep_config_drive__"
+keepBigIq="__keep_bigiq__"
 
 function cleanup() {
-    shred -u -z /config/cloud/openstack/adminPwd /config/cloud/openstack/rootPwd /config/cloud/openstack/rootPwdRandom /config/cloud/openstack/adminPwdRandom
-    
-    mountFound=$(grep '/mnt/config' /proc/mounts -c)
-    if [[ $mountFound == 1 ]] ; then
-        umount /mnt/config
-        rmdir /mnt/config
+    shred -u -z  /config/cloud/openstack/rootPwd /config/cloud/openstack/rootPwdRandom /config/cloud/openstack/adminPwdRandom
+
+    if [[ "$keepAdmin" == "False" ]]; then
+       shred -u -z /config/cloud/openstack/adminPwd
+    fi
+
+    if [[ "$keepBigIq" == "False" ]]; then
+      shred -u -z /config/cloud/openstack/bigIqPwd
+    fi
+
+    if [[ "$keepConfigDrive" == "False" ]]; then
+        mountFound=$(grep '/mnt/config' /proc/mounts -c)
+        if [[ $mountFound == 1 ]] ; then
+            umount /mnt/config
+            rmdir /mnt/config
+        fi
     fi
 }
 
@@ -44,9 +57,7 @@ function main() {
 
     send_heat_signal
 
-    echo '*****POST-ONBOARD DONE******' 
+    echo '*****POST-ONBOARD DONE******'
 }
 
 main
-
-

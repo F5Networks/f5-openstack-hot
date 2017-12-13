@@ -3,7 +3,10 @@ echo '*****ONBOARD STARTING******'
 
 #vars
 #some default values set by heat str_replace
-addOn_licenses="__add_on_licenses__"
+
+#licensing
+licenseKey="__license__"
+addOnLicenses="__add_on_licenses__"
 dns="__dns__"
 hostName="__host_name__"
 mgmtIp="__mgmt_ip__"
@@ -14,21 +17,32 @@ msg=""
 stat="FAILURE"
 logFile="/var/log/onboard.log"
 
+allowUsageAnalytics="__allow_ua__"
+templateName="__template_name__"
+templateVersion="__template_version__"
+cloudLibsTag="__cloudlibs_tag__"
+custId=$(echo "__cust_id__"|sha512sum|cut -d " " -f 1)
+deployId=$(echo "__deploy_id__"|sha512sum|cut -d " " -f 1)
+region="__region__"
+metrics=""
+metricsOpt=""
+
 function set_vars() {
-    if [ "$addOn_licenses" == "--add-on None" ]; then
-        addOn_licenses="" 
+    if [ "$addOnLicenses" == "--add-on None" ]; then
+        addOnLicenses=""
     fi
 
     if [ "$dns" == "--dns None" ]; then
         dns=""
     fi
 
-    #remove trailing . from fqdn
-    hostName=${hostName%.}
-    if [[ $hostName == "" ]]; then
-        echo 'building hostname manually - no fqdn returned from neutron port assignment'
-        dnsSuffix=$(/bin/grep search /etc/resolv.conf | awk '{print $2}')
-        hostName="host-$mgmtIp.$dnsSuffix"
+    if [[ "$hostName" == "" || "$hostName" == "None" ]]; then
+      echo 'building hostname manually - no fqdn returned from neutron port assignment'
+      dnsSuffix=$(/bin/grep search /etc/resolv.conf | awk '{print $2}')
+      hostName="host-$mgmtIp.$dnsSuffix"
+    else
+      #remove trailing . from fqdn
+      hostName=${hostName%.}
     fi
 
     onboardRun=$(grep "Starting Onboard call" -i -c -m 1 "$logFile" )
@@ -41,6 +55,13 @@ function set_vars() {
 
     adminPwd=$(</config/cloud/openstack/adminPwd)
     newRootPwd=$(</config/cloud/openstack/rootPwd)
+
+    if [[ "$allowUsageAnalytics" == "True" ]]; then
+        bigIpVersion=$(tmsh show sys version | grep -e "Build" -e " Version" | awk '{print $2}' ORS=".")
+        metrics="customerId:${custId},deploymentId:${deployId},templateName:${templateName},templateVersion:${templateVersion},region:${region},bigIpVersion:${bigIpVersion},licenseType:BYOL,cloudLibsVersion:${cloudLibsTag},cloudName:openstack"
+        metricsOpt="--metrics"
+        echo "$metrics"
+    fi
 }
 
 function set_adminPwd() {
@@ -50,11 +71,12 @@ function set_adminPwd() {
 function onboard_run() {
     echo 'Starting Onboard call'
     if f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/onboard.js \
-        $addOn_licenses \
+        $metricsOpt $metrics \
+        $addOnLicenses \
         $dns \
         --host localhost \
         --hostname "$hostName" \
-        --license "__license__" \
+        --license $licenseKey \
         --log-level debug \
         __modules__ \
         __ntp__ \
@@ -78,6 +100,7 @@ function onboard_run() {
                 msg="Onboard command exited without error."
                 stat="SUCCESS"
             fi
+            
         fi
     else
         msg='Onboard exited with an error signal.'

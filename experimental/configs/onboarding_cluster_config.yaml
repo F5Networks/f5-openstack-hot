@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template configures clustering components for a standard f5 VE image in an active/standby group.  
+description: This template configures clustering components for a standard f5 VE image in an active/standby group.
 
 parameters:
   mgmt_ip:
@@ -17,7 +17,7 @@ parameters:
     description: Management IP Address of the master BIG-IP.
   config_sync_ip:
     type: string
-    label: f5 BIG-IP Cluster Self-IP 
+    label: f5 BIG-IP Cluster Self-IP
     description: ConfigSync IP Address of this BIG-IP.
   device_group:
     type: string
@@ -42,14 +42,14 @@ parameters:
   host_name:
     type: string
     label: f5 BIG-IP Host Name
-    description: Device Name for the BIG-IP. 
+    description: Device Name for the BIG-IP.
   use_config_drive:
     type: boolean
     label: Use Config Drive
     description: Use config drive to provide meta and user data.
   wait_handle_curl:
     type: string
-    label: Wait Handle 
+    label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
 
 resources:

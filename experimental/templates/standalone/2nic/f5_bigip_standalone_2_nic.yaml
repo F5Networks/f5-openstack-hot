@@ -8,12 +8,11 @@ parameters:
     label: f5 BIG-IP VE Image
     description: The BIG-IP VE image to be used on the compute instance.
     constraints:
-      - custom_constraint: glance.image 
+      - custom_constraint: glance.image
   bigip_flavor:
     type: string
     label: f5 BIG-IP VE Flavor
     description: Type of instance (flavor) to be used for the VE.
-    default: m1.medium
     constraints:
       - custom_constraint: nova.flavor
   use_config_drive:
@@ -25,7 +24,7 @@ parameters:
     type: string
     label: f5 CloudLibs Tag
     description: Tag that determines version of f5 cloudlibs to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
-    default: v3.3.0
+    default: v3.5.0
   f5_cloudlibs_url_override:
     type: string
     label: f5 cloud-libs URL Override
@@ -35,6 +34,16 @@ parameters:
     type: string
     label: f5 cloud-libs verifyHash URL Override
     description: Alternate URL for verifyHash used to validate f5-cloud-libs package. If not specified, the scripts/verifyHash will be used.
+    default: None
+  f5_cloudlibs_openstack_tag:
+    type: string
+    label: f5-cloud-libs-openstack Tag
+    description: Tag that determines version of f5 cloudlibs-package to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
+    default: v1.0.0
+  f5_cloudlibs_openstack_url_override:
+    type: string
+    label: f5-cloud-libs-openstack URL Override
+    description: Alternate URL for f5-cloud-libs-openstack package. If not specified, the default GitHub location for f5-cloud-libs will be used. If version is different from default f5_cloudlibs_tag, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
     default: None
   bigip_servers_ntp:
     type: comma_delimited_list
@@ -49,6 +58,11 @@ parameters:
     description: A list of DNS servers to configure on the BIG-IP.
     default:
       -
+  allow_usage_analytics:
+    type: boolean
+    label: Allow Usage Analytics
+    description: Toggles whether non-identifiable statistical information is sent to F5.
+    default: True
   #bigip credentials
   bigip_os_ssh_key:
     type: string
@@ -60,7 +74,7 @@ parameters:
     type: string
     label: f5 BIG-IP VE Admin User Password
     description: Password for the BIG-IP admin user.
-    hidden: true  
+    hidden: true
   bigip_root_pwd:
     type: string
     label: f5 BIG-IP VE Root User Password
@@ -76,7 +90,7 @@ parameters:
     label: Additional BIG-IP VE License Keys
     description: f5 BIG-IP License Add-On Keys.
     default:
-      - 
+      -
   bigip_modules:
     type: comma_delimited_list
     label: Modules to provision on the BIG-IP.
@@ -113,7 +127,7 @@ parameters:
   network_vlan_subnet:
     type: string
     label: OS Neutron Subnet to map to the BIG-IP VLAN
-    description: The Neutron Subnet for the corresponding BIG-IP VLAN. 
+    description: The Neutron Subnet for the corresponding BIG-IP VLAN.
     constraints:
       - custom_constraint: neutron.subnet
   #bigip network
@@ -152,56 +166,59 @@ parameters:
     label: f5 BIG-IP VE VLAN SelfIP Address
     description: Self-IP address to associate with the BIG-IP VLAN.
   bigip_self_cidr_block:
-    type: string 
+    type: string
     label: f5 BIG-IP VE VLAN CIDR Block
     description: CIDR Block for the BIG-IP SelfIP address.
   bigip_self_port_lockdown:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN Allow Services
-    description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default is used. 
+    description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default is used.
     default:
-      - 
+      -
 
 parameter_groups:
-- label: BIG-IP General Provisioning
-  parameters:
-  - bigip_image
-  - bigip_flavor
-  - use_config_drive
-  - f5_cloudlibs_tag
-  - f5_cloudlibs_url_override
-  - f5_cloudlibs_verify_hash_url_override
-  - bigip_servers_ntp
-  - bigip_servers_dns
-- label: BIG-IP Credentials
-  parameters:
-  - bigip_os_ssh_key
-  - bigip_admin_pwd
-  - bigip_root_pwd
-- label: BIG-IP Licensing and Modules
-  parameters:
-  - bigip_license_key
-  - bigip_addon_license_keys
-  - bigip_modules
-- label: OS Network 
-  parameters:
-  - external_network
-  - mgmt_network
-  - mgmt_security_group_name
-  - network_vlan_security_group_name
-  - network_vlan_name
-  - network_vlan_subnet
-- label: BIG-IP Network
-  parameters:
-  - bigip_default_gateway
-  - bigip_mgmt_port
-  - bigip_vlan_name
-  - bigip_vlan_mtu
-  - bigip_vlan_tag
-  - bigip_vlan_nic
-  - bigip_self_ip_addr
-  - bigip_self_cidr_block
-  - bigip_self_port_lockdown
+  - label: BIG-IP General Provisioning
+    parameters:
+    - bigip_image
+    - bigip_flavor
+    - use_config_drive
+    - f5_cloudlibs_tag
+    - f5_cloudlibs_url_override
+    - f5_cloudlibs_verify_hash_url_override
+    - f5_cloudlibs_openstack_tag
+    - f5_cloudlibs_openstack_url_override
+    - bigip_servers_ntp
+    - bigip_servers_dns
+    - allow_usage_analytics
+  - label: BIG-IP Credentials
+    parameters:
+    - bigip_os_ssh_key
+    - bigip_admin_pwd
+    - bigip_root_pwd
+  - label: BIG-IP Licensing and Modules
+    parameters:
+    - bigip_license_key
+    - bigip_addon_license_keys
+    - bigip_modules
+  - label: OS Network
+    parameters:
+    - external_network
+    - mgmt_network
+    - mgmt_security_group_name
+    - network_vlan_security_group_name
+    - network_vlan_name
+    - network_vlan_subnet
+  - label: BIG-IP Network
+    parameters:
+    - bigip_default_gateway
+    - bigip_mgmt_port
+    - bigip_vlan_name
+    - bigip_vlan_mtu
+    - bigip_vlan_tag
+    - bigip_vlan_nic
+    - bigip_self_ip_addr
+    - bigip_self_cidr_block
+    - bigip_self_port_lockdown
 
 resources:
   wait_condition_onboard_complete:
@@ -260,6 +277,8 @@ resources:
     properties:
       cloudlibs_tag: { get_param: f5_cloudlibs_tag }
       cloudlibs_url_override: { get_param: f5_cloudlibs_url_override }
+      cloudlibs_os_tag: { get_param: f5_cloudlibs_openstack_tag }
+      cloudlibs_os_url_override: { get_param: f5_cloudlibs_openstack_url_override }
   init_3_onboard_scripts:
     type: F5::BigIP::OnboardingScripts
     properties:
@@ -275,6 +294,12 @@ resources:
       ssh_key_name: { get_param: bigip_os_ssh_key }
       use_config_drive: { get_param: use_config_drive }
       wait_handle_curl: { get_attr: [wait_handle_onboard, curl_cli] }
+      ua_allow: { get_param: allow_usage_analytics }
+      ua_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
+      ua_project_id: { get_param: 'OS::project_id'}
+      ua_stack_id: { get_param: 'OS::stack_id' }
+      ua_template_name: exp-f5_bigip_standalone_2_nic.yaml
+      ua_template_version: 3.0.0
   init_4_onboard_network_config:
     type: F5::BigIP::OnboardNetworkConfig
     properties:

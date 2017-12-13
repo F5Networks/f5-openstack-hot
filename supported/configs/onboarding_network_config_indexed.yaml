@@ -1,0 +1,106 @@
+heat_template_version: 2016-04-08
+
+description: This template configures network components for a standard f5 standalone VE image.
+
+parameters:
+  script_path:
+    type: string
+    label: Script Path
+    description: Full path of the onboard network script
+    default: /config/onboard-network-0.sh
+  default_gateway:
+    type: string
+    label: Default Gateway IP
+    description: Upstream Gateway IP Address for VE instances.
+    default: None
+  vlan_names:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN name
+    description: Name of the VLAN to be created/referenced on the BIG-IP.
+  vlan_mtus:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN MTU
+    description: MTU value of the VLAN on the BIG-IP.
+  vlan_tags:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN tag
+    description: Tag to apply on the VLAN on the BIG-IP. VLAN default is untagged.
+    default: None
+  nic_count:
+    type: number
+    label: f5 BIG-IP NIC count
+    description: The number of additional NICs for the BIG-IP excluding management NIC.
+    default: 1
+  vlan_last_nic_index:
+    type: number
+    label: f5 BIG-IP last NIC index (0-based)
+    description: The 0-based index of the last NIC to attach to Big-IP. This is essentially bigip_nic_count minus 1. This helps identify the last nic in the resource group.
+                 Since there are no intrinsic arithmetic functions currently supported in heat, this parameter is required.
+    default: 0
+  vlan_nic_index:
+    # If this is number, str_split and list_join somehow don't work as expected
+    type: string
+    label: f5 BIG-IP VE VLAN NIC index
+    description: The index of additional NIC for the BIG-IP. For example, an index of 0 maps to 1.1 NIC, index of 1 maps to 1.2 NIC, and so on.
+    default: "0"
+  self_ip_addrs:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN SelfIP Address
+    description: Self-IP address to associate with the BIG-IP VLAN.
+  self_cidr_blocks:
+    type: comma_delimited_list 
+    label: f5 BIG-IP VE VLAN CIDR Block
+    description: CIDR Block for the BIG-IP SelfIP address.
+  self_port_lockdowns:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE VLAN Allow Services
+    description: Optional list of <service:port> lockdown settings for the VLAN. If no value is supplied, default port lockdown settings are used. 
+    default:
+      - 
+  wait_handle_curl:
+    type: string
+    label: Wait Handle 
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat.
+
+resources:
+  onboard_network_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        write_files:
+        - path: { get_param: script_path }
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                __default_gateway__: { get_param: default_gateway }
+                __network_vlan_name__ : { get_param: [vlan_names, {get_param: vlan_nic_index} ] }
+                __network_vlan_create__: True
+                __network_vlan_tag__ : { get_param: [ vlan_tags, {get_param: vlan_nic_index}]}
+                __network_vlan_mtu__ : { get_param: [ vlan_mtus, {get_param: vlan_nic_index}]}
+                __network_vlan_nic__ : ""
+                __network_nic_count__ : { get_param: nic_count}
+                __network_vlan_nic_index__ : { get_param: vlan_nic_index }
+                __network_vlan_last_nic_index__ : { get_param: vlan_last_nic_index }
+                __network_self_name__ : ""
+                __network_self_ip_addr__ : { get_param: [self_ip_addrs, {get_param: vlan_nic_index} ] }
+                __network_self_cidr_block__ : { get_param: [self_cidr_blocks, {get_param: vlan_nic_index} ] }
+                __network_self_port_lockdown__ :
+                  list_join:
+                  - ' '
+                  - 
+                    str_split:
+                      - ';'
+                      - { get_param: [self_port_lockdowns, { get_param: vlan_nic_index }] }
+                wc_notify: { get_param: wait_handle_curl }
+              template: { get_file: ../scripts/onboard-network.sh}
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::OnboardNetworkConfig resource.
+    value: { get_resource: onboard_network_config }
+  config_id:
+    value: {get_resource: onboard_network_config }
+  config_index:
+    value: { get_param: vlan_nic_index }

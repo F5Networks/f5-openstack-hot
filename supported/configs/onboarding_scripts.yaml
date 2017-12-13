@@ -3,6 +3,43 @@ heat_template_version: 2016-04-08
 description: This template creates additional scripts required to provision a Big-IP.
 
 parameters:
+  # Optional Usage Analytics
+  ua_allow:
+    type: boolean
+    label: Allow Usage Analytics
+    description: Toggles whether non-identifiable statistical information is sent to F5.
+    default: True
+  ua_template_name:
+    type: string
+    label: Template Name (Usage Analytics)
+    description: Name of the template used to launch the stack
+    default: None
+  ua_template_version:
+    type: string
+    label: Template Version (Usage Analytics)
+    description: Version of the template used to launch the stack
+    default: None
+  ua_cloudlibs_tag:
+    type: string
+    label: f5-cloud-libs Tag (Usage Analytics)
+    description: Tag that identifies cloudlibs version
+    default: None
+  ua_project_id:
+    type: string
+    label: Project ID (Usage Analytics)
+    description: ID of the template user
+    default: None
+  ua_region:
+    type: string
+    label: Region (Usage Analytics)
+    description: Region where template is launched
+    default: None
+  ua_stack_id:
+    type: string
+    label: Stack Id (Usage Analytics)
+    description: Stack Id or Name
+    default: None
+
   verify_hash_url_override:
     type: string
     label: Script verifyHash override source URL
@@ -13,7 +50,7 @@ parameters:
     label: Additional VE License Keys
     description: f5 TMOS License Add-On Keys.
     default:
-      - 
+      -
   bigip_license:
     type: string
     label: Primary VE License Base Key
@@ -45,15 +82,15 @@ parameters:
   ssh_key_name:
     type: string
     label: SSH Key Name
-    description: SSH Key Name to inject for Big-IP Access. 
+    description: SSH Key Name to inject for Big-IP Access.
   use_config_drive:
     type: boolean
     label: Enable Config Drive
-    description: Determines if cloud init data is polled from config drive instead of metadata service. 
+    description: Determines if cloud init data is polled from config drive instead of metadata service.
     default: false
   wait_handle_curl:
     type: string
-    label: Wait Handle 
+    label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
 resources:
   onboarding_scripts:
@@ -129,8 +166,15 @@ resources:
                         repeat:
                           template: --ntp server_ntp
                           for_each:
-                            server_ntp: {get_param: ntp}
-                  wc_notify: { get_param: wait_handle_curl}
+                            server_ntp: { get_param: ntp }
+                  __allow_ua__: { get_param: ua_allow }
+                  __template_name__: { get_param: ua_template_name }
+                  __template_version__: { get_param: ua_template_version }
+                  __cloudlibs_tag__: { get_param: ua_cloudlibs_tag }
+                  __cust_id__: { get_param: ua_project_id }
+                  __deploy_id__: { get_param: ua_stack_id }
+                  __region__: { get_param: ua_region }
+                  wc_notify: { get_param: wait_handle_curl }
               template: { get_file: ../scripts/onboard.sh }
 
 outputs:

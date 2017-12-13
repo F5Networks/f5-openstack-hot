@@ -1,0 +1,33 @@
+heat_template_version: 2016-04-08
+
+description: This template deploys a customized security group to be associated with a BIG-IP data VLAN.
+
+parameters:
+  network_vlan_names:
+    type: comma_delimited_list
+    label: Network VLAN names
+    description: The names of the networks to be used as prefix for security group names
+  security_group_index:
+    type: number
+    label: Security Group Index
+  security_group_rules:
+    type: json
+    label: Security Group Rules
+    description: The rules to apply to the security group
+
+resources:
+  bigip_custom_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: security group rules for data interfaces
+      name:
+        str_replace:
+          template: <%vlan_name%>-secgroup
+          params:
+            <%vlan_name%>: { get_param: [ network_vlan_names,{ get_param: security_group_index} ] }
+      rules: { get_param: [security_group_rules, { get_param: security_group_index}, rules ]}
+
+outputs:
+   security_group_id:
+     description: Get resource id of this security group
+     value: { get_resource: bigip_custom_security_group }

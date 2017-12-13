@@ -1,0 +1,163 @@
+heat_template_version: 2016-04-08
+
+description: This template configures autoscale components for a standard f5 VE instance in an active/standby config sync group. 
+
+parameters:
+  mgmt_ip:
+    type: string
+    label: f5 BIG-IP Management IP address
+    description: Management IP address of the BIG-IP.
+  mgmt_port:
+    type: number
+    label: f5 BIG-IP Management Port
+    description: Management port of the BIG-IP.
+  bigiq_license_host_ip:
+    type: string
+    label: f5 BIG-IQ License Host IP Address
+    description: The IP address (or hostname) for the existing BIG-IQ instance to be used when licensing the BIG-IP. The instance can exist in another cloud environment as long as it is network reachable.
+  bigiq_license_username:
+    type: string
+    label: f5 BIG-IQ UserName
+    description: The BIG-IQ username to use to license the BIG-IP instances.
+  bigiq_license_pool:
+    type: string
+    label: f5 BIG-IQ License Pool Name
+    description: f5 BIG-IP License Pool to use to license the BIG-IP instances.
+  bigiq_use_alt_bigip_mgmt_ip:
+    type: boolean
+    label: Use BIG-IP Floating IP for BIG-IQ licensing
+    description: Determines whether to use the external address or floating ip of the BIG-IP for BIG-IQ licensing 
+    default: false
+  bigiq_alt_bigip_mgmt_ip:
+    type: string
+    label: Alternate BIG-IP IP Address for BIG-IQ licensing
+    description: The alternate ip address to use when licensing the BIG-IP through BIG-IQ. If not specified, management address is used. 
+  # Note: For now, default to None. If needed, we can expose to parent template and add config for new port
+  bigiq_alt_bigip_mgmt_port:
+    type: string
+    label: Alternate BIG-IP Port for BIG-IQ licensing
+    description: The alternate port to use when licensing the BIG-IP through BIG-IQ. If not specified, management port is used. 
+    default: None
+  config_sync_ip:
+    type: string
+    label: f5 BIG-IP Cluster Self-IP 
+    description: ConfigSync IP Address of this BIG-IP.
+  device_group:
+    type: string
+    label: f5 BIG-IP Device Group Name
+    description: Name of the BIG-IP Group to create or join.
+    default: Sync
+  host_name:
+    type: string
+    label: f5 BIG-IP Host Name
+    description: Device Name for the BIG-IP. 
+  use_config_drive:
+    type: boolean
+    label: Use Config Drive
+    description: Use config drive to provide meta and user data.
+  wait_handle_curl:
+    type: string
+    label: Wait Handle Curl
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to 
+  autoscale_group_tag:
+    type: string
+    label: Autoscale Group Tag
+    description: Autoscale tag that helps identify the group members.
+  autoscale_metadata_endpoint:
+    type: string
+    label: Autoscale Metadata Resource URL
+    description: URL Endpoint for storing Autoscale metadata
+  autoscale_metadata_resource_name:
+    type: string
+    label: Autoscale Metadata Resource Name
+    description: Name of resource for storing autoscale metadata
+  autoscale_stack_name: 
+    type: string
+    label: Autoscale Stack Name
+    description: Name of the parent stack that was launched
+  os_username:
+    type: string
+    label: Openstack User Name
+    description: User name for openstack account that can perform stack operations
+  os_password:
+    type: string
+    label: Openstack Password
+    description: Password for openstack account that can perform stack operations
+    hidden: True
+  os_region:
+    type: string
+    label: Openstack Region
+    description: Region for openstack account that can perform stack operations
+  os_auth_url:
+    type: string
+    label: Openstack Auth Endpoint URL
+    description: Auth Endpoint URL for openstack account that can perform stack operations
+  os_auth_version:
+    type: string
+    label: Openstack Auth Version
+    description: Version of the Auth URL
+    default: v3
+  os_domain_name:
+    type: string
+    label: Openstack domain name
+    description: Name of the openstack domain
+    default: regionOne
+resources:
+  onboard_autoscale_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        write_files:
+        - path: /config/onboard-autoscale.sh
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                __mgmt_ip__: { get_param: mgmt_ip}
+                __mgmt_port__: { get_param: mgmt_port }
+                __device_group__: { get_param: device_group }
+                __host_name__: { get_param: host_name }
+                __use_config_drive__: { get_param: use_config_drive }
+                __autoscale_group_tag__: { get_param: autoscale_group_tag }
+                __autoscale_metadata_url__: { get_param: autoscale_metadata_endpoint }
+                __autoscale_metadata_resource__: { get_param: autoscale_metadata_resource_name }
+                __autoscale_stack__: { get_param: autoscale_stack_name } 
+                __bigiq_host__: { get_param: bigiq_license_host_ip }
+                __bigiq_username__: { get_param: bigiq_license_username }
+                __bigiq_lic_pool__: { get_param: bigiq_license_pool }
+                __bigiq_use_alt_mgmt_ip__: { get_param: bigiq_use_alt_bigip_mgmt_ip }
+                __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
+                __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
+                wc_notify: { get_param: wait_handle_curl }
+              template: { get_file: ../scripts/onboard-autoscale.sh}
+        - path: /config/cloud/openstack/.os
+          permissions: 0755
+          owner: root:root
+          content:
+            str_replace:
+              params:
+                __username__: { get_param: os_username }
+                __password__: { get_param: os_password }
+                __region__: { get_param: os_region }
+                __auth__: { get_param: os_auth_url }
+                __auth_version__ : { get_param: os_auth_version }
+                __domain__ : { get_param: os_domain_name }
+              template: |
+                  {
+                    "username": "__username__",
+                    "password": "__password__",
+                    "region": "__region__",
+                    "authUrl": "__auth__",
+                    "authVersion": "__auth_version__",
+                    "domainName": "__domain__"
+                  }
+
+
+
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::OnboardAutoscaleConfig resource.
+    value:
+      get_resource: onboard_autoscale_config
