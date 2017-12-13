@@ -53,8 +53,8 @@ resources:
             else
               cloudlibsOsUrl=${cloudlibsOsUrlOverride}
             fi
-            echo "******Starting Download for f5-cloud-libs-openstack from ${cloudlibsOsUrl} ******"
-            curl -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz ${cloudlibsOsUrl}
+            # echo "******Starting Download for f5-cloud-libs-openstack from ${cloudlibsOsUrl} ******"
+            # curl -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz ${cloudlibsOsUrl}
 
 outputs:
   OS::stack_id:

@@ -28,7 +28,8 @@ if ! tmsh load sys config merge file /config/verifyHash; then
     msg="Unable to validate verifyHash."
 fi
 echo loaded verifyHash
-declare -a filesToVerify=("/config/cloud/openstack/f5-cloud-libs.tar.gz" "/config/cloud/openstack/f5-cloud-libs-openstack.tar.gz")
+# declare -a filesToVerify=("/config/cloud/openstack/f5-cloud-libs.tar.gz" "/config/cloud/openstack/f5-cloud-libs-openstack.tar.gz")
+declare -a filesToVerify=("/config/cloud/openstack/f5-cloud-libs.tar.gz")
 for fileToVerify in "${filesToVerify[@]}"
 do
     echo verifying "$fileToVerify"
@@ -44,7 +45,7 @@ if [[ "$msg" == "" ]]; then
     echo 'Preparing CloudLibs'
     mkdir -p /config/cloud/openstack/node_modules
     tar xvfz /config/cloud/openstack/f5-cloud-libs.tar.gz -C /config/cloud/openstack/node_modules
-    tar --warning=no-unknown-keyword -zxf /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz -C /config/cloud/openstack/node_modules/f5-cloud-libs/node_modules > /dev/null
+    # tar --warning=no-unknown-keyword -zxf /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz -C /config/cloud/openstack/node_modules/f5-cloud-libs/node_modules > /dev/null
     touch /config/cloud/openstack/cloudLibsReady
 fi
 
