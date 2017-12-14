@@ -12,9 +12,12 @@ In this auto scale solution, as thresholds are met, the number of BIG-IP VE LTM 
 
 The BIG-IP VE(s) are configured in 2-NIC mode. In a 2-NIC implementation, each BIG-IP VE has one interface used for management and data-plane traffic from the Internet, and the second interface connected into the Neutron networks where traffic is processed by the pool members in a traditional two-ARM design. Traffic flows from the BIG-IP VE to the application servers.
 
+This solution uses (requires) a [BIG-IQ device](https://f5.com/products/big-iq-centralized-management) with a pool of BIG-IP VE licenses to automatically license the auto scaled BIG-IP VEs.
+
 The **autoscale_ltm** heat orchestration template incorporates existing networks defined in Neutron.
 
 ## Prerequisites and Configuration Notes
+  - You must have an existing BIG-IQ device with a pool of BIG-IP LTM licenses to use this solution.
   - The autoscale ltm solution consists of two templates that configure clustering:
     - *f5_bigip_autoscale_ltm_2_nic.yaml*, the parent template that needs to be specified as the template parameter.
     - *f5_bigip_autoscale_ltm_instance_2_nic.yaml*, the BIG-IP instance-specific template referenced by the parent template.
