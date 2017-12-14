@@ -39,6 +39,11 @@ parameters:
     label: Stack Id (Usage Analytics)
     description: Stack Id or Name
     default: None
+  ua_license_type:
+    type: string
+    label: License Type (Usage Analytics)
+    description: Type of Licensing
+    default: BYOL
 
   verify_hash_url_override:
     type: string
@@ -55,6 +60,7 @@ parameters:
     type: string
     label: Primary VE License Base Key
     description: f5 TMOS License Basekey
+    default: None
   modules:
     type: json
     label: Modules to provision on the BIG-IP.
@@ -174,6 +180,7 @@ resources:
                   __cust_id__: { get_param: ua_project_id }
                   __deploy_id__: { get_param: ua_stack_id }
                   __region__: { get_param: ua_region }
+                  __license_type__: { get_param: ua_license_type }
                   wc_notify: { get_param: wait_handle_curl }
               template: { get_file: ../scripts/onboard.sh }
 

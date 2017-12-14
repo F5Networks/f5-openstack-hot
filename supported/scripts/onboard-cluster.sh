@@ -8,7 +8,6 @@ deviceName="__host_name__"
 masterIp="__master_mgmt_ip__"
 mgmtIp="__mgmt_ip__"
 configSyncIp="__config_sync_ip__"
-useConfigDrive="__use_config_drive__"
 autoSync="__auto_sync__"
 saveOnAutoSync="__save_on_auto_sync__"
 
@@ -51,7 +50,7 @@ echo 'Configuring config-sync ip'
 tmsh modify cm device "$deviceName" configsync-ip $configSyncIp unicast-address { { effective-ip $configSyncIp effective-port 1026 ip $configSyncIp } }
 
 if [[ "$isMaster" == true ]] ; then
-echo 'Master device'
+echo 'Config-Sync Master device'
     f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/cluster.js \
     -o /var/log/onboard-cluster.log \
     --log-level debug \
@@ -67,7 +66,7 @@ echo 'Master device'
     "$autoSync" \
     "$saveOnAutoSync"
 else
-echo 'Standby device'
+echo 'Config-Sync Secondary device'
     f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/cluster.js \
     -o /var/log/onboard-cluster.log \
     --log-level debug \

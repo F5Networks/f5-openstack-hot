@@ -259,7 +259,6 @@ parameters:
     type: number
     label: Autoscale Set Minimum Count
     description: The maximum number of BIG-IP VE instances to deploy in the scale set.
-    default: 2
   os_username:
     type: string
     label: Openstack User Name
@@ -403,7 +402,7 @@ resources:
     properties:
       meter_name: { get_param: autoscale_meter_name }
       statistic: { get_param: autoscale_meter_stat }
-      period: 300
+      period: { get_param: autoscale_period }
       evaluation_periods: { get_param: autoscale_num_eval_period }
       threshold: { get_param: autoscale_scale_down_threshold }
       alarm_actions:
@@ -485,23 +484,15 @@ resources:
 outputs:
   device_group_current_size:
     value: { get_attr: [device_group, current_size]}
-  device_group_show:
-    value: { get_attr: [device_group, show]}
-  device_group_signal_data_list:
-    value: { get_attr: [device_group, outputs_list, signal_data]}
-  device_group_signal_show_list:
-    value: { get_attr: [device_group, outputs_list, signal_show]}
-  device_group_signal_data:
-    value: { get_attr: [device_group, outputs, signal_data]}
-  device_group_signal_show:
-    value: { get_attr: [device_group, outputs, signal_show]}
-  device_group_resource_id:
+  device_group_resource_ids:
     value: { get_attr: [device_group, outputs, resourceid]}
-  device_group_signal_endpoint:
-    value: { get_attr: [device_group, outputs, signal_endpoint]}
-  device_group_signal_cli:
-    value: { get_attr: [device_group, outputs, signal_cli]}
-  device_group_signal_signal:
-    value: { get_attr: [device_group, outputs, signal_signal]}
-  device_group_signal_handle_show:
-    value: { get_attr: [device_group, outputs, signal_handle_show] }
+  device_group_bigip_instance_ids:
+    value: { get_attr: [device_group, outputs, bigip_instance_id]}
+  device_group_bigip_instance_namess:
+    value: { get_attr: [device_group, outputs, bigip_instance_name]}
+  device_group_bigip_instance_networks:
+    value: { get_attr: [device_group, outputs, bigip_instance_networks]}
+  device_group_bigip_instance_addresses:
+    value: { get_attr: [device_group, outputs, bigip_instance_addresses]}
+  device_group_bigip_instance_floating_ips:
+    value: { get_attr: [device_group, outputs, bigip_instance_floating_ip]}

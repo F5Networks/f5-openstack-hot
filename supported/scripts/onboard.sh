@@ -6,6 +6,7 @@ echo '*****ONBOARD STARTING******'
 
 #licensing
 licenseKey="__license__"
+licenseOpt="--license"
 addOnLicenses="__add_on_licenses__"
 dns="__dns__"
 hostName="__host_name__"
@@ -26,8 +27,15 @@ deployId=$(echo "__deploy_id__"|sha512sum|cut -d " " -f 1)
 region="__region__"
 metrics=""
 metricsOpt=""
+licenseType="__license_type__"
 
 function set_vars() {
+
+    if [ "${licenseKey,,}" == "none" ]; then
+        licenseKey=""
+        licenseOpt=""
+    fi
+
     if [ "$addOnLicenses" == "--add-on None" ]; then
         addOnLicenses=""
     fi
@@ -58,7 +66,7 @@ function set_vars() {
 
     if [[ "$allowUsageAnalytics" == "True" ]]; then
         bigIpVersion=$(tmsh show sys version | grep -e "Build" -e " Version" | awk '{print $2}' ORS=".")
-        metrics="customerId:${custId},deploymentId:${deployId},templateName:${templateName},templateVersion:${templateVersion},region:${region},bigIpVersion:${bigIpVersion},licenseType:BYOL,cloudLibsVersion:${cloudLibsTag},cloudName:openstack"
+        metrics="customerId:${custId},deploymentId:${deployId},templateName:${templateName},templateVersion:${templateVersion},region:${region},bigIpVersion:${bigIpVersion},licenseType:${licenseType},cloudLibsVersion:${cloudLibsTag},cloudName:openstack"
         metricsOpt="--metrics"
         echo "$metrics"
     fi
@@ -76,7 +84,7 @@ function onboard_run() {
         $dns \
         --host localhost \
         --hostname "$hostName" \
-        --license $licenseKey \
+        $licenseOpt $licenseKey \
         --log-level debug \
         __modules__ \
         __ntp__ \

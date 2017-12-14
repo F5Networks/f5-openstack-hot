@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template deploys standard f5 BIG-IP VE - 2NIC instances in an active/standby cluster.
+description: This template deploys standard f5 BIG-IP VE - 2NIC instances in a config-sync cluster.
 
 parameters:
   bigip_image:
@@ -85,6 +85,9 @@ parameters:
     type: comma_delimited_list
     label: Primary BIG-IP VE License Base Keys
     description: f5 BIG-IP List of License Base Keys.
+    default: 
+      -
+      -
   bigip_addon_license_keys:
     type: comma_delimited_list
     label: Additional BIG-IP VE License Keys
@@ -323,15 +326,15 @@ resources:
           ua_template_name: sup-f5_bigip_cluster_2_nic.yaml
           ua_template_version: 3.0.0
 outputs:
-  bigip_active_instance_id:
+  bigip1_instance_id:
     value: { get_attr: [device_cluster, resource.0.bigip_instance_id] }
-  bigip_active_instance_name:
+  bigip1_instance_name:
     value: { get_attr: [device_cluster, resource.0.bigip_instance_name] }
-  bigip_active_floating_ip:
+  bigip1_floating_ip:
     value: { get_attr: [device_cluster, resource.0.bigip_instance_floating_ip] }
-  bigip_standby_instance_id:
+  bigip2_instance_id:
     value: { get_attr: [device_cluster, resource.1.bigip_instance_id] }
-  bigip_standby_instance_name:
+  bigip2_instance_name:
     value: { get_attr: [device_cluster, resource.1.bigip_instance_name] }
-  bigip_standby_floating_ip:
+  bigip2_floating_ip:
     value: { get_attr: [device_cluster, resource.1.bigip_instance_floating_ip] }

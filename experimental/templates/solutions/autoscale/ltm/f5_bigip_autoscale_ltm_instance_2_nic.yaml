@@ -399,6 +399,7 @@ resources:
       wait_handle_curl: { get_attr: [wait_handle_onboard, curl_cli] }
       keep_admin: True
       keep_config_drive: True
+      keep_bigiq: True
       ua_allow: { get_param: ua_allow }
       ua_template_name: { get_param: ua_template_name }
       ua_template_version: { get_param: ua_template_version }
@@ -406,6 +407,7 @@ resources:
       ua_project_id: { get_param: ua_project_id }
       ua_region: { get_param: ua_region }
       ua_stack_id: { get_param: ua_stack_id }
+      ua_license_type: BIGIQ
   init_4_1_onboard_network_config:
     type: F5::BigIP::OnboardNetworkConfig
     properties:

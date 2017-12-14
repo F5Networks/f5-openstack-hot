@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This solution uses a Heat Orchestration Template to launch an nNIC (multi NIC) deployment of a BIG-IP VE in an Openstack Private Cloud. In a multi NIC implementation, one interface is for management and data-plane traffic from the Internet, and the NIC count you provide determines the number of additional NICs used for processing traffic.  You can specify up to 10 total NICs, including the NIC for management and data-plane traffic from the Internet.
+This solution uses a Heat Orchestration Template to launch an nNIC (multi NIC) deployment of a BIG-IP VE in an Openstack Private Cloud. In a multi NIC implementation, one interface is for management and data-plane traffic from the Internet, and the NIC count you provide determines the number of additional NICs used for processing traffic.  You can include up to 10 total NICs, including the NIC for management and data-plane traffic from the Internet.
 
 The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
 
@@ -100,7 +100,7 @@ The following parameters can be defined in your environment file.
 
 | Parameter | Required | Description | Constraints |
 | --- | :---: | --- | --- |
-| bigip_license_key | Yes | Primary BIG-IP VE License Base Key |  |
+| bigip_license_key | No | Primary BIG-IP VE License Base Key |  |
 | bigip_addon_license_keys | No | Additional BIG-IP VE License Keys |  |
 | bigip_modules | No | Modules to provision on the BIG-IP.  Default `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 

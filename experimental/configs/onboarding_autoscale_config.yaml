@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template configures autoscale components for a standard f5 VE instance in an active/standby config sync group. 
+description: This template configures autoscale components for a standard f5 VE instance in a config-sync cluster.
 
 parameters:
   mgmt_ip:

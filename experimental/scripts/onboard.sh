@@ -6,6 +6,7 @@ echo '*****ONBOARD STARTING******'
 
 #licensing
 licenseKey="__license__"
+licenseOpt="--license"
 addOnLicenses="__add_on_licenses__"
 bigIqHost="__bigiq_host__"
 bigIqUsername="__bigiq_username__"
@@ -36,6 +37,7 @@ deployId=$(echo "__deploy_id__"|sha512sum|cut -d " " -f 1)
 region="__region__"
 metrics=""
 metricsOpt=""
+licenseType="__license_type__"
 
 function set_vars() {
     if [ "$addOnLicenses" == "--add-on None" ]; then
@@ -46,7 +48,7 @@ function set_vars() {
         dns=""
     fi
 
-    if [ "$licenseKey" == "None" ]; then
+    if [ "$licenseType" == "BIGIQ" ]; then
         if [ "$bigIqUseAltMgmtIp" == "True" ]; then
             bigIqMgmtIp="--big-ip-mgmt-address ${bigIqAltMgmtIp}"
 
@@ -57,8 +59,12 @@ function set_vars() {
         licenseOpt="--license-pool"
         license="--license-pool-name ${bigIqLicPool} --big-iq-host ${bigIqHost} --big-iq-user ${bigIqUsername} --big-iq-password-uri ${bigIqPwdUri} ${bigIqMgmtIp} ${bigIqMgmtPort}"
     else
-        licenseOpt="--license"
-        license="${licenseKey}"
+        if [ "${licenseKey,,}" == "none" ]; then
+            license=""
+            licenseOpt=""
+        else
+            license="${licenseKey}"
+        fi
     fi
 
     if [[ "$hostName" == "" || "$hostName" == "None" ]]; then
@@ -83,7 +89,7 @@ function set_vars() {
 
     if [[ "$allowUsageAnalytics" == "True" ]]; then
         bigIpVersion=$(tmsh show sys version | grep -e "Build" -e " Version" | awk '{print $2}' ORS=".")
-        metrics="customerId:${custId},deploymentId:${deployId},templateName:${templateName},templateVersion:${templateVersion},region:${region},bigIpVersion:${bigIpVersion},licenseType:BYOL,cloudLibsVersion:${cloudLibsTag},cloudName:openstack"
+        metrics="customerId:${custId},deploymentId:${deployId},templateName:${templateName},templateVersion:${templateVersion},region:${region},bigIpVersion:${bigIpVersion},licenseType:${licenseType},cloudLibsVersion:${cloudLibsTag},cloudName:openstack"
         metricsOpt="--metrics"
         echo "$metrics"
     fi
@@ -125,6 +131,7 @@ function onboard_run() {
                 msg="Onboard command exited without error."
                 stat="SUCCESS"
             fi
+            
         fi
     else
         msg='Onboard exited with an error signal.'

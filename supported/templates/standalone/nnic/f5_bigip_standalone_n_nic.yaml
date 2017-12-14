@@ -114,6 +114,7 @@ parameters:
     type: string
     label: Primary BIG-IP VE License Base Key
     description: f5 BIG-IP License Base Key.
+    default: None
   bigip_addon_license_keys:
     type: comma_delimited_list
     label: Additional BIG-IP VE License Keys

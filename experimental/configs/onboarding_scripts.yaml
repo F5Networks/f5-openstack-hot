@@ -39,6 +39,11 @@ parameters:
     label: Stack Id (Usage Analytics)
     description: Stack Id or Name
     default: None
+  ua_license_type:
+    type: string
+    label: License Type (Usage Analytics)
+    description: Type of Licensing
+    default: BYOL
 
   verify_hash_url_override:
     type: string
@@ -202,31 +207,31 @@ resources:
                   __add_on_licenses__:
                     list_join:
                       - ' '
-                      -
+                      - 
                         repeat:
                           template: --add-on "addon"
                           for_each:
-                            addon: { get_param: bigip_addon_licenses }
+                            addon: {get_param: bigip_addon_licenses}
                   __dns__:
                     list_join:
                       - ' '
-                      -
+                      - 
                         repeat:
                           template: --dns server_dns
                           for_each:
-                            server_dns: { get_param: dns }
+                            server_dns: {get_param: dns}
                   __modules__:
                     list_join:
                       - ' '
-                      -
+                      - 
                         repeat:
                           template: --module bigip_module
                           for_each:
-                            bigip_module: { get_param: modules }
+                            bigip_module: {get_param: modules}
                   __ntp__:
                     list_join:
                       - ' '
-                      -
+                      - 
                         repeat:
                           template: --ntp server_ntp
                           for_each:
@@ -238,6 +243,7 @@ resources:
                   __cust_id__: { get_param: ua_project_id }
                   __deploy_id__: { get_param: ua_stack_id }
                   __region__: { get_param: ua_region }
+                  __license_type__: { get_param: ua_license_type }
                   wc_notify: { get_param: wait_handle_curl }
               template: { get_file: ../scripts/onboard.sh }
 
