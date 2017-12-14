@@ -161,11 +161,11 @@ The following parameters can be defined in your environment file.
 | autoscale_set_min_count | No | The minimum number of BIG-IP VE instance to deploy in the scaling group. |  |
 | autoscale_set_max_count | No | The maximum number of BIG-IP VE instances to deploy in the scaling group. |  |
 | os_username | Yes | User name for OpenStack account that can perform heat, ceilometer, and swift operations |  |
-| os_password | Password for OpenStack account that can perform heat, ceilometer, and swift operations |  |
+| os_password | Yes | Password for OpenStack account that can perform heat, ceilometer, and swift operations |  |
 | os_region | Yes | Region for OpenStack account that can perform  heat, ceilometer, and swift operations |  |
 | os_auth_url | Yes | Auth Endpoint URL for OpenStack account that can perform  heat, ceilometer, and swift operations |  |
 | os_auth_version | No | Version of the Auth URL | The default is **v3** |  |
-| os_domain_name | No | Name of the OpenStack account domain | The default is **default |  |
+| os_domain_name | No | Name of the OpenStack account domain | The default is **default** |  |
 
 <br>
 
