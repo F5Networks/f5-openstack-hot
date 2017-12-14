@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This solution uses a Heat Orchestration Template to launch a 1-NIC deployment of a BIG-IP VE in an Openstack Private Cloud. Traffic flows from the BIG-IP VE to the application servers. This is the standard Cloud design where the compute instance of F5 is running with a single interface, which processes both management and data plane traffic. This is a traditional model in the cloud where the deployment is considered one-armed.
+This solution uses a Heat Orchestration Template to launch a 1-NIC deployment of a BIG-IP VE in an OpenStack Private Cloud. Traffic flows from the BIG-IP VE to the application servers. This is the standard Cloud design where the compute instance of F5 is running with a single interface, which processes both management and data plane traffic. This is a traditional model in the cloud where the deployment is considered one-armed.
 
 The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
 
@@ -119,7 +119,7 @@ bigip_modules:
  - modules: [afm,am,apm,asm,avr,dos,fps,gtm,ilx,lc,ltm,pem,swg,urldb]
  - levels: [custom,dedicated,minimum,nominal,none]
 
- ### Sending statistical information to F5
+ ### Sending statistical information to F5  
  All of the F5 templates now have an option to send anonymous statistical data to F5 Networks to help us improve future templates.  
  None of the information we collect is personally identifiable, and only includes:
 
