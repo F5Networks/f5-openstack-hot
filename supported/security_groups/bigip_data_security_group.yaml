@@ -14,7 +14,7 @@ resources:
     properties:
       description: security group rules for data interfaces
       name: { get_param: security_group_name }
-      rules: 
+      rules:
         - protocol: icmp
           direction: ingress
         - protocol: icmp
@@ -29,6 +29,6 @@ resources:
           direction: egress
 
 outputs:
-   data_security_group_id:
-     description: Get resource id of this security group
-     value: { get_resource: bigip_data_security_group }
+  data_security_group_id:
+    description: Get resource id of this security group
+    value: { get_resource: bigip_data_security_group }

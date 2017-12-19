@@ -24,10 +24,10 @@ resources:
         str_replace:
           template: <%vlan_name%>-secgroup
           params:
-            <%vlan_name%>: { get_param: [ network_vlan_names,{ get_param: security_group_index} ] }
+            <%vlan_name%>: { get_param: [ network_vlan_names, { get_param: security_group_index} ] }
       rules: { get_param: [security_group_rules, { get_param: security_group_index}, rules ]}
 
 outputs:
-   security_group_id:
-     description: Get resource id of this security group
-     value: { get_resource: bigip_custom_security_group }
+  security_group_id:
+    description: Get resource id of this security group
+    value: { get_resource: bigip_custom_security_group }

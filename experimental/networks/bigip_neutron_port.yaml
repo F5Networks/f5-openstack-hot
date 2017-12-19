@@ -31,6 +31,8 @@ resources:
       network: { get_param: [network_names, { get_param: index }] }
       security_groups: [{ get_param: [ security_groups, { get_param: index}] }]
       admin_state_up: true
+      allowed_address_pairs:
+        - ip_address: 0.0.0.0/0
       fixed_ips:
         - subnet: { get_param: [network_subnets, { get_param: index }] }
           ip_address: { get_param: [ip_addresses, { get_param: index }] }

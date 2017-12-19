@@ -18,4 +18,3 @@ package:
         name: f5-openstack-hot-supported-$CI_BUILD_REF
         paths:
             - dist/
-

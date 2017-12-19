@@ -26,21 +26,21 @@ parameters:
   bigiq_use_alt_bigip_mgmt_ip:
     type: boolean
     label: Use BIG-IP Floating IP for BIG-IQ licensing
-    description: Determines whether to use the external address or floating ip of the BIG-IP for BIG-IQ licensing 
+    description: Determines whether to use the external address or floating ip of the BIG-IP for BIG-IQ licensing
     default: false
   bigiq_alt_bigip_mgmt_ip:
     type: string
     label: Alternate BIG-IP IP Address for BIG-IQ licensing
-    description: The alternate ip address to use when licensing the BIG-IP through BIG-IQ. If not specified, management address is used. 
+    description: The alternate ip address to use when licensing the BIG-IP through BIG-IQ. If not specified, management address is used.
   # Note: For now, default to None. If needed, we can expose to parent template and add config for new port
   bigiq_alt_bigip_mgmt_port:
     type: string
     label: Alternate BIG-IP Port for BIG-IQ licensing
-    description: The alternate port to use when licensing the BIG-IP through BIG-IQ. If not specified, management port is used. 
+    description: The alternate port to use when licensing the BIG-IP through BIG-IQ. If not specified, management port is used.
     default: None
   config_sync_ip:
     type: string
-    label: f5 BIG-IP Cluster Self-IP 
+    label: f5 BIG-IP Cluster Self-IP
     description: ConfigSync IP Address of this BIG-IP.
   device_group:
     type: string
@@ -50,7 +50,7 @@ parameters:
   host_name:
     type: string
     label: f5 BIG-IP Host Name
-    description: Device Name for the BIG-IP. 
+    description: Device Name for the BIG-IP.
   use_config_drive:
     type: boolean
     label: Use Config Drive
@@ -58,7 +58,7 @@ parameters:
   wait_handle_curl:
     type: string
     label: Wait Handle Curl
-    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to 
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to
   autoscale_group_tag:
     type: string
     label: Autoscale Group Tag
@@ -71,7 +71,7 @@ parameters:
     type: string
     label: Autoscale Metadata Resource Name
     description: Name of resource for storing autoscale metadata
-  autoscale_stack_name: 
+  autoscale_stack_name:
     type: string
     label: Autoscale Stack Name
     description: Name of the parent stack that was launched
@@ -83,7 +83,7 @@ parameters:
     type: string
     label: Openstack Password
     description: Password for openstack account that can perform stack operations
-    hidden: True
+    hidden: true
   os_region:
     type: string
     label: Openstack Region
@@ -109,51 +109,50 @@ resources:
       cloud_config:
         merge_how: dict(recurse_array,no_replace)+list(append)
         write_files:
-        - path: /config/onboard-autoscale.sh
-          permissions: 0755
-          owner: root:root
-          content:
-            str_replace:
-              params:
-                __mgmt_ip__: { get_param: mgmt_ip}
-                __mgmt_port__: { get_param: mgmt_port }
-                __device_group__: { get_param: device_group }
-                __host_name__: { get_param: host_name }
-                __use_config_drive__: { get_param: use_config_drive }
-                __autoscale_group_tag__: { get_param: autoscale_group_tag }
-                __autoscale_metadata_url__: { get_param: autoscale_metadata_endpoint }
-                __autoscale_metadata_resource__: { get_param: autoscale_metadata_resource_name }
-                __autoscale_stack__: { get_param: autoscale_stack_name } 
-                __bigiq_host__: { get_param: bigiq_license_host_ip }
-                __bigiq_username__: { get_param: bigiq_license_username }
-                __bigiq_lic_pool__: { get_param: bigiq_license_pool }
-                __bigiq_use_alt_mgmt_ip__: { get_param: bigiq_use_alt_bigip_mgmt_ip }
-                __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
-                __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
-                wc_notify: { get_param: wait_handle_curl }
-              template: { get_file: ../scripts/onboard-autoscale.sh}
-        - path: /config/cloud/openstack/.os
-          permissions: 0755
-          owner: root:root
-          content:
-            str_replace:
-              params:
-                __username__: { get_param: os_username }
-                __password__: { get_param: os_password }
-                __region__: { get_param: os_region }
-                __auth__: { get_param: os_auth_url }
-                __auth_version__ : { get_param: os_auth_version }
-                __domain__ : { get_param: os_domain_name }
-              template: |
-                  {
-                    "username": "__username__",
-                    "password": "__password__",
-                    "region": "__region__",
-                    "authUrl": "__auth__",
-                    "authVersion": "__auth_version__",
-                    "domainName": "__domain__"
-                  }
-
+          - path: /config/onboard-autoscale.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
+                  __mgmt_ip__: { get_param: mgmt_ip}
+                  __mgmt_port__: { get_param: mgmt_port }
+                  __device_group__: { get_param: device_group }
+                  __host_name__: { get_param: host_name }
+                  __use_config_drive__: { get_param: use_config_drive }
+                  __autoscale_group_tag__: { get_param: autoscale_group_tag }
+                  __autoscale_metadata_url__: { get_param: autoscale_metadata_endpoint }
+                  __autoscale_metadata_resource__: { get_param: autoscale_metadata_resource_name }
+                  __autoscale_stack__: { get_param: autoscale_stack_name }
+                  __bigiq_host__: { get_param: bigiq_license_host_ip }
+                  __bigiq_username__: { get_param: bigiq_license_username }
+                  __bigiq_lic_pool__: { get_param: bigiq_license_pool }
+                  __bigiq_use_alt_mgmt_ip__: { get_param: bigiq_use_alt_bigip_mgmt_ip }
+                  __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
+                  __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
+                  wc_notify: { get_param: wait_handle_curl }
+                template: { get_file: ../scripts/onboard-autoscale.sh}
+          - path: /config/cloud/openstack/.os
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
+                  __username__: { get_param: os_username }
+                  __password__: { get_param: os_password }
+                  __region__: { get_param: os_region }
+                  __auth__: { get_param: os_auth_url }
+                  __auth_version__: { get_param: os_auth_version }
+                  __domain__: { get_param: os_domain_name }
+                template: |
+                    {
+                      "username": "__username__",
+                      "password": "__password__",
+                      "region": "__region__",
+                      "authUrl": "__auth__",
+                      "authVersion": "__auth_version__",
+                      "domainName": "__domain__"
+                    }
 
 
 outputs:

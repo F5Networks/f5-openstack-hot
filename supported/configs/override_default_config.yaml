@@ -1,13 +1,13 @@
 heat_template_version: 2016-04-08
 
-description: This template performs overrides of defaults for a standard f5 standalone VE image.  
+description: This template performs overrides of defaults for a standard f5 standalone VE image.
 
 parameters:
   admin_password:
     type: string
     label: f5 VE Admin User Password
     description: Password used to perform image import services.
-    hidden: true  
+    hidden: true
   root_password:
     type: string
     label: f5 VE Root User Password
@@ -36,13 +36,13 @@ resources:
     type: OS::Heat::SoftwareConfig
     properties:
       group: ungrouped
-      config: 
+      config:
         str_replace:
           params:
-              __admin_password_random__: { get_attr: [random_password_admin, value] }
-              __root_password_random__: { get_attr: [random_password_root, value] }
-              __admin_password__: { get_param: admin_password }
-              __root_password__: { get_param: root_password }
+            __admin_password_random__: { get_attr: [random_password_admin, value] }
+            __root_password_random__: { get_attr: [random_password_root, value] }
+            __admin_password__: { get_param: admin_password }
+            __root_password__: { get_param: root_password }
           template: |
               #!/bin/bash
               echo '******Overriding Default Configuration******'

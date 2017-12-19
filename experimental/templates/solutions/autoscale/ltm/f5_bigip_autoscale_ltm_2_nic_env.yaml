@@ -46,7 +46,7 @@ parameters:
   os_auth_url: "http://keystonehost.openstacklocal:<port>"
   os_auth_version: v3
   os_domain_name: keystoneDomain
-  allow_usage_analytics: True
+  allow_usage_analytics: true
 
 resource_registry:
   F5::BigIP::OverrideDefaultConfig: ../../../../experimental/configs/override_default_config.yaml

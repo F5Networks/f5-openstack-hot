@@ -62,7 +62,7 @@ parameters:
     type: boolean
     label: Allow Usage Analytics
     description: Toggles whether non-identifiable statistical information is sent to F5.
-    default: True
+    default: true
   #bigip credentials
   bigip_os_ssh_key:
     type: string
@@ -85,7 +85,7 @@ parameters:
     type: comma_delimited_list
     label: Primary BIG-IP VE License Base Keys
     description: f5 BIG-IP List of License Base Keys.
-    default: 
+    default:
       -
       -
   bigip_addon_license_keys:
@@ -205,55 +205,55 @@ parameters:
     description: Non-floating SelfIP Addresses for clustering
 
 parameter_groups:
-- label: BIG-IP General Provisioning
-  parameters:
-  - bigip_image
-  - bigip_flavor
-  - use_config_drive
-  - f5_cloudlibs_tag
-  - f5_cloudlibs_url_override
-  - f5_cloudlibs_verify_hash_url_override
-  - f5_cloudlibs_openstack_tag
-  - f5_cloudlibs_openstack_url_override
-  - bigip_servers_ntp
-  - bigip_servers_dns
-  - allow_usage_analytics
-- label: BIG-IP Credentials
-  parameters:
-  - bigip_os_ssh_key
-  - bigip_admin_pwd
-  - bigip_root_pwd
-- label: BIG-IP Licensing and Modules
-  parameters:
-  - bigip_license_keys
-  - bigip_addon_license_keys
-  - bigip_modules
-- label: OS Network
-  parameters:
-  - external_network
-  - mgmt_network
-  - mgmt_security_group_name
-  - network_vlan_security_group_name
-  - network_vlan_name
-  - network_vlan_subnet
-- label: BIG-IP Network
-  parameters:
-  - bigip_default_gateway
-  - bigip_mgmt_port
-  - bigip_vlan_name
-  - bigip_vlan_mtu
-  - bigip_vlan_tag
-  - bigip_vlan_nic
-  - bigip_self_ip_addresses
-  - bigip_self_cidr_block
-  - bigip_self_port_lockdown
-- label: BIG-IP Cluster
-  parameters:
-  - bigip_device_group
-  - bigip_sync_type
-  - bigip_auto_sync
-  - bigip_save_on_auto_sync
-  - bigip_cluster_self_ip_addresses
+  - label: BIG-IP General Provisioning
+    parameters:
+      - bigip_image
+      - bigip_flavor
+      - use_config_drive
+      - f5_cloudlibs_tag
+      - f5_cloudlibs_url_override
+      - f5_cloudlibs_verify_hash_url_override
+      - f5_cloudlibs_openstack_tag
+      - f5_cloudlibs_openstack_url_override
+      - bigip_servers_ntp
+      - bigip_servers_dns
+      - allow_usage_analytics
+  - label: BIG-IP Credentials
+    parameters:
+      - bigip_os_ssh_key
+      - bigip_admin_pwd
+      - bigip_root_pwd
+  - label: BIG-IP Licensing and Modules
+    parameters:
+      - bigip_license_keys
+      - bigip_addon_license_keys
+      - bigip_modules
+  - label: OS Network
+    parameters:
+      - external_network
+      - mgmt_network
+      - mgmt_security_group_name
+      - network_vlan_security_group_name
+      - network_vlan_name
+      - network_vlan_subnet
+  - label: BIG-IP Network
+    parameters:
+      - bigip_default_gateway
+      - bigip_mgmt_port
+      - bigip_vlan_name
+      - bigip_vlan_mtu
+      - bigip_vlan_tag
+      - bigip_vlan_nic
+      - bigip_self_ip_addresses
+      - bigip_self_cidr_block
+      - bigip_self_port_lockdown
+  - label: BIG-IP Cluster
+    parameters:
+      - bigip_device_group
+      - bigip_sync_type
+      - bigip_auto_sync
+      - bigip_save_on_auto_sync
+      - bigip_cluster_self_ip_addresses
 
 resources:
   mgmt_security_group:
@@ -317,24 +317,43 @@ resources:
           bigip_default_gateway: { get_param: bigip_default_gateway }
           bigip_device_names: { get_attr: [device_mgmt_ports, show, dns_assignment, 0, fqdn] }
           bigip_cluster_self_ip_addresses: { get_param: bigip_cluster_self_ip_addresses }
-          bigip_auto_sync : { get_param: bigip_auto_sync }
-          bigip_save_on_auto_sync : { get_param: bigip_save_on_auto_sync }
+          bigip_auto_sync: { get_param: bigip_auto_sync }
+          bigip_save_on_auto_sync: { get_param: bigip_save_on_auto_sync }
           ua_allow: { get_param: allow_usage_analytics }
           ua_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
           ua_project_id: { get_param: 'OS::project_id'}
           ua_stack_id: { get_param: 'OS::stack_id' }
           ua_template_name: sup-f5_bigip_cluster_2_nic.yaml
           ua_template_version: 3.0.0
+
 outputs:
   bigip1_instance_id:
+    description: ID of the BIG-IP (resource.0) instance
     value: { get_attr: [device_cluster, resource.0.bigip_instance_id] }
   bigip1_instance_name:
+    description: Name of the BIG-IP (resource.0) instance
     value: { get_attr: [device_cluster, resource.0.bigip_instance_name] }
   bigip1_floating_ip:
+    description: Floating IP associated with the management port of BIG-IP (resource.0) instance
     value: { get_attr: [device_cluster, resource.0.bigip_instance_floating_ip] }
+  bigip1_mgmt_port_id:
+    description: Management neutron port ID of BIG-IP (resource.0) instance
+    value: { get_attr: [device_cluster, resource.0.bigip_instance_mgmt_port_id] }
+  bigip1_vlan_port_id:
+    description: Port ID of network vlan on the BIG-IP (resource.0) instance
+    value: { get_attr: [device_cluster, resource.0.bigip_instance_vlan_port_id] }
   bigip2_instance_id:
+    description: ID of the BIG-IP (resource.1) instance
     value: { get_attr: [device_cluster, resource.1.bigip_instance_id] }
   bigip2_instance_name:
+    description: Name of the BIG-IP (resource.1) instance
     value: { get_attr: [device_cluster, resource.1.bigip_instance_name] }
   bigip2_floating_ip:
+    description: Floating IP associated with the management port of the BIG-IP (resource.1) instance
     value: { get_attr: [device_cluster, resource.1.bigip_instance_floating_ip] }
+  bigip2_mgmt_port_id:
+    description: Management neutron port ID of BIG-IP (resource.1) instance
+    value: { get_attr: [device_cluster, resource.1.bigip_instance_mgmt_port_id] }
+  bigip2_vlan_port_id:
+    description: Port ID of network vlan on the BIG-IP (resource.1) instance
+    value: { get_attr: [device_cluster, resource.1.bigip_instance_vlan_port_id ]}

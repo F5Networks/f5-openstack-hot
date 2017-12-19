@@ -3,8 +3,8 @@ heat_template_version: 2016-04-08
 description: This template configures the run commands for onboard-network-<%nic_index%>.sh, which is used to configure network components for a standard f5 VE image.
 
 parameters:
-    nic_indexes:
-      type: comma_delimited_list
+  nic_indexes:
+    type: comma_delimited_list
 
 resources:
   run_commands:

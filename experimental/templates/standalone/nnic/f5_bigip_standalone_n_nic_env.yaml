@@ -6,19 +6,19 @@ parameters:
   bigip_admin_pwd: adminPwd
   bigip_root_pwd: rootPwd
   bigip_license_key: baseLicenseKey
-  bigip_addon_license_keys: 
+  bigip_addon_license_keys:
     - addonKey1
     - addonKey2
   bigip_modules:
     - ltm:nominal
 
-  ###This should be an existing neutron network. 
+  ###This should be an existing neutron network.
   external_network: public
 
-  ###This should be an existing neutron network. 
+  ###This should be an existing neutron network.
   mgmt_network: external_net
 
-  ###Name to apply to the security group to be created for management network. 
+  ###Name to apply to the security group to be created for management network.
   mgmt_security_group_name: mgmt-secgroup-nnic
 
 
@@ -26,10 +26,10 @@ parameters:
   bigip_nic_count: 5
 
   ###This is usually bigip_nic_count minus 1. (zero-based index)
-  ###This determines which nic setup to wait to finish before triggering post_onboard.sh, where custom tmsh commands can be added. 
+  ###This determines which nic setup to wait to finish before triggering post_onboard.sh, where custom tmsh commands can be added.
   bigip_last_nic_index: 4
 
-  ###This should be a list of existing neutron networks. 
+  ###This should be a list of existing neutron networks.
   network_vlan_names:
     - dev-data1
     - dev-data2
@@ -37,7 +37,7 @@ parameters:
     - dev-data4
     - dev-data5
 
-  ###This should be a list of existing neutron subnets. 
+  ###This should be a list of existing neutron subnets.
   network_vlan_subnets:
     - dev-data1-subnet
     - dev-data2-subnet
@@ -45,55 +45,55 @@ parameters:
     - dev-data4-subnet
     - dev-data5-subnet
 
-  ### Rules to apply to the security groups to be created for the vlans. 
+  ### Rules to apply to the security groups to be created for the vlans.
   ### Each group of rules is the same syntax as rules property of OS::Neutron::SecurityGroup
   ### JSON object { "security_group_rules": [ {"rules": [...] }, { "rules": [...] } ] }
   network_vlan_security_group_rules:
     security_group_rules:
     #secgroup-0
-    - rules:
-      - protocol: icmp
-        remote_ip_prefix: 0.0.0.0/0
-      - protocol: tcp
-        remote_ip_prefix: 0.0.0.0/0
-      - protocol: udp
-        remote_ip_prefix: 0.0.0.0/0
-    #secgroup-1
-    - rules:
-      - protocol: icmp
-        remote_ip_prefix: 0.0.0.0/0
-      - protocol: tcp
-        remote_ip_prefix: 0.0.0.0/0
-      - protocol: udp
-        remote_ip_prefix: 0.0.0.0/0
-    #secgroup-2
-    - rules:
-      - protocol: icmp
-        direction: egress
-      - protocol: tcp
-        direction: egress
-      - protocol: udp
-        direction: egress
-    #secgroup-3
-    - rules:
-        - protocol: icmp
-          direction: ingress
-        - protocol: icmp
-          direction: egress
-        - protocol: tcp
-          direction: ingress
-        - protocol: tcp
-          direction: egress
-        - protocol: udp
-          direction: ingress
-        - protocol: udp
-          direction: egress
-    #secgroup-4
-    - rules:
-      - protocol: tcp
-        remote_ip_prefix: 0.0.0.0/0
-        port_range_min: 22
-        port_range_max: 22
+      - rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: udp
+            remote_ip_prefix: 0.0.0.0/0
+      #secgroup-1
+      - rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: udp
+            remote_ip_prefix: 0.0.0.0/0
+      #secgroup-2
+      - rules:
+          - protocol: icmp
+            direction: egress
+          - protocol: tcp
+            direction: egress
+          - protocol: udp
+            direction: egress
+      #secgroup-3
+      - rules:
+          - protocol: icmp
+            direction: ingress
+          - protocol: icmp
+            direction: egress
+          - protocol: tcp
+            direction: ingress
+          - protocol: tcp
+            direction: egress
+          - protocol: udp
+            direction: ingress
+          - protocol: udp
+            direction: egress
+      #secgroup-4
+      - rules:
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+            port_range_min: 22
+            port_range_max: 22
 
   bigip_self_ip_addresses:
     - 172.16.1.53
@@ -131,15 +131,15 @@ parameters:
     - data5
 
   bigip_self_port_lockdowns:
-    ###Nested list items are returned in the format [u'item'], which causes extra chars to be returned when using str_split. 
-    ###So we are using flat list instead with semicolon as delimiter. 
-    ###Syntax for each list item: <service>:<port> 
+    ###Nested list items are returned in the format [u'item'], which causes extra chars to be returned when using str_split.
+    ###So we are using flat list instead with semicolon as delimiter.
+    ###Syntax for each list item: <service>:<port>
     ###If left empty, use the default allow settings for the vlan - same as allow-default.
     ###To be supported in future cloud-libs fix: allow-none, allow-all
-    - 
+    -
     - allow-default
-    - 
-    - 
+    -
+    -
     - tcp:22;tcp:443
 
   ###Tag value for f5-cloud-libs download. Syntax: <vrelease> Defaults to v3.5.0

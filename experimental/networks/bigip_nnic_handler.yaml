@@ -1,6 +1,6 @@
 heat_template_version: 2016-04-08
 
-description: This template builds components for dynamic number of nics. 
+description: This template builds components for dynamic number of nics.
 
 parameters:
   bigip_nic_count:
@@ -11,7 +11,7 @@ parameters:
     type: number
     label: f5 BIG-IP last NIC index (0-based)
     description: The 0-based index of the last NIC to attach to Big-IP. This is essentially bigip_nic_count minus 1. This helps identify the last nic in the resource group.
-                 Since there are no intrinsic arithmetic functions currently supported in heat, this parameter is required. 
+                 Since there are no intrinsic arithmetic functions currently supported in heat, this parameter is required.
   network_vlan_names:
     type: comma_delimited_list
     label: OS Neutron Networks to map to the BIG-IP VLANs
@@ -34,7 +34,7 @@ parameters:
     label: f5 BIG-IP VE VLAN names
     description: Names of the VLAN to be created on the BIG-IP.
     default:
-     -
+      -
   bigip_vlan_mtus:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN MTUs
@@ -104,7 +104,7 @@ resources:
           vlan_nic_index: "%index%"
           vlan_last_nic_index: { get_param: bigip_last_nic_index }
           self_ip_addrs: { get_param: bigip_self_ip_addresses }
-          self_cidr_blocks:  { get_param: bigip_self_cidr_blocks}
+          self_cidr_blocks: { get_param: bigip_self_cidr_blocks}
           self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
           default_gateway: { get_param: bigip_default_gateway }
           wait_handle_curl: { get_param: wait_handle_curl}
@@ -117,16 +117,16 @@ resources:
         runcmd:
           - nohup /config/preOnboard.sh &>> /var/log/preOnboard.log < /dev/null &
           - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/onboard.log < /dev/null &
-          - 
+          -
             str_replace:
               params:
-                <%last_nic_index%> : { get_param: bigip_last_nic_index }
+                <%last_nic_index%>: { get_param: bigip_last_nic_index }
               template: "nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_<%last_nic_index%>_DONE -o /var/log/postOnboard.log' &>> /var/log/runScript.log < /dev/null & "
 
   run_network_commands:
     type: F5::BigIP::RunOnboardNetworkConfigs
     properties:
-      nic_indexes:  { get_attr: [ onboard_network_configs, config_index ] }
+      nic_indexes: { get_attr: [ onboard_network_configs, config_index ] }
 
 outputs:
   port_ids:
@@ -137,4 +137,3 @@ outputs:
     value: { get_resource: run_core_commands }
   init_6_run_network_commands:
     value: { get_resource: run_network_commands }
-
