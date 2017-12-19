@@ -1,6 +1,8 @@
 heat_template_version: 2016-04-08
 
+
 description: This template deploys standard f5 BIG-IP VE - 2NIC instances which are automatically scaled according to configured policies.
+
 
 parameters:
   #bigip general provisioning
@@ -63,7 +65,7 @@ parameters:
     type: boolean
     label: Allow Usage Analytics
     description: Toggles whether non-identifiable statistical information is sent to F5.
-    default: True
+    default: true
   #bigip credentials
   bigip_os_ssh_key:
     type: string
@@ -94,7 +96,7 @@ parameters:
     type: string
     label: f5 BIG-IQ Password
     description: The BIG-IQ password to use to license the BIG-IP instances.
-    hidden: True
+    hidden: true
   bigiq_license_pool:
     type: string
     label: f5 BIG-IQ License Pool Name
@@ -267,7 +269,7 @@ parameters:
     type: string
     label: Openstack Password
     description: Password for openstack account that can perform heat, ceilometer, and swift operations
-    hidden: True
+    hidden: true
   os_region:
     type: string
     label: Openstack Region
@@ -288,6 +290,7 @@ parameters:
     description: Name of the openstack domain
     default: default
 
+
 parameter_groups:
   - label: BIG-IP General Provisioning
     parameters:
@@ -301,6 +304,7 @@ parameter_groups:
       - f5_cloudlibs_openstack_url_override
       - bigip_servers_ntp
       - bigip_servers_dns
+      - allow_usage_analytics
   - label: BIG-IP Credentials
     parameters:
       - bigip_os_ssh_key
@@ -357,7 +361,6 @@ parameter_groups:
       - os_auth_url
       - os_auth_version
       - os_domain_name
-      - allow_usage_analytics
 
 
 resources:
@@ -376,7 +379,7 @@ resources:
     properties:
       adjustment_type: { get_param: autoscale_adjustment_type }
       auto_scaling_group_id: { get_resource: device_group }
-      cooldown:  { get_param: autoscale_policy_cooldown }
+      cooldown: { get_param: autoscale_policy_cooldown }
       scaling_adjustment: 1
   scale_down_policy:
     type: OS::Heat::ScalingPolicy
@@ -469,7 +472,7 @@ resources:
           os_auth_url: { get_param: os_auth_url }
           os_auth_version: { get_param: os_auth_version }
           os_domain_name: { get_param: os_domain_name }
-          autoscale_group_tag : { get_param: autoscale_group_tag }
+          autoscale_group_tag: { get_param: autoscale_group_tag }
           autoscale_metadata_endpoint: { get_attr: [signal_handle_autoscale_metadata, endpoint]}
           autoscale_metadata_resource_name: 'signal_autoscale_metadata'
           autoscale_stack_name: { get_param: 'OS::stack_name' }
@@ -481,18 +484,32 @@ resources:
           ua_template_name: exp-f5_bigip_autoscale_ltm_2_nic.yaml
           ua_template_version: 3.0.0
 
+
 outputs:
   device_group_current_size:
+    description: Current size of the autoscale group
     value: { get_attr: [device_group, current_size]}
   device_group_resource_ids:
+    description: Resource IDs of the autoscale instance stack
     value: { get_attr: [device_group, outputs, resourceid]}
   device_group_bigip_instance_ids:
+    description: Instance IDs of the BIG-IPs in the autoscale group
     value: { get_attr: [device_group, outputs, bigip_instance_id]}
-  device_group_bigip_instance_namess:
+  device_group_bigip_instance_names:
+    description: Instance Names of the BIG-IPs in the autoscale group
     value: { get_attr: [device_group, outputs, bigip_instance_name]}
   device_group_bigip_instance_networks:
+    description: Networks info for the BIG-IPs in the autoscale group
     value: { get_attr: [device_group, outputs, bigip_instance_networks]}
   device_group_bigip_instance_addresses:
+    description: Addresses of the BIG-IPs in the autoscale group
     value: { get_attr: [device_group, outputs, bigip_instance_addresses]}
   device_group_bigip_instance_floating_ips:
+    description: Floating IPs associated with the management port of the BIG-IPs in the autoscale group
     value: { get_attr: [device_group, outputs, bigip_instance_floating_ip]}
+  device_group_bigip_instance_mgmt_port_ids:
+    description: Neutron port ids for the management nics of the BIG-IPs in the autoscale group
+    value: { get_attr: [device_group, outputs, bigip_instance_mgmt_port_id ]}
+  device_group_bigip_instance_vlan_port_ids:
+    description: Neutron port ids for the vlan nics of the BIG-IPs in the autoscale group
+    value: { get_attr: [device_group, outputs, bigip_instance_network_vlan_port_id ]}
