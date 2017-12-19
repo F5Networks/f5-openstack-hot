@@ -10,7 +10,7 @@ licenseOpt="--license"
 addOnLicenses="__add_on_licenses__"
 dns="__dns__"
 hostName="__host_name__"
-mgmtIp="__mgmt_ip__"
+mgmtPortId="__mgmt_port_id__"
 adminPwd=""
 newRootPwd=""
 oldRootPwd=""
@@ -45,12 +45,16 @@ function set_vars() {
     fi
 
     if [[ "$hostName" == "" || "$hostName" == "None" ]]; then
-      echo 'building hostname manually - no fqdn returned from neutron port assignment'
-      dnsSuffix=$(/bin/grep search /etc/resolv.conf | awk '{print $2}')
-      hostName="host-$mgmtIp.$dnsSuffix"
+        echo 'using mgmt neutron portid as hostname - no fqdn returned from neutron port assignment'
+        # get first matching domain
+        dnsSuffix=$(/bin/grep search /etc/resolv.conf | awk '{print $2}')
+        if [[ "$dnsSuffix" == "" ]]; then
+            dnsSuffix="openstacklocal"
+        fi
+            hostName="host-$mgmtPortId.$dnsSuffix"
     else
-      #remove trailing . from fqdn
-      hostName=${hostName%.}
+        #remove trailing . from fqdn
+        hostName=${hostName%.}
     fi
 
     onboardRun=$(grep "Starting Onboard call" -i -c -m 1 "$logFile" )
@@ -108,7 +112,7 @@ function onboard_run() {
                 msg="Onboard command exited without error."
                 stat="SUCCESS"
             fi
-            
+
         fi
     else
         msg='Onboard exited with an error signal.'

@@ -75,7 +75,7 @@ parameters:
     type: boolean
     label: Allow Usage Analytics
     description: Toggles whether non-identifiable statistical information is sent to F5.
-    default: True
+    default: true
 
    #bigip nnic provisioning
   bigip_nic_count:
@@ -176,7 +176,7 @@ parameters:
     label: f5 BIG-IP VE VLAN names
     description: Names of the VLAN to be created on the BIG-IP.
     default:
-     -
+      -
   bigip_vlan_mtus:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN MTUs
@@ -204,49 +204,49 @@ parameters:
 parameter_groups:
   - label: BIG-IP General Provisioning
     parameters:
-    - bigip_image
-    - bigip_flavor
-    - use_config_drive
-    - f5_cloudlibs_tag
-    - f5_cloudlibs_url_override
-    - f5_cloudlibs_verify_hash_url_override
-    - f5_cloudlibs_openstack_tag
-    - f5_cloudlibs_openstack_url_override
-    - bigip_servers_ntp
-    - bigip_servers_dns
-    - allow_usage_analytics
+      - bigip_image
+      - bigip_flavor
+      - use_config_drive
+      - f5_cloudlibs_tag
+      - f5_cloudlibs_url_override
+      - f5_cloudlibs_verify_hash_url_override
+      - f5_cloudlibs_openstack_tag
+      - f5_cloudlibs_openstack_url_override
+      - bigip_servers_ntp
+      - bigip_servers_dns
+      - allow_usage_analytics
   - label: BIG-IP nNIC Provisioning
     parameters:
-    - bigip_nic_count
-    - bigip_last_nic_index
+      - bigip_nic_count
+      - bigip_last_nic_index
   - label: BIG-IP Credentials
     parameters:
-    - bigip_os_ssh_key
-    - bigip_admin_pwd
-    - bigip_root_pwd
+      - bigip_os_ssh_key
+      - bigip_admin_pwd
+      - bigip_root_pwd
   - label: BIG-IP Licensing and Modules
     parameters:
-    - bigip_license_key
-    - bigip_addon_license_keys
-    - bigip_modules
+      - bigip_license_key
+      - bigip_addon_license_keys
+      - bigip_modules
   - label: OS Network
     parameters:
-    - external_network
-    - mgmt_network
-    - mgmt_security_group_name
-    - network_vlan_security_group_rules
-    - network_vlan_names
-    - network_vlan_subnets
+      - external_network
+      - mgmt_network
+      - mgmt_security_group_name
+      - network_vlan_security_group_rules
+      - network_vlan_names
+      - network_vlan_subnets
   - label: BIG-IP Network
     parameters:
-    - bigip_default_gateway
-    - bigip_mgmt_port
-    - bigip_vlan_names
-    - bigip_vlan_mtus
-    - bigip_vlan_tags
-    - bigip_self_ip_addresses
-    - bigip_self_cidr_blocks
-    - bigip_self_port_lockdowns
+      - bigip_default_gateway
+      - bigip_mgmt_port
+      - bigip_vlan_names
+      - bigip_vlan_mtus
+      - bigip_vlan_tags
+      - bigip_self_ip_addresses
+      - bigip_self_cidr_blocks
+      - bigip_self_port_lockdowns
 
 resources:
   wait_condition_onboard_complete:
@@ -292,7 +292,7 @@ resources:
       bigip_self_ip_addresses: { get_param: bigip_self_ip_addresses }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
       bigip_vlan_mtus: { get_param: bigip_vlan_mtus }
-      bigip_self_cidr_blocks:  { get_param: bigip_self_cidr_blocks}
+      bigip_self_cidr_blocks: { get_param: bigip_self_cidr_blocks}
       bigip_self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
       bigip_default_gateway: { get_param: bigip_default_gateway }
       wait_handle_curl: { get_attr: [wait_handle_onboard_network, curl_cli]}
@@ -318,7 +318,7 @@ resources:
       ntp: { get_param: bigip_servers_ntp }
       dns: { get_param: bigip_servers_dns }
       host_name: { get_attr: [mgmt_port, show, dns_assignment, 0, fqdn] }
-      management_ip: { get_attr: [mgmt_port, fixed_ips, 0, ip_address] }
+      management_port_id: { get_resource: mgmt_port }
       management_port: { get_param: bigip_mgmt_port }
       ssh_key_name: { get_param: bigip_os_ssh_key }
       use_config_drive: { get_param: use_config_drive }
@@ -342,13 +342,13 @@ resources:
                 - ','
                 -
                   list_join:
-                   - ','
-                   - [{ get_resource: init_1_override_default_config }]
-                   - [{ get_resource: init_2_onboard_libs }]
-                   - [{ get_resource: init_3_onboard_scripts }]
-                   - { get_attr: [ bigip_nnic_handler, init_4_onboard_network_configs ] }
-                   - [{ get_attr: [ bigip_nnic_handler, init_5_run_core_commands ]}]
-                   - [{ get_attr: [ bigip_nnic_handler, init_6_run_network_commands ]}]
+                    - ','
+                    - [{ get_resource: init_1_override_default_config }]
+                    - [{ get_resource: init_2_onboard_libs }]
+                    - [{ get_resource: init_3_onboard_scripts }]
+                    - { get_attr: [ bigip_nnic_handler, init_4_onboard_network_configs ] }
+                    - [{ get_attr: [ bigip_nnic_handler, init_5_run_core_commands ]}]
+                    - [{ get_attr: [ bigip_nnic_handler, init_6_run_network_commands ]}]
   bigip_instance:
     type: OS::Nova::Server
     depends_on: bigip_nnic_handler
@@ -365,12 +365,12 @@ resources:
           for_each:
             <%port%>:
               str_split:
-               - ','
-               -
-                 list_join:
-                  - ','
-                  - [{ get_resource: mgmt_port }]
-                  - { get_attr: [bigip_nnic_handler, port_ids] }
+                - ','
+                -
+                  list_join:
+                    - ','
+                    - [{ get_resource: mgmt_port }]
+                    - { get_attr: [bigip_nnic_handler, port_ids] }
       user_data_format: RAW
       user_data: {get_resource: bigip_provision}
 

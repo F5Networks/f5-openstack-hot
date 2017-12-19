@@ -8,7 +8,7 @@ parameters:
     type: boolean
     label: Allow Usage Analytics
     description: Toggles whether non-identifiable statistical information is sent to F5.
-    default: True
+    default: true
   ua_template_name:
     type: string
     label: Template Name (Usage Analytics)
@@ -77,10 +77,10 @@ parameters:
     type: string
     label: Host Name
     description: BIG-IP Host Name
-  management_ip:
+  management_port_id:
     type: string
-    label: Management IP
-    description: BIG-IP Management IP address
+    label: Management Port ID
+    description: Neutron Port ID of the BIG-IP Management NIC
   management_port:
     type: number
     label: Management Port
@@ -101,18 +101,18 @@ parameters:
   keep_admin:
     type: boolean
     label: Keep Admin
-    description: Toggles removal of admin file after all onboard is done. Set to True if there is an ongoing process that needs access.
-    default: False
+    description: Toggles removal of admin file after all onboard is done. Set to true if there is an ongoing process that needs access.
+    default: false
   keep_bigiq:
     type: boolean
     label: Keep Big-IQ
-    description: Toggles removal of big-iq file after all onboard is done. Set to True if there is an ongoing process that needs access.
-    default: False
+    description: Toggles removal of big-iq file after all onboard is done. Set to true if there is an ongoing process that needs access.
+    default: false
   keep_config_drive:
     type: boolean
     label: Keep Config Drive
-    description: Toggles removal of config drive after initial onboard is done. Set to True if there is a process that needs access after initial onboard.
-    default: False
+    description: Toggles removal of config drive after initial onboard is done. Set to true if there is a process that needs access after initial onboard.
+    default: false
   bigiq_use_alt_bigip_mgmt_ip:
     type: boolean
     label: Use BIG-IP Alternate Management IP Address for licensing
@@ -154,46 +154,46 @@ resources:
     properties:
       cloud_config:
         write_files:
-        - path: /config/cloud/openstack/bigIqPwd
-          permissions: 0755
-          owner: root:root
-          content: { get_param: bigiq_license_pwd }
-        - path: /config/verifyHash
-          permissions: 0755
-          owner: root:root
-          content: { get_file: ../scripts/verifyHash }
-        - path: /config/preOnboard.sh
-          permissions: 0755
-          owner: root:root
-          content:
-            str_replace:
-              params:
+          - path: /config/cloud/openstack/bigIqPwd
+            permissions: 0755
+            owner: root:root
+            content: { get_param: bigiq_license_pwd }
+          - path: /config/verifyHash
+            permissions: 0755
+            owner: root:root
+            content: { get_file: ../scripts/verifyHash }
+          - path: /config/preOnboard.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
                   __ssh_key_name__: { get_param: ssh_key_name }
                   __use_config_drive__: { get_param: use_config_drive }
                   __verify_hash_override__: { get_param: verify_hash_url_override }
                   wc_notify: { get_param: wait_handle_curl}
-              template: { get_file: ../scripts/preOnboard.sh }
-        - path: /config/wait_cloudlibs_install.sh
-          permissions: 0755
-          owner: root:root
-          content: { get_file: ../scripts/wait_cloudlibs_install.sh }
-        - path: /config/postOnboard.sh
-          permissions: 0755
-          owner: root:root
-          content:
-            str_replace:
-              params:
+                template: { get_file: ../scripts/preOnboard.sh }
+          - path: /config/wait_cloudlibs_install.sh
+            permissions: 0755
+            owner: root:root
+            content: { get_file: ../scripts/wait_cloudlibs_install.sh }
+          - path: /config/postOnboard.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
                   wc_notify: { get_param: wait_handle_curl}
                   __keep_admin__: { get_param: keep_admin }
                   __keep_bigiq__: { get_param: keep_bigiq }
-                  __keep_config_drive__ : { get_param: keep_config_drive }
-              template: { get_file: ../scripts/postOnboard.sh }
-        - path: /config/onboard.sh
-          permissions: 0755
-          owner: root:root
-          content:
-            str_replace:
-              params:
+                  __keep_config_drive__: { get_param: keep_config_drive }
+                template: { get_file: ../scripts/postOnboard.sh }
+          - path: /config/onboard.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
                   __license__: { get_param: bigip_license }
                   __bigiq_host__: { get_param: bigiq_license_host_ip }
                   __bigiq_username__: { get_param: bigiq_license_username }
@@ -202,12 +202,12 @@ resources:
                   __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
                   __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
                   __host_name__: { get_param: host_name }
-                  __mgmt_ip__: { get_param: management_ip }
+                  __mgmt_port_id__: { get_param: management_port_id }
                   __mgmt_port__: { get_param: management_port }
                   __add_on_licenses__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --add-on "addon"
                           for_each:
@@ -215,7 +215,7 @@ resources:
                   __dns__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --dns server_dns
                           for_each:
@@ -223,7 +223,7 @@ resources:
                   __modules__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --module bigip_module
                           for_each:
@@ -231,7 +231,7 @@ resources:
                   __ntp__:
                     list_join:
                       - ' '
-                      - 
+                      -
                         repeat:
                           template: --ntp server_ntp
                           for_each:
@@ -245,7 +245,7 @@ resources:
                   __region__: { get_param: ua_region }
                   __license_type__: { get_param: ua_license_type }
                   wc_notify: { get_param: wait_handle_curl }
-              template: { get_file: ../scripts/onboard.sh }
+                template: { get_file: ../scripts/onboard.sh }
 
 outputs:
   OS::stack_id:
