@@ -1,10 +1,83 @@
-image: node:4
-
 stages:
+    - build
+    - test
+    - test-exp
+    - test-sup
     - package
+    - cleanup
+prep:
+    tags:
+        - os
+    stage: build
+    only:
+        - /^release-.*/
+        - /^develop*/
+        - /^gitlab*/
+        - triggers
+    script:
+        - cp -r $CI_PROJECT_DIR ~/src/f5-openstack-hot/ && cp -r ~/src/dev_env/ ~/src/f5-openstack-hot/dev_env/
+        - cd ~/src && git clone -b $CI_BUILD_REF_NAME --single-branch $OS_TEST_REPO $CI_BUILD_REF_NAME
+        - mv $CI_BUILD_REF_NAME f5-openstack-hot-tests
+        - cp tempest/ f5-openstack-hot-tests/tempest/ -r
+test-unit:
+    tags:
+        - os
+    stage: test
+    only:
+        - /^release-.*/
+        - /^develop*/
+        - /^gitlab*/
+        - triggers
+    variables:
+      GIT_STRATEGY: none
+    script:
+        - cd ~/src/f5-openstack-hot-tests
+        - echo '***======== Running Unit Tests - Experimental ========***'
+        - tox -e exp TemplateValid
+        - echo '***======== Running Unit Tests - Supported ========***'
+        - tox -e sup TemplateValid
+    after_script:
+        - cd ~/src/f5-openstack-hot-tests && shred -uz tempest/logs/tempest.log
+test-integration-experimental:
+    tags:
+        - os
+    stage: test-exp
+    only:
+        - /^release-.*/
+        - /^develop*/
+        - /^gitlab*/
+        - triggers
+    variables:
+      GIT_STRATEGY: none
+    script:
+        - cd ~/src/f5-openstack-hot-tests
+        - echo '***======== Running Integration Tests - Experimental ========***'
+        - tox -e exp Standalone
+        - tox -e exp Cluster
+    after_script:
+        - cd ~/src/f5-openstack-hot-tests && shred -uz tempest/logs/tempest.log
+test-integration-supported:
+    tags:
+        - os
+    stage: test-sup
+    only:
+        - /^build-hash*/
+        - /^release-.*/
+        - /^develop*/
+        - /^gitlab*/
+        - triggers
+    variables:
+      GIT_STRATEGY: none
+    script:
+        - cd ~/src/f5-openstack-hot-tests
+        - echo '***======== Running Integration Tests - Supported ========***'
+        - tox -e sup Standalone
+        - tox -e sup Cluster
+    after_script:
+        - cd ~/src/f5-openstack-hot-tests && shred -uz tempest/logs/tempest.log
 package:
     tags:
-        - docker-executor
+        - os
     stage: package
     only:
         - /^build-hash*/
@@ -18,3 +91,9 @@ package:
         name: f5-openstack-hot-supported-$CI_BUILD_REF
         paths:
             - dist/
+cleanup:
+  stage: cleanup
+  script:
+      - rm ~/src/f5-openstack-hot -dfr
+      - rm ~/src/f5-openstack-hot-tests -dfr
+  when: always
