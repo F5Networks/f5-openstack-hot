@@ -22,12 +22,13 @@ while [ $checks -lt 120 ]; do echo checking mcpd
     let checks=checks+1
     sleep 10
 done
-echo loading verifyHash script
+
+echo 'loading verifyHash script'
 if ! tmsh load sys config merge file /config/verifyHash; then
     echo cannot validate signature of /config/verifyHash
     msg="Unable to validate verifyHash."
 fi
-echo loaded verifyHash
+echo 'loaded verifyHash'
 # declare -a filesToVerify=("/config/cloud/openstack/f5-cloud-libs.tar.gz" "/config/cloud/openstack/f5-cloud-libs-openstack.tar.gz")
 declare -a filesToVerify=("/config/cloud/openstack/f5-cloud-libs.tar.gz")
 for fileToVerify in "${filesToVerify[@]}"

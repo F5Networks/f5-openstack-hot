@@ -153,6 +153,7 @@ resources:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
         write_files:
           - path: /config/cloud/openstack/bigIqPwd
             permissions: 0755

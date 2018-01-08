@@ -72,6 +72,6 @@ resources:
 
 outputs:
   OS::stack_id:
-    description: F5::BigIP::PasswordConfig resource.
+    description: F5::BigIP::OverrideDefaultConfig resource.
     value:
       get_resource: override_default_config

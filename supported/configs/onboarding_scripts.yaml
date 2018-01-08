@@ -103,11 +103,8 @@ resources:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
         write_files:
-          - path: /config/cloud/openstack/bigIqPwd
-            permissions: 0755
-            owner: root:root
-            content: { get_param: bigiq_license_pwd }
           - path: /config/verifyHash
             permissions: 0755
             owner: root:root
