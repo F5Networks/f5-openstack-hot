@@ -21,6 +21,9 @@ These templates employ similar pattern as OpenStack TripleO wherein the common/r
 Descriptions for each template are contained at the top of each template in the *Description* key.
 For additional information, and assistance in deploying a template, see the README file on the individual template pages.
 
+### Matrix for tagged releases
+F5 has created a matrix that contains all of the tagged releases of the F5 OpenStack Heat Orchestration templates, and the corresponding BIG-IP versions available for a specific tagged release. See https://github.com/F5Networks/f5-openstack-hot/blob/master/openstack-bigip-version-matrix.md.
+
 ## CVE-2017-6168 information  
 If you have launched an F5 CFT template from a prior release, see the <a href="#important">important note</a> at the bottom of this page.
 
