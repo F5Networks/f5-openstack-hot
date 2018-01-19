@@ -1,5 +1,5 @@
 ## BIG-IP Version Matrix for OpenStack Heat Orchestration Templates
-The following table contains all of the tagged releases of the F5 OpenStack Heat Orchestration Templates templates, and the corresponding BIG-IP versions, license types and throughput levels available for a specific tagged release.  To view a Tag, from the f5-google-gdm-templates repo (https://github.com/F5Networks/f5-openstack-hot/ or a sub directory), click the Branch < current branch > button, and then click the *Tags* tab.  You see a list of all of the F5 tagged releases.
+The following table contains all of the tagged releases of the F5 OpenStack Heat Orchestration Templates templates, and the corresponding BIG-IP versions, license types and throughput levels available for a specific tagged release.  To view a Tag, from the f5-openstack-hot repo (https://github.com/F5Networks/f5-openstack-hot/ or a sub directory), click the Branch < current branch > button, and then click the *Tags* tab.  You see a list of all of the F5 tagged releases.
 
 **Note**: This matrix does not include License bundles and throughput rates as users upload their own image to their environment.
 
