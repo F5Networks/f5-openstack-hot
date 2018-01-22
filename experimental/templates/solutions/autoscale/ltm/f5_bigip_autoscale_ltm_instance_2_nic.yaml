@@ -479,12 +479,12 @@ resources:
       cloud_config:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
-          - nohup /config/preOnboard.sh &>> /var/log/preOnboard.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/onboard.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK1_DONE' &>> /var/log/runScript.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-2.sh --wait-for ONBOARD_NETWORK1_DONE --signal ONBOARD_NETWORK2_DONE' &>> /var/log/runScript.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-autoscale.sh --wait-for ONBOARD_NETWORK2_DONE --signal ONBOARD_AUTOSCALE_DONE' &>> /var/log/runScript.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_AUTOSCALE_DONE -o /var/log/postOnboard.log' &>> /var/log/runScript.log < /dev/null &
+          - nohup /config/preOnboard.sh &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK1_DONE' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-2.sh --wait-for ONBOARD_NETWORK1_DONE --signal ONBOARD_NETWORK2_DONE' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-autoscale.sh --wait-for ONBOARD_NETWORK2_DONE --signal ONBOARD_AUTOSCALE_DONE' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_AUTOSCALE_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
   bigip_provision:
     type: OS::Heat::MultipartMime
     properties:

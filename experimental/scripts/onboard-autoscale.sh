@@ -70,7 +70,7 @@ function run_autoscale() {
   echo "$logMessage"
 
   if f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/autoscale.js \
-    --output /var/log/onboard-autoscale.log \
+    --output /var/log/cloud/openstack/onboard-autoscale.log \
     --log-level debug \
     --host "$mgmtIp" \
     --port "$mgmtPort" \
@@ -106,7 +106,7 @@ function create_iCall() {
     tmsh create sys icall script "$iCallName" \
         definition '{' \
             exec f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/autoscale.js \
-                --output /var/log/onboard-autoscale.log \
+                --output /var/log/cloud/openstack/onboard-autoscale.log \
                 --log-level debug \
                 --host localhost \
                 --port "$mgmtPort" \
@@ -166,17 +166,17 @@ function setup_cluster_update() {
 }
 
 function send_heat_signal() {
-    if [ -f /var/log/onboard-autoscale.log ]; then
-        onboardAutoscaleErrorCount=$(tail /var/log/onboard-autoscale.log -n 25 | grep "error" -i -c)
+    if [ -f /var/log/cloud/openstack/onboard-autoscale.log ]; then
+        onboardAutoscaleErrorCount=$(tail /var/log/cloud/openstack/onboard-autoscale.log -n 25 | grep "error" -i -c)
 
         if [ "$onboardAutoscaleErrorCount" -gt 0 ]; then
-            msg="Onboard-autoscale command exited with error. See /var/log/onboard-autoscale.log for details."
+            msg="Onboard-autoscale command exited with error. See /var/log/cloud/openstack/onboard-autoscale.log for details."
         else
             stat="SUCCESS"
             msg="Onboard-autoscale command exited without error."
         fi
     else
-        msg="Onboard-autoscale log not found and command not run successfully. See /var/log/runScript.log for details. "
+        msg="Onboard-autoscale log not found and command not run successfully. See /var/log/cloud/openstack/runScript.log for details. "
     fi
 
     msg="$msg *** Instance: $hostName"
@@ -187,10 +187,10 @@ function send_heat_signal() {
 function main() {
     local logMessage=""
     set_vars
-    onboardErrorCount=$(tail /var/log/onboard.log -n 25 | grep "BIG-IP onboard failed" -i -c)
+    onboardErrorCount=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "BIG-IP onboard failed" -i -c)
     if [[ "$onboardErrorCount" -gt 0 ]]; then
      logMessage="ERROR: Onboard command did not finish successfuly. Unable to proceed with autoscale set up."
-        echo " logMessage" >> /var/log/onboard-autoscale.log
+        echo " logMessage" >> /var/log/cloud/openstack/onboard-autoscale.log
     else
         if start_or_join_cluster ; then
             if set_cluster_configsync ; then

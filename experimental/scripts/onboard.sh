@@ -26,7 +26,7 @@ newRootPwd=""
 oldRootPwd=""
 msg=""
 stat="FAILURE"
-logFile="/var/log/onboard.log"
+logFile="/var/log/cloud/openstack/onboard.log"
 
 allowUsageAnalytics="__allow_ua__"
 templateName="__template_name__"
@@ -121,13 +121,13 @@ function onboard_run() {
         --tz UTC \
         --user admin --password-url file:///config/cloud/openstack/adminPwd ; then
 
-        licenseExists=$(tail /var/log/onboard.log -n 25 | grep "Fault code: 51092" -i -c)
+        licenseExists=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "Fault code: 51092" -i -c)
 
         if [ "$licenseExists" -gt 0 ]; then
             msg="Onboard completed but licensing failed. Error 51092: This license has already been activated on a different unit."
             stat="SUCCESS"
         else
-            errorCount=$(tail /var/log/onboard.log | grep "BIG-IP onboard failed" -i -c)
+            errorCount=$(tail /var/log/cloud/openstack/onboard.log | grep "BIG-IP onboard failed" -i -c)
 
             if [ "$errorCount" -gt 0 ]; then
                 msg="Onboard command failed. See logs for details."

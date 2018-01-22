@@ -70,6 +70,8 @@ resources:
               echo __root_password__ >> /config/cloud/openstack/rootPwd
               echo __root_password_random__ >> /config/cloud/openstack/rootPwdRandom
 
+              mkdir -p /var/log/cloud/openstack
+
 outputs:
   OS::stack_id:
     description: F5::BigIP::OverrideDefaultConfig resource.

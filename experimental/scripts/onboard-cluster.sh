@@ -52,7 +52,7 @@ tmsh modify cm device "$deviceName" configsync-ip $configSyncIp unicast-address 
 if [[ "$isMaster" == true ]] ; then
 echo 'Config-Sync Master device'
     f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/cluster.js \
-    -o /var/log/onboard-cluster.log \
+    -o /var/log/cloud/openstack/onboard-cluster.log \
     --log-level debug \
     --host __mgmt_ip__\
     --user admin \
@@ -68,7 +68,7 @@ echo 'Config-Sync Master device'
 else
 echo 'Config-Sync Secondary device'
     f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/cluster.js \
-    -o /var/log/onboard-cluster.log \
+    -o /var/log/cloud/openstack/onboard-cluster.log \
     --log-level debug \
     --host __mgmt_ip__\
     --user admin \
@@ -83,10 +83,10 @@ echo 'Config-Sync Secondary device'
 
 fi
 
-onboardClusterErrorCount=$(tail /var/log/onboard-cluster.log | grep "cluster failed" -i -c)
+onboardClusterErrorCount=$(tail /var/log/cloud/openstack/onboard-cluster.log | grep "cluster failed" -i -c)
 
 if [ "$onboardClusterErrorCount" -gt 0 ]; then
-    msg="Onboard-cluster command exited with error. See /var/log/onboard-cluster.log for details."
+    msg="Onboard-cluster command exited with error. See /var/log/cloud/openstack/onboard-cluster.log for details."
 else
     stat="SUCCESS"
     msg="Onboard-cluster command exited without error."

@@ -101,9 +101,9 @@ function set_vars() {
     fi
 
     if [[ "$vlan_nic_index" == "" || "$vlan_nic_index" == "None" ]]; then
-        logFile="/var/log/onboard-network.log"
+        logFile="/var/log/cloud/openstack/onboard-network.log"
     else
-        logFile="/var/log/onboard-network-$vlan_nic_index.log"
+        logFile="/var/log/cloud/openstack/onboard-network-$vlan_nic_index.log"
     fi
 }
 

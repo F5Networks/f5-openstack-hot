@@ -94,7 +94,7 @@ if [[ "$msg" == "" ]]; then
     msg="Pre-onboard completed without error."
 else
     stat="FAILURE"
-    msg="Last Error:$msg . See /var/log/preOnboard.log for details."
+    msg="Last Error:$msg . See /var/log/cloud/openstack/preOnboard.log for details."
 fi
 
 wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
