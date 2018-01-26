@@ -79,7 +79,7 @@ The following is a list of the current *supported* F5 OpenStack HOT templates. C
 
 ### Copyright
 
-Copyright 2014-2017 F5 Networks Inc.
+Copyright 2014-2018 F5 Networks Inc.
 
 
 ### License
