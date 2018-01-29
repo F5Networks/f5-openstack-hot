@@ -473,6 +473,9 @@ outputs:
   bigip_instance_floating_ip:
     description: Management Floating IP of the BIG-IP Instance
     value: { get_attr: [floating_ip, floating_ip_address] }
+  bigip_instance_mgmt_ip:
+    description: Management IP of the BIG-IP Instance
+    value: { get_param: [mgmt_network_ips, { get_param: bigip_instance_num }]}
   bigip_instance_mgmt_port_id:
     description: Management Port ID of the BIG-IP Instance
     value: {get_param: [mgmt_network_portids, {get_param: bigip_instance_num}]}

@@ -300,7 +300,7 @@ resources:
       ua_project_id: { get_param: 'OS::project_id'}
       ua_stack_id: { get_param: 'OS::stack_id' }
       ua_template_name: sup-f5_bigip_standalone_2_nic.yaml
-      ua_template_version: 3.0.0
+      ua_template_version: 3.1.0
   init_4_onboard_network_config:
     type: F5::BigIP::OnboardNetworkConfig
     properties:
