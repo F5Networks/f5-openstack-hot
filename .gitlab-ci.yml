@@ -43,8 +43,6 @@ test-integration-experimental:
         - os
     stage: test-exp
     only:
-        - /^release-.*/
-        - /^develop*/
         - /^gitlab*/
         - triggers
     variables:
