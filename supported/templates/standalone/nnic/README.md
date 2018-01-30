@@ -85,8 +85,6 @@ The following parameters can be defined in your environment file.
 | Parameter | Required | Description | Constraints |
 | --- | :---: | --- | --- |
 | bigip_nic_count | Yes | Number of additional NICs to attach to the BIG-IP VE. Note: Exclude the management NIC from the count. | min: 1 max: 9 |
-| bigip_last_nic_index | Yes | The 0-based index of the last NIC setup to wait to finish before performing post-onboard operations. This is usually bigip_nic_count minus 1. | min: 0 max: 9 |
-
 
 #### BIG-IP Credentials
 

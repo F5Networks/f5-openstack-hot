@@ -84,12 +84,6 @@ parameters:
     description: Number of additional NICs to attach to the BIG-IP. Note - exclude management nic from count.
     constraints:
       - range: { min: 1, max: 9 }
-  bigip_last_nic_index:
-    type: number
-    label: f5 BIG-IP last NIC index (0-based)
-    description: Index of the last NIC setup to wait to finish. This is usually bigip_nic_count minus 1. Since there are no intrinsic math functions currently supported in heat, this parameter is required.
-    constraints:
-      - range: { min: 0, max: 8 }
 
   #bigip credentials
   bigip_os_ssh_key:
@@ -218,7 +212,6 @@ parameter_groups:
   - label: BIG-IP nNIC Provisioning
     parameters:
       - bigip_nic_count
-      - bigip_last_nic_index
   - label: BIG-IP Credentials
     parameters:
       - bigip_os_ssh_key
@@ -261,7 +254,7 @@ resources:
     type: OS::Heat::WaitCondition
     properties:
       handle: {get_resource: wait_handle_onboard_network}
-      count: { get_param: bigip_nic_count }
+      count: 1
       timeout: 1800
   wait_handle_onboard_network:
     type: OS::Heat::WaitConditionHandle
@@ -284,7 +277,6 @@ resources:
     type: F5::BigIP::NNicHandler
     properties:
       bigip_nic_count: {get_param: bigip_nic_count }
-      bigip_last_nic_index: {get_param: bigip_last_nic_index}
       network_vlan_names: { get_param: network_vlan_names }
       network_vlan_subnets: { get_param: network_vlan_subnets }
       network_vlan_security_group_rules: { get_param: network_vlan_security_group_rules }
@@ -346,9 +338,9 @@ resources:
                     - [{ get_resource: init_1_override_default_config }]
                     - [{ get_resource: init_2_onboard_libs }]
                     - [{ get_resource: init_3_onboard_scripts }]
-                    - { get_attr: [ bigip_nnic_handler, init_4_onboard_network_configs ] }
+                    - [{ get_attr: [ bigip_nnic_handler, init_4_onboard_network_config ] }]
                     - [{ get_attr: [ bigip_nnic_handler, init_5_run_core_commands ]}]
-                    - [{ get_attr: [ bigip_nnic_handler, init_6_run_network_commands ]}]
+
   bigip_instance:
     type: OS::Nova::Server
     depends_on: bigip_nnic_handler

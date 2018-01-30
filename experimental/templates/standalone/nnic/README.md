@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This solution uses a Heat Orchestration Template to launch an nNIC (multi NIC) deployment of a BIG-IP VE in an Openstack Private Cloud. In a multi NIC implementation, one interface is for management and data-plane traffic from the Internet, and the NIC count you provide determines the number of additional NICs used for processing traffic.  You can include up to 10 total NICs, including the NIC for management and data-plane traffic from the Internet.
+This solution uses a Heat Orchestration Template to launch an nNIC (multi NIC) deployment of a BIG-IP VE in an OpenStack Private Cloud. In a multi NIC implementation, one interface is for management and data-plane traffic from the Internet, and the NIC count you provide determines the number of additional NICs used for processing traffic.  You can include up to 10 total NICs, including the NIC for management and data-plane traffic from the Internet.
 
 The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
 
@@ -83,7 +83,6 @@ The following parameters can be defined in your environment file.
 | Parameter | Required | Description | Constraints |
 | --- | :---: | --- | --- |
 | bigip_nic_count | Yes | Number of additional NICs to attach to the BIG-IP VE. Note: Exclude the management NIC from the count. | min: 1 max: 9 |
-| bigip_last_nic_index | Yes | The 0-based index of the last NIC setup to wait to finish before performing post-onboard operations. This is usually bigip_nic_count minus 1. | min: 0 max: 8 |
 
 
 #### BIG-IP Credentials

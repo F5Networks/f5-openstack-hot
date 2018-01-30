@@ -7,11 +7,6 @@ parameters:
     type: number
     label: f5 BIG-IP NIC count
     description: Number of additional NICs to attach to the BIG-IP. Note - exclude management nic from count.
-  bigip_last_nic_index:
-    type: number
-    label: f5 BIG-IP last NIC index (0-based)
-    description: The 0-based index of the last NIC to attach to Big-IP. This is essentially bigip_nic_count minus 1. This helps identify the last nic in the resource group.
-                 Since there are no intrinsic arithmetic functions currently supported in heat, this parameter is required.
   network_vlan_names:
     type: comma_delimited_list
     label: OS Neutron Networks to map to the BIG-IP VLANs
@@ -88,26 +83,18 @@ resources:
           ip_addresses: { get_param: bigip_self_ip_addresses }
           security_groups: {get_attr: [security_groups, security_group_id]}
 
-  onboard_network_configs:
-    type: OS::Heat::ResourceGroup
+  onboard_network_config:
+    type: F5::BigIP::OnboardNetworkConfigNNic
     properties:
-      count: { get_param: bigip_nic_count }
-      resource_def:
-        type: F5::BigIP::OnboardNetworkConfigIndexed
-        properties:
-          #Note: %index% resolves directly for str_replace as shown here, but not in get_param
-          script_path: /config/onboard-network-%index%.sh
-          nic_count: { get_param: bigip_nic_count }
-          vlan_names: { get_param: bigip_vlan_names }
-          vlan_tags: { get_param: bigip_vlan_tags }
-          vlan_mtus: { get_param: bigip_vlan_mtus }
-          vlan_nic_index: "%index%"
-          vlan_last_nic_index: { get_param: bigip_last_nic_index }
-          self_ip_addrs: { get_param: bigip_self_ip_addresses }
-          self_cidr_blocks: { get_param: bigip_self_cidr_blocks}
-          self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
-          default_gateway: { get_param: bigip_default_gateway }
-          wait_handle_curl: { get_param: wait_handle_curl}
+      nic_count: { get_param: bigip_nic_count }
+      vlan_names: { get_param: bigip_vlan_names }
+      vlan_tags: { get_param: bigip_vlan_tags }
+      vlan_mtus: { get_param: bigip_vlan_mtus }
+      self_ip_addrs: { get_param: bigip_self_ip_addresses }
+      self_cidr_blocks: { get_param: bigip_self_cidr_blocks}
+      self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
+      default_gateway: { get_param: bigip_default_gateway }
+      wait_handle_curl: { get_param: wait_handle_curl}
 
   run_core_commands:
     type: OS::Heat::CloudConfig
@@ -115,25 +102,16 @@ resources:
       cloud_config:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
-          - nohup /config/preOnboard.sh &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
-          -
-            str_replace:
-              params:
-                <%last_nic_index%>: { get_param: bigip_last_nic_index }
-              template: "nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_<%last_nic_index%>_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null & "
+          - nohup sh -c '/config/preOnboard.sh' &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_DONE  -o /var/log/cloud/openstack/onboard-network.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
 
-  run_network_commands:
-    type: F5::BigIP::RunOnboardNetworkConfigs
-    properties:
-      nic_indexes: { get_attr: [ onboard_network_configs, config_index ] }
 
 outputs:
   port_ids:
     value: { get_attr: [network_vlan_ports, bigip_neutron_port_id ]}
-  init_4_onboard_network_configs:
-    value: { get_attr: [onboard_network_configs, config_id ]}
+  init_4_onboard_network_config:
+    value: { get_resource: onboard_network_config }
   init_5_run_core_commands:
     value: { get_resource: run_core_commands }
-  init_6_run_network_commands:
-    value: { get_resource: run_network_commands }

@@ -25,9 +25,6 @@ parameters:
   ###This should be the number of additional nics, excluding mgmt (nic 1.0).
   bigip_nic_count: 5
 
-  ###This is usually bigip_nic_count minus 1. (zero-based index)
-  ###This determines which nic setup to wait to finish before triggering post_onboard.sh, where custom tmsh commands can be added.
-  bigip_last_nic_index: 4
 
   ###This should be a list of existing neutron networks.
   network_vlan_names:
@@ -150,9 +147,8 @@ resource_registry:
   F5::BigIP::OverrideDefaultConfig: ../../../configs/override_default_config.yaml
   F5::BigIP::OnboardingLibs: ../../../configs/onboarding_libs.yaml
   F5::BigIP::OnboardingScripts: ../../../configs/onboarding_scripts.yaml
-  F5::BigIP::OnboardNetworkConfigIndexed: ../../../configs/onboarding_network_config_indexed.yaml
+  F5::BigIP::OnboardNetworkConfigNNic: ../../../configs/onboarding_network_config_nnic.yaml
   F5::BigIP::ManagementSecurityGroup: ../../../security_groups/bigip_mgmt_security_group.yaml
   F5::BigIP::CustomSecurityGroup: ../../../security_groups/bigip_custom_security_group.yaml
   F5::BigIP::NeutronPort: ../../../networks/bigip_neutron_port.yaml
   F5::BigIP::NNicHandler: ../../../networks/bigip_nnic_handler.yaml
-  F5::BigIP::RunOnboardNetworkConfigs: ../../../configs/run_onboard_network_configs.yaml
