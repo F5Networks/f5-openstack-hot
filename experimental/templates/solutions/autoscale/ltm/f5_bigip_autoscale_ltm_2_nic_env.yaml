@@ -1,5 +1,5 @@
 parameters:
-  bigip_image: bigip13
+  bigip_image: test-bigip-13
   bigip_flavor: f5.medium
   use_config_drive: true
   bigip_os_ssh_key: sshKeyName
@@ -49,13 +49,13 @@ parameters:
   allow_usage_analytics: true
 
 resource_registry:
-  F5::BigIP::OverrideDefaultConfig: ../../../../experimental/configs/override_default_config.yaml
-  F5::BigIP::OnboardingLibs: ../../../../experimental/configs/onboarding_libs.yaml
-  F5::BigIP::OnboardingScripts: ../../../../experimental/configs/onboarding_scripts.yaml
-  F5::BigIP::OnboardNetworkConfig: ../../../../experimental/configs/onboarding_network_config.yaml
-  F5::BigIP::OnboardClusterConfig: ../../../../experimental/configs/onboarding_cluster_config.yaml
-  F5::BigIP::ManagementSecurityGroup: ../../../../experimental/security_groups/bigip_mgmt_security_group.yaml
-  F5::BigIP::DataSecurityGroup: ../../../../experimental/security_groups/bigip_data_security_group.yaml
-  F5::BigIP::ControlSecurityGroup: ../../../../experimental/security_groups/bigip_control_security_group.yaml
-  F5::BigIP::AutoScaleInstance2Nic: ../../../../experimental/templates/solutions/autoscale/ltm/f5_bigip_autoscale_ltm_instance_2_nic.yaml
-  F5::BigIP::OnboardAutoscaleConfig: ../../../../experimental/configs/onboarding_autoscale_config.yaml
+  F5::BigIP::OverrideDefaultConfig: ../../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfig: ../../../../configs/onboarding_network_config.yaml
+  F5::BigIP::OnboardClusterConfig: ../../../../configs/onboarding_cluster_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::AutoScaleInstance2Nic: ../../../../templates/solutions/autoscale/ltm/f5_bigip_autoscale_ltm_instance_2_nic.yaml
+  F5::BigIP::OnboardAutoscaleConfig: ../../../../configs/onboarding_autoscale_config.yaml
