@@ -103,9 +103,9 @@ resources:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
           - nohup sh -c '/config/preOnboard.sh' &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
-          - nohup sh -c '/config/wait-cloudlibsInstall.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
-          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_DONE  -o /var/log/cloud/openstack/onboard-network.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
-          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_DONE  -o /var/log/cloud/openstack/onboard-network.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
 
 
 outputs:
