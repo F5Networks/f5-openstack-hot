@@ -4,7 +4,7 @@ The following table contains all of the tagged releases of the F5 OpenStack Heat
 **Note**: This matrix does not include License bundles and throughput rates as users upload their own image to their environment.
 
 | Release Tag | Template Family | BIG-IP Versions |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | [v3.1.0](https://github.com/F5Networks/f5-openstack-hot/releases/tag/v3.1.0) | Standalone | BIG-IP v13.1.0.2, v13.0  |
 |  | Cluster | BIG-IP v13.1.0.2, v13.0   |
 |  | Auto Scale LTM (experimental) | BIG-IP v13.1.0.2, v13.0  |
