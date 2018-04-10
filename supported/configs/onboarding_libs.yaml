@@ -3,11 +3,37 @@ heat_template_version: 2016-04-08
 description: This template downloads additional packages required to provision a Big-IP.
 
 parameters:
+  libs_proxy_protocol:
+    type: string
+    label: Proxy Protocol to use when downloading libs
+    description: Use specified protocol when downloading libs through a proxy
+    default: None
+  libs_proxy_host:
+    type: string
+    label: Proxy Host to use when downloading libs
+    description: Use specified host when downloading libs through a proxy
+    default: None
+  libs_proxy_port:
+    type: string
+    label: Proxy Port to use when downloading libs
+    description: Use specified port when downloading libs through a proxy
+    default: None
+  libs_proxy_auth:
+    type: string
+    label: Basic Proxy Authentication
+    description: Default auth value in the format <username:password>
+    hidden: true
+    default: None
+  libs_proxy_addtl_opts:
+    type: string
+    label: Additional Proxy Options
+    description: Additional parameters to add to download request with proxy
+    default: None
   cloudlibs_tag:
     type: string
     label: f5-cloud-libs Tag
     description: Tag that determines version of cloudlibs to use. If specified, ensure that hashes are updated for verifyHash
-    default: v3.5.0
+    default: v4.0.3
   cloudlibs_url_override:
     type: string
     label: f5-cloud-libs URL Override
@@ -17,7 +43,7 @@ parameters:
     type: string
     label: f5-cloud-libs-openstack tag
     description: Tag that determines version of f5-cloudlibs-openstack to use. If specified, ensure that hashes are updated for verifyHash.
-    default: v1.0.0
+    default: v2.0.0
   cloudlibs_os_url_override:
     type: string
     label: f5-cloud-libs-openstack URL Override
@@ -35,29 +61,60 @@ resources:
             __cloudlibs_url_override__: { get_param: cloudlibs_url_override }
             __cloudlibs_os_tag__: { get_param: cloudlibs_os_tag }
             __cloudlibs_os_url_override__: { get_param: cloudlibs_os_url_override }
+            __proxy_protocol__: { get_param: libs_proxy_protocol }
+            __proxy_host__: { get_param: libs_proxy_host }
+            __proxy_port__: { get_param: libs_proxy_port }
+            __proxy_auth__: { get_param: libs_proxy_auth }
+            __proxy_addtl_opts__: { get_param: libs_proxy_addtl_opts }
           template: |
             #!/bin/bash
             cloudlibsUrlOverride="__cloudlibs_url_override__"
             cloudlibsOsUrlOverride="__cloudlibs_os_url_override__"
+            proxyProtocol="__proxy_protocol__"
+            proxyHost="__proxy_host__"
+            proxyPort="__proxy_port__"
+            proxyAuth="__proxy_auth__"
+            proxyAddtlOpts="__proxy_addtl_opts__"
+            proxyOpt=""
+            proxyVal=""
 
             if [[ "$cloudlibsUrlOverride" == "None" ]]; then
-              cloudlibsUrl="https://raw.githubusercontent.com/f5Networks/f5-cloud-libs/__cloudlibs_tag__/dist/f5-cloud-libs.tar.gz"
+                cloudlibsUrl="https://raw.githubusercontent.com/f5Networks/f5-cloud-libs/__cloudlibs_tag__/dist/f5-cloud-libs.tar.gz"
             else
-              cloudlibsUrl=${cloudlibsUrlOverride}
+                cloudlibsUrl=${cloudlibsUrlOverride}
             fi
-            echo "******Starting Download for f5-cloud-libs from ${cloudlibsUrl} ******"
-            curl -o /config/cloud/openstack/f5-cloud-libs.tar.gz ${cloudlibsUrl}
+            # if [[ "$cloudlibsOsUrlOverride" == "None" ]]; then
+            #   cloudlibsOsUrl="https://raw.githubusercontent.com/f5Networks/f5-cloud-libs-openstack/__cloudlibs_os_tag__/dist/f5-cloud-libs-openstack.tar.gz"
+            # else
+            #   cloudlibsOsUrl=${cloudlibsOsUrlOverride}
+            # fi
 
-            if [[ "$cloudlibsOsUrlOverride" == "None" ]]; then
-              cloudlibsOsUrl="https://raw.githubusercontent.com/f5Networks/f5-cloud-libs-openstack/__cloudlibs_os_tag__/dist/f5-cloud-libs-openstack.tar.gz"
-            else
-              cloudlibsOsUrl=${cloudlibsOsUrlOverride}
-            fi
+            echo "******Starting Download for f5-cloud-libs from ${cloudlibsUrl} ******"
             # echo "******Starting Download for f5-cloud-libs-openstack from ${cloudlibsOsUrl} ******"
-            # curl -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz ${cloudlibsOsUrl}
+            if [[ $proxyProtocol != "None" ]]; then
+                if [[ $proxyPort != "None" ]]; then
+                  proxyPort=":$proxyPort"
+                fi
+
+                if [[ $proxyAuth != "None" ]]; then
+                  proxyAuth="$proxyAuth@"
+                fi
+
+                proxyOpt="--proxy"
+                proxyVal="$proxyProtocol://$proxyAuth$proxyHost$proxyPort $proxyAddtlOpts"
+                echo "Using proxy host: $proxyHost"
+                curl "$proxyOpt" "$proxyVal" -o /config/cloud/openstack/f5-cloud-libs.tar.gz ${cloudlibsUrl}
+                # curl "$proxyOpt" "$proxyVal" -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz ${cloudlibsOsUrl}
+            else
+                curl -o /config/cloud/openstack/f5-cloud-libs.tar.gz ${cloudlibsUrl} --retry 5 --retry-delay 10
+                # curl -o /config/cloud/openstack/f5-cloud-libs-openstack.tar.gz ${cloudlibsOsUrl} --retry 5 --retry-delay 10
+            fi
+
 
 outputs:
   OS::stack_id:
     description: The F5::BigIP::OnboardingLibs resource.
-    value:
-      get_resource: onboarding_libs
+    value: { get_resource: onboarding_libs }
+  config:
+    description: The actual config value of F5::BigIP::OnboardingLibs
+    value: { get_attr: [onboarding_libs, config] }

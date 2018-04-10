@@ -1,0 +1,61 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  # The BIG-IQ host must be reachable from the BIG-IP
+  bigiq_license_host_ip: 192.168.1.20
+  bigiq_license_username: bigiqUser
+  bigiq_license_pwd: bigiqPwd
+  bigip_modules:
+    - ltm:nominal
+    - ilx:minimum
+  bigiq_license_pool: bigiqLicPoolName
+  # If necessary, to reach BIG-IP from BIG-IQ, for licensing
+  bigiq_use_bigip_floating_ip: true
+  external_network: external_net
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: Mgmt_secgroup_2_NIC_autoscale
+  network_vlan_name: data_net
+  network_vlan_subnet: data_subnet
+  network_vlan_security_group_name: Data_secgroup_2_NIC_autoscale
+  bigip_vlan_nic: "1.1"
+  bigip_self_cidr_block: 10.1.9.0/24
+  bigip_vlan_mtu: 1400
+  # Ensure unique device group value for tenant
+  autoscale_group_tag: myDeviceGroup
+  # Ensure that your environment is configured for metering and alarm
+  # The autoscale settings allowable values are same as the corresponding Heat resource type allowable property values
+  autoscale_meter_name: network.incoming.bytes.rate
+  autoscale_meter_stat: avg
+  autoscale_period: 60
+  autoscale_num_eval_period: 1
+  autoscale_set_min_count: 1
+  autoscale_set_max_count: 2
+  autoscale_scale_up_threshold: 2000
+  autoscale_scale_down_threshold: 500
+  # Ensure that the account has privileges to perform the following operations:
+  # - query stack resources
+  # - create swift signal (long-lived temp url)
+  # - create ceilometer alarm
+  os_username: keystoneUser
+  os_password: keystonePassword
+  os_region: keystoneRegion
+  os_auth_url: "http://keystonehost.openstacklocal:<port>"
+  os_auth_version: v3
+  os_domain_name: keystoneDomain
+  allow_usage_analytics: true
+
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../../../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../../../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../../../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfig: ../../../../../../../configs/onboarding_network_config.yaml
+  F5::BigIP::OnboardClusterConfig: ../../../../../../../configs/onboarding_cluster_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../../../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../../../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../../../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::OnboardAutoscaleConfig: ../../../../../../../configs/onboarding_autoscale_config.yaml
+  F5::BigIP::AutoScaleInstance2Nic: f5_bigip_autoscale_ltm_instance_2_nic.yaml

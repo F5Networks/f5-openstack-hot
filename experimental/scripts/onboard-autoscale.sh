@@ -19,13 +19,21 @@ osCreds="file:///config/cloud/openstack/.os"
 
 bigIqHost="__bigiq_host__"
 bigIqUser="__bigiq_username__"
-bigIqPwdUri="file:///config/cloud/openstack/bigIqPwd"
+bigIqPwdUri="file:///config/cloud/openstack/.bigIqPwd"
 bigIqLicPool="__bigiq_lic_pool__"
 bigIqMgmtIp="__bigiq_alt_mgmt_ip__"
 bigIqMgmtPort="__bigiq_alt_mgmt_port__"
 bigIqUseAltMgmt="__bigiq_use_alt_mgmt_ip__"
 
+wcNotifyOptions="__wc_notify_options__"
+
 function set_vars(){
+    if [ "$wcNotifyOptions" == "None" ]; then
+        wcNotifyOptions=""
+    else
+        wcNotifyOptions=" $wcNotifyOptions"
+    fi
+
     if [[ $hostName == "" ]]; then
         configDriveDest="/mnt/config"
         echo 'Attempting to retrieve hostname from metadata'
@@ -69,13 +77,14 @@ function run_autoscale() {
 
   echo "$logMessage"
 
-  if f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/autoscale.js \
+  if f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/autoscale.js \
     --output /var/log/cloud/openstack/onboard-autoscale.log \
     --log-level debug \
     --host "$mgmtIp" \
     --port "$mgmtPort" \
     --user admin \
-    --password-url file:///config/cloud/openstack/adminPwd \
+    --password-url file:///config/cloud/openstack/.adminPwd \
+    --password-encrypted \
     --cloud openstack \
     --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
     --device-group "$deviceGroup" \
@@ -105,13 +114,14 @@ function create_iCall() {
     # create script
     tmsh create sys icall script "$iCallName" \
         definition '{' \
-            exec f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/autoscale.js \
+            exec f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/autoscale.js \
                 --output /var/log/cloud/openstack/onboard-autoscale.log \
                 --log-level debug \
                 --host localhost \
                 --port "$mgmtPort" \
                 --user admin \
-                --password-url file:///config/cloud/openstack/adminPwd \
+                --password-url file:///config/cloud/openstack/.adminPwd \
+                --password-encrypted \
                 --cloud openstack \
                 --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
                 --device-group "$deviceGroup" \
@@ -181,7 +191,7 @@ function send_heat_signal() {
 
     msg="$msg *** Instance: $hostName"
     echo "$msg"
-    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30$wcNotifyOptions
 }
 
 function main() {
@@ -190,7 +200,7 @@ function main() {
     onboardErrorCount=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "BIG-IP onboard failed" -i -c)
     if [[ "$onboardErrorCount" -gt 0 ]]; then
      logMessage="ERROR: Onboard command did not finish successfuly. Unable to proceed with autoscale set up."
-        echo " logMessage" >> /var/log/cloud/openstack/onboard-autoscale.log
+        echo "$logMessage" >> /var/log/cloud/openstack/onboard-autoscale.log
     else
         if start_or_join_cluster ; then
             if set_cluster_configsync ; then

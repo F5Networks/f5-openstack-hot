@@ -16,7 +16,7 @@ Welcome to the GitHub repository for F5's Heat Orchestration Templates for deplo
   The *experimental* directory also contains heat templates that have been created by F5 Networks. However, these templates have not completed full testing and are subject to change. F5 Networks does not offer technical support for templates in the experimental directory, so use these templates with caution.
 
 ## Template information
-These templates employ similar pattern as OpenStack TripleO wherein the common/reusable templates and components such as software configs and scripts are referenced by parent templates. When launching a stack, you only need to specify the parent template as the template param, and Heat engine automatically takes care of the dependencies. 
+These templates employ similar pattern as OpenStack TripleO wherein the common/reusable templates and components such as software configs and scripts are referenced by parent templates. When launching a stack, you only need to specify the parent template as the template param, and Heat engine automatically takes care of the dependencies.
 
 Descriptions for each template are contained at the top of each template in the *Description* key.
 For additional information, and assistance in deploying a template, see the README file on the individual template pages.
@@ -24,20 +24,20 @@ For additional information, and assistance in deploying a template, see the READ
 ### Matrix for tagged releases
 F5 has created a matrix that contains all of the tagged releases of the F5 OpenStack Heat Orchestration templates, and the corresponding BIG-IP versions available for a specific tagged release. See https://github.com/F5Networks/f5-openstack-hot/blob/master/openstack-bigip-version-matrix.md.
 
-## CVE-2017-6168 information  
+## CVE-2017-6168 information
 If you have launched an F5 CFT template from a prior release, see the <a href="#important">important note</a> at the bottom of this page.
 
 ## Supported Versions
 
 ### BIG-IP VE
-The templates are developed for standard BIG-IP Virtual Edition images version **13.0 or later**. 
-Earlier versions may require image patching to create OpenStack-ready images in *glance*. 
+The templates are developed for standard BIG-IP Virtual Edition images version **13.0 or later**.
+Earlier versions may require image patching to create OpenStack-ready images in *glance*.
 **Note:**
-Refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-heat) for templates that launch pre-version 13.0 instances. 
+Refer to [f5-openstack-heat](https://github.com/F5Networks/f5-openstack-heat) for templates that launch pre-version 13.0 instances.
 
 ### OpenStack
-The templates are developed on an operational OpenStack Mitaka deployment. 
-For additional resources on configuring environments with F5 Integration for OpenStack Neutron LBaaS, refer to this [configuration guide](http://clouddocs.f5.com/cloud/openstack/v1/lbaas/index.html) 
+The templates are developed on an operational OpenStack Mitaka deployment.
+For additional resources on configuring environments with F5 Integration for OpenStack Neutron LBaaS, refer to this [configuration guide](http://clouddocs.f5.com/cloud/openstack/v1/lbaas/index.html)
 
 ## Prerequisites
 The following is a summary of prerequisites for successfully launching templates from this repo:
@@ -56,7 +56,7 @@ The following is a summary of prerequisites for successfully launching templates
 ## List of Supported F5 OpenStack Heat Orchestration templates 
 The following is a list of the current *supported* F5 OpenStack HOT templates. Click the links to view the README files which include the deployment instructions and additional information.
 
-  - [Standalone 1 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/1nic)  
+  - [Standalone 1 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/1nic)
   - [Standalone 2 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/2nic)
   - [Standalone N NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/nnic)
   - [Cluster 2 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/cluster/2nic)

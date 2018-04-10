@@ -1,0 +1,180 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_license_keys:
+    - bigip1baseLicenseKey
+    - bigip2baseLicenseKey
+  bigip_addon_license_keys:
+    - bigip1addonKey1;bigip1addonKey2;bigip1addonKey3
+    - bigip2addonKey1;bigip1addonKey2;bigip2addonKey3
+  bigip_modules:
+    - ltm:nominal
+    - ilx:minimum
+  external_network: external-net
+  mgmt_network: dev-mgmt
+  mgmt_security_group_name: mgmt-secgroup-nnic-cluster
+
+  ### This should be the number of additional nics, excluding mgmt (nic 1.0).
+  bigip_nic_count: 3
+
+  ### This should be the 0 based index of the vlan where cluster ip should be configured
+  ### For example, value of 1 means the cluster ip will be in the dev-data2 vlan
+  network_vlan_names_cluster_index: 1
+  ### This should be the 0 based index of the vlan subnet where cluster ip should be configured
+  ### For example, value of 1 means the 2nd neutron fixed ip on dev-data2-subnet
+  ### will be configured as the cluster configsync self-ip on the BIG-IP
+  ### Ensure that this value is a valid index for both the first instance and second instance subnets
+  network_vlan_subnets_cluster_index: 1
+
+  ###This should be a list of existing neutron networks.
+  network_vlan_names:
+    - dev-data1
+    - dev-data2
+    - dev-data3
+    - dev-data4
+    - dev-data5
+
+  ### This should be a list of existing neutron subnets.
+  ### Specify multiple fixed ips by providing multiple subnet values in the format <subnet;subnet;subnet>
+  ### Ensure that there are no trailing ;
+  network_vlan_subnets:
+    # Subnets for first instance; these will create 9 neutron fixed ips
+    # The first fixed ip for each subnet entry will be configured as a selfip on the BIG-IP
+    -
+      - dev-data1-subnet
+      - dev-data2-subnet;dev-data2-subnet
+      - dev-data3-subnet1;dev-data3-subnet2
+      - dev-data4-subnet;dev-data4-subnet;dev-data4-subnet
+      - dev-data5-subnet
+    # Subnets for second instance; these will create 5 neutron fixed ips
+    # The first fixed ip for each subnet entry will be configured as a selfip on the BIG-IP
+    -
+      - dev-data1-subnet
+      - dev-data2-subnet;dev-data2-subnet;dev-data2-subnet
+      - dev-data3-subnet1
+      - dev-data4-subnet
+      - dev-data5-subnet
+
+  ### Rules to apply to the security groups to be created for the vlans.
+  ### Each group of rules is the same syntax as rules property of OS::Neutron::SecurityGroup
+  ### JSON object { "security_group_rules": [ {"rules": [...] }, { "rules": [...] } ] }
+  network_vlan_security_group_rules:
+    security_group_rules:
+    #secgroup-0
+    - rules:
+      - protocol: icmp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: udp
+        remote_ip_prefix: 0.0.0.0/0
+    #secgroup-1
+    - rules:
+      - protocol: icmp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: udp
+        remote_ip_prefix: 0.0.0.0/0
+    #secgroup-2
+    - rules:
+      - protocol: icmp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+      - protocol: udp
+        remote_ip_prefix: 0.0.0.0/0
+    #secgroup-3
+    - rules:
+        - protocol: icmp
+          direction: ingress
+        - protocol: icmp
+          direction: egress
+        - protocol: tcp
+          direction: ingress
+        - protocol: tcp
+          direction: egress
+        - protocol: udp
+          direction: ingress
+        - protocol: udp
+          direction: egress
+    #secgroup-4
+    - rules:
+      - protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+        port_range_min: 22
+        port_range_max: 22
+
+  ###Optional default gw
+  # bigip_default_gateway: 172.16.1.1
+  bigip_vlan_mtus:
+    - 1400
+    - 1400
+    - 1450
+    - 1500
+    - 1410
+
+  bigip_vlan_tags:
+    - 100
+    -
+    -
+    - 400
+    - 500
+
+  bigip_vlan_names:
+    - data1
+    - data2
+    - data3
+    - data4
+    - data5
+
+  bigip_self_port_lockdowns:
+    ### Nested list items are returned in the format [u'item'], which causes extra chars to be returned when using str_split.
+    ### So we are using flat list instead with semicolon as delimiter.
+    ### Syntax for each list item: <service>:<port>
+    ### If left empty, use the default allow settings for the vlan - same as allow-default.
+    - tcp:22;tcp:443
+    - allow-default
+    - allow-default;tcp:8080
+    - allow-all
+    - tcp:22;tcp:443
+
+  libs_proxy_protocol: http
+  libs_proxy_host: 10.10.10.110
+  libs_proxy_port: 8080
+  libs_proxy_auth: 'username:password'
+  libs_proxy_addtl_opts: -L
+  os_heat_wc_notify_options: -k -v
+  bigip_remote_hosts_names:
+    - host1.mytest.com
+    - heatapi.mycloud.com
+  bigip_remote_hosts_ips:
+    - 192.168.1.111
+    - 192.168.1.10
+  bigip_timezone: GMT
+  bigip_licensing_type: BIGIQ
+  bigiq_license_host_ip: 10.10.10.111
+  bigiq_license_username: bigIqUser
+  bigiq_license_pwd: bigIqPassword
+  bigiq_license_pool: bigIqPool
+  bigiq_use_bigip_floating_ip: true
+
+resource_registry:
+
+  F5::BigIP::OverrideDefaultConfig: ../../../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfigNNic: ../../../../../configs/onboarding_network_config_nnic.yaml
+  F5::BigIP::OnboardClusterConfig: ../../../../../configs/onboarding_cluster_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::ClusterInstanceNNic: f5_bigip_cluster_instance_n_nic_nested.yaml
+  F5::BigIP::CustomSecurityGroup: ../../../../../security_groups/bigip_custom_security_group.yaml
+  F5::BigIP::NeutronPort: ../../../../../networks/bigip_neutron_port.yaml
+  F5::BigIP::NeutronPorts: ../../../../../networks/bigip_neutron_ports.yaml
+  F5::BigIP::NNicHandler: ../../../../../.networks/bigip_nnic_handler.yaml

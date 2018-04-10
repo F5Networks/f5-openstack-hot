@@ -58,6 +58,12 @@ parameters:
     type: string
     label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+    default: None
+
 
 resources:
   onboard_network_config:
@@ -91,6 +97,7 @@ resources:
                           template: allowport
                           for_each:
                             allowport: { get_param: self_port_lockdown }
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl }
                 template: { get_file: ../scripts/onboard-network.sh}
 outputs:

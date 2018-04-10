@@ -8,7 +8,7 @@ parameters:
     label: Port Index
     description: The index of the port in the group
   security_groups:
-    type: json
+    type: comma_delimited_list
     label: Security Groups
     description: Security group settings for the ports
   network_names:
@@ -19,10 +19,6 @@ parameters:
     type: comma_delimited_list
     label: Network Subnets
     description: A list of subnets the ports should be created in
-  ip_addresses:
-    type: comma_delimited_list
-    label: IP Addresses
-    description: A list of IP addresses for the ports
 
 resources:
   bigip_neutron_port:
@@ -33,10 +29,27 @@ resources:
       admin_state_up: true
       allowed_address_pairs:
         - ip_address: 0.0.0.0/0
+        - ip_address: ::/0
       fixed_ips:
-        - subnet: { get_param: [network_subnets, { get_param: index }] }
-          ip_address: { get_param: [ip_addresses, { get_param: index }] }
+        repeat:
+          for_each:
+            <%subnet%>:
+              str_split:
+                - ';'
+                - { get_param: [network_subnets, { get_param: index }] }
+          template:
+            subnet: <%subnet%>
 
 outputs:
-  bigip_neutron_port_id:
+  neutron_port_id:
     value: {get_resource: bigip_neutron_port}
+  neutron_port_subnets:
+    value: { get_attr: [bigip_neutron_port, subnets] }
+  neutron_port_fixed_ips:
+    value: { get_attr: [bigip_neutron_port, fixed_ips] }
+  bigip_self_ip_address:
+    value: { get_attr: [bigip_neutron_port, fixed_ips, 0, ip_address] }
+  bigip_self_ip_cidr:
+    value: { get_attr: [bigip_neutron_port, subnets, 0, cidr] }
+  bigip_self_ip_mask:
+    value: { str_split: ['/', { get_attr: [ bigip_neutron_port, subnets, 0, cidr] }, 1] }

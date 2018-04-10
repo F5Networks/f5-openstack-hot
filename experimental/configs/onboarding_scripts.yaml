@@ -50,6 +50,11 @@ parameters:
     label: Script verifyHash override source URL
     description: The URL to the source of verifyHash script override
     default: None
+  verify_cloudlibs_os:
+    type: boolean
+    label: Verify f5-cloud-libs-openstack package
+    description: Toggles verify of f5-cloud-libs-openstack package.
+    default: false
   bigip_addon_licenses:
     type: comma_delimited_list
     label: Additional VE License Keys
@@ -69,10 +74,31 @@ parameters:
     type: comma_delimited_list
     label: NTP servers
     description: A list of NTP servers
+    default:
+      -
   dns:
     type: comma_delimited_list
     label: Domain Name Servers
     description: A list of Domain Name Servers
+    default:
+      -
+  remote_hosts_names:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE Remote Host Names
+    description: A list of remote hosts to add to the BIG-IP
+    default:
+      -
+  remote_hosts_ips:
+    type: comma_delimited_list
+    label: f5 BIG-IP VE Remote Host IP Addresses
+    description: A list of remote host ips to add to the BIG-IP. The index should match the entries provided in bigip_remote_hosts_names
+    default:
+      -
+  timezone:
+    type: string
+    label: Time Zone
+    description: Time Zone to configure the device with
+    default: UTC
   host_name:
     type: string
     label: Host Name
@@ -85,6 +111,21 @@ parameters:
     type: number
     label: Management Port
     description: Management port for the BIG-IP admin
+  set_management_mtu:
+    type: boolean
+    label: Post-onboard Set Management MTU
+    description: Toggles the flag for setting management MTU after onboard
+    default: false
+  management_nic:
+    type: string
+    label: Management NIC Name
+    description: Name of Management NIC
+    default: mgmt
+  management_mtu:
+    type: number
+    label: Management NIC MTU
+    description: MTU value for the BIG-IP Management NIC
+    default: 1400
   ssh_key_name:
     type: string
     label: SSH Key Name
@@ -98,6 +139,11 @@ parameters:
     type: string
     label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+    default: None
   keep_admin:
     type: boolean
     label: Keep Admin
@@ -148,6 +194,12 @@ parameters:
     label: f5 BIG-IQ License Pool Name
     description: f5 BIG-IP License Pool to use to license the BIG-IP instances.
     default: None
+  db_vars:
+    type: comma_delimited_list
+    label: DB Variables
+    description: Custom DB Variable values in the format <key:value>
+    default:
+      -
 resources:
   onboarding_scripts:
     type: OS::Heat::CloudConfig
@@ -155,7 +207,7 @@ resources:
       cloud_config:
         merge_how: dict(recurse_array,no_replace)+list(append)
         write_files:
-          - path: /config/cloud/openstack/bigIqPwd
+          - path: /config/cloud/openstack/.bigIqPwd
             permissions: 0755
             owner: root:root
             content: { get_param: bigiq_license_pwd }
@@ -169,25 +221,37 @@ resources:
             content:
               str_replace:
                 params:
+                  __remote_hosts_names__: { get_param: remote_hosts_names }
+                  __remote_hosts_ips__: { get_param: remote_hosts_ips }
                   __ssh_key_name__: { get_param: ssh_key_name }
                   __use_config_drive__: { get_param: use_config_drive }
                   __verify_hash_override__: { get_param: verify_hash_url_override }
+                  __verify_cloudlibs_os__: { get_param: verify_cloudlibs_os }
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl}
                 template: { get_file: ../scripts/preOnboard.sh }
-          - path: /config/wait_cloudlibs_install.sh
+          - path: /config/wait-cloudlibsInstall.sh
             permissions: 0755
             owner: root:root
-            content: { get_file: ../scripts/wait_cloudlibs_install.sh }
+            content: { get_file: ../scripts/wait-cloudlibsInstall.sh }
+          - path: /config/encrypt.sh
+            permissions: 0755
+            owner: root:root
+            content: { get_file: ../scripts/encrypt.sh }
           - path: /config/postOnboard.sh
             permissions: 0755
             owner: root:root
             content:
               str_replace:
                 params:
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl}
                   __keep_admin__: { get_param: keep_admin }
                   __keep_bigiq__: { get_param: keep_bigiq }
                   __keep_config_drive__: { get_param: keep_config_drive }
+                  __set_mgmt_mtu__: { get_param: set_management_mtu }
+                  __mgmt_mtu__: { get_param: management_mtu }
+                  __mgmt_nic__: { get_param: management_nic }
                 template: { get_file: ../scripts/postOnboard.sh }
           - path: /config/onboard.sh
             permissions: 0755
@@ -237,6 +301,7 @@ resources:
                           template: --ntp server_ntp
                           for_each:
                             server_ntp: { get_param: ntp }
+                  __timezone__: { get_param: timezone }
                   __allow_ua__: { get_param: ua_allow }
                   __template_name__: { get_param: ua_template_name }
                   __template_version__: { get_param: ua_template_version }
@@ -245,6 +310,15 @@ resources:
                   __deploy_id__: { get_param: ua_stack_id }
                   __region__: { get_param: ua_region }
                   __license_type__: { get_param: ua_license_type }
+                  __db_vars__:
+                    list_join:
+                      - ' '
+                      -
+                        repeat:
+                          template: --db db_var
+                          for_each:
+                            db_var: {get_param: db_vars}
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl }
                 template: { get_file: ../scripts/onboard.sh }
 

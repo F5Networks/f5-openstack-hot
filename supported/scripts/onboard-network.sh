@@ -22,9 +22,15 @@ vlan=""
 gateway_opt=""
 msg=""
 stat="FAILURE"
+wcNotifyOptions="__wc_notify_options__"
 
 
 function set_vars() {
+    if [ "$wcNotifyOptions" == "None" ]; then
+        wcNotifyOptions=""
+    else
+        wcNotifyOptions=" $wcNotifyOptions"
+    fi
 
     if [[ "$vlan_nic" == "" ]]; then
         vlan_nic_ctr=$(( vlan_nic_index + 1 ))
@@ -67,7 +73,7 @@ function set_vars() {
         if [ "$vlan_tag" == "None" ]; then
             vlan_tag=""
         else
-            vlan_tag=",tag:${vlan_tag}" 
+            vlan_tag=",tag:${vlan_tag}"
         fi
         vlan="name:${vlan_name},nic:${vlan_nic}${vlan_mtu}${vlan_tag}"
         vlan_opt="--vlan"
@@ -77,20 +83,15 @@ function set_vars() {
     fi
 
     case "$self_port_lockdown" in
-        " " | "" | "None" )
-            self_port_lockdown=""
-            ;;
-        "allow-default" )
+        " " | "" | "None" | "allow-default" )
             self_port_lockdown=",allow:default"
             ;;
-        ### NOTE:
-        ### To be supported in future cloud-libs fix
-        # "allow-all" )
-        #     self_port_lockdown=",allow:all"
-        #     ;;
-        # "allow-none" )
-        #     self_port_lockdown=",allow:none"
-        #     ;;
+        "allow-all" )
+            self_port_lockdown=",allow:all"
+            ;;
+        "allow-none" )
+            self_port_lockdown=",allow:none"
+            ;;
         * )
             self_port_lockdown=",allow:${self_port_lockdown}"
             ;;
@@ -110,12 +111,13 @@ function set_vars() {
 function onboard_network_run() {
     echo "Configuring vlan: ${vlan_name} self_ip: ${self_ip}"
 
-    f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/network.js \
+    f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/network.js \
     -o "${logFile}" \
     --log-level debug \
     --host localhost \
     --user admin \
-    --password-url file:///config/cloud/openstack/adminPwd \
+    --password-url file:///config/cloud/openstack/.adminPwd \
+    --password-encrypted \
     "$vlan_opt" "$vlan" \
     --self-ip "name:${self_ip_name},address:${self_ip}/${self_ip_prefix},vlan:${vlan_name}${self_port_lockdown}" \
     "$gateway_opt" "$default_gateway"
@@ -125,7 +127,7 @@ function disable_dhclient() {
     if [[ "$vlan_nic_index" == "" || "$vlan_nic_index" == "None" || "$vlan_nic_index" == "$vlan_last_nic_index" ]]; then
         echo "Disabling dhclient for mgmt nic"
         tmsh modify sys db dhclient.mgmt { value disable }
-        tmsh save sys config 
+        tmsh save sys config
     fi
 }
 
@@ -145,7 +147,7 @@ function send_heat_signal() {
     fi
 
     echo "$msg"
-    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30$wcNotifyOptions
 }
 
 function main() {
@@ -156,4 +158,3 @@ function main() {
 }
 
 main
-

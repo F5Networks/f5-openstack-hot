@@ -10,6 +10,7 @@ logFile="/var/log/cloud/openstack/onboard-network.log"
 gateway_opt=""
 msg=""
 stat="FAILURE"
+wcNotifyOptions="__wc_notify_options__"
 
 
 function set_vlan_params() {
@@ -50,25 +51,20 @@ function set_vlan_params() {
 
 function set_selfip_params() {
     case "$self_port_lockdown" in
-        " " | "" | "None" )
+        " " | "" | "None" | "allow-default" )
             self_port_lockdown=",allow:default"
+            ;;
+        "allow-all" )
+            self_port_lockdown=",allow:all"
+            ;;
+        "allow-none" )
+            self_port_lockdown=",allow:none"
             ;;
         * )
             self_port_lockdown=",allow:${self_port_lockdown//;/ }"
             ;;
     esac
 
-        # "allow-default" )
-        #     self_port_lockdown=",allow:default"
-        #     ;;
-        # ### NOTE:
-        # ### To be supported in future cloud-libs fix
-        # # "allow-all" )
-        # #     self_port_lockdown=",allow:all"
-        # #     ;;
-        # # "allow-none" )
-        # #     self_port_lockdown=",allow:none"
-        # #     ;;
     self_port_lockdown="${self_port_lockdown//allow-default/default}"
     self_port_lockdown="${self_port_lockdown//allow-all/all}"
     self_port_lockdown="${self_port_lockdown//allow-none/none}"
@@ -81,6 +77,11 @@ function set_selfip_params() {
 }
 
 function set_vars() {
+    if [ "$wcNotifyOptions" == "None" ]; then
+        wcNotifyOptions=""
+    else
+        wcNotifyOptions=" $wcNotifyOptions"
+    fi
 
     vlan_creates='__network_vlan_create__'
     vlan_names='__network_vlan_name__'
@@ -164,12 +165,13 @@ function set_vars() {
 }
 
 function onboard_network_run() {
-    cmd="f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/network.js "
+    cmd="f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/network.js "
     cmd+="-o ${logFile} "
     cmd+="--log-level debug "
     cmd+="--host localhost "
     cmd+="--user admin "
-    cmd+="--password-url file:///config/cloud/openstack/adminPwd "
+    cmd+="--password-url file:///config/cloud/openstack/.adminPwd "
+    cmd+="--password-encrypted "
     cmd+="${vlan_params} "
     cmd+="${selfip_params} "
     cmd+="${gateway_opt} ${default_gateway} "
@@ -199,7 +201,7 @@ function send_heat_signal() {
     fi
 
     echo "$msg"
-    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30
+    wc_notify --data-binary '{"status": "'"$stat"'", "reason":"'"$msg"'"}' --retry 5 --retry-max-time 300 --retry-delay 30$wcNotifyOptions
 }
 
 function main() {

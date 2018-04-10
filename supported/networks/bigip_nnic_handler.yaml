@@ -15,10 +15,10 @@ parameters:
     type: comma_delimited_list
     label: OS Neutron Subnets to map to the BIG-IP VLANs
     description: The Neutron Subnets for the corresponding BIG-IP VLANs.
-  network_vlan_security_group_rules:
-    type: json
-    label: Security Group Rules
-    description: The rules to apply to the security groups
+  network_vlan_security_group_ids:
+    type: comma_delimited_list
+    label: Security Group IDs
+    description: The security group ids to associate with each Neutron port
   bigip_default_gateway:
     type: string
     label: Default Gateway IP
@@ -39,14 +39,6 @@ parameters:
     label: f5 BIG-IP VE VLAN tags
     description: Tags to apply on the VLAN on the BIG-IP. Use default value "None" for untagged.
     default: None
-  bigip_self_ip_addresses:
-    type: comma_delimited_list
-    label: f5 BIG-IP VE VLAN SelfIP Address
-    description: Self-IP address to associate with the BIG-IP VLAN.
-  bigip_self_cidr_blocks:
-    type: comma_delimited_list
-    label: f5 BIG-IP VE VLAN CIDR Blocks
-    description: CIDR Blocks for the BIG-IP SelfIP addresses.
   bigip_self_port_lockdowns:
     type: comma_delimited_list
     label: f5 BIG-IP VE VLAN Allow Services Settings
@@ -56,32 +48,22 @@ parameters:
     type: string
     label: Wait Handle Curl
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+    default: None
+
 
 resources:
 
-  security_groups:
-    type: OS::Heat::ResourceGroup
-    properties:
-      count: { get_param: bigip_nic_count }
-      resource_def:
-        type: F5::BigIP::CustomSecurityGroup
-        properties:
-          network_vlan_names: { get_param: network_vlan_names }
-          security_group_index: "%index%"
-          security_group_rules: { get_param: [network_vlan_security_group_rules, security_group_rules] }
-
   network_vlan_ports:
-    type: OS::Heat::ResourceGroup
+    type: F5::BigIP::NeutronPorts
     properties:
       count: { get_param: bigip_nic_count }
-      resource_def:
-        type: F5::BigIP::NeutronPort
-        properties:
-          index: "%index%"
-          network_names: { get_param: network_vlan_names }
-          network_subnets: { get_param: network_vlan_subnets }
-          ip_addresses: { get_param: bigip_self_ip_addresses }
-          security_groups: {get_attr: [security_groups, security_group_id]}
+      network_names: { get_param: network_vlan_names }
+      network_subnets: { get_param: network_vlan_subnets }
+      security_group_ids: { get_param: network_vlan_security_group_ids }
 
   onboard_network_config:
     type: F5::BigIP::OnboardNetworkConfigNNic
@@ -90,11 +72,12 @@ resources:
       vlan_names: { get_param: bigip_vlan_names }
       vlan_tags: { get_param: bigip_vlan_tags }
       vlan_mtus: { get_param: bigip_vlan_mtus }
-      self_ip_addrs: { get_param: bigip_self_ip_addresses }
-      self_cidr_blocks: { get_param: bigip_self_cidr_blocks}
+      self_ip_addrs: { get_attr: [network_vlan_ports, bigip_self_ips_addresses] }
+      self_cidr_blocks: { get_attr: [network_vlan_ports, bigip_self_ips_cidrs] }
       self_port_lockdowns: { get_param: bigip_self_port_lockdowns }
       default_gateway: { get_param: bigip_default_gateway }
-      wait_handle_curl: { get_param: wait_handle_curl}
+      wait_handle_curl: { get_param: wait_handle_curl }
+      wait_handle_curl_options: { get_param: wait_handle_curl_options }
 
   run_core_commands:
     type: OS::Heat::CloudConfig
@@ -103,15 +86,26 @@ resources:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
           - nohup sh -c '/config/preOnboard.sh' &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; /config/onboard.sh' >> /var/log/cloud/openstack/onboard.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_DONE  -o /var/log/cloud/openstack/onboard-network.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
-          - nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/encrypt.sh -o /var/log/cloud/openstack/encrypt.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/onboard.sh --wait-for ENCR_DONE -o /var/log/cloud/openstack/onboard.log' &>> /var/log/cloud/openstack/onboard.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_DONE  -o /var/log/cloud/openstack/onboard-network.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
+          - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/postOnboard.sh --wait-for ONBOARD_NETWORK_DONE -o /var/log/cloud/openstack/postOnboard.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
 
 
 outputs:
-  port_ids:
-    value: { get_attr: [network_vlan_ports, bigip_neutron_port_id ]}
+  ports_ids:
+    value: { get_attr: [network_vlan_ports, neutron_ports_ids] }
+  ports_fixed_ips:
+    value: { get_attr: [network_vlan_ports, neutron_ports_fixed_ips] }
+  ports_subnets:
+    value: { get_attr: [network_vlan_ports, neutron_ports_subnets]}
   init_4_onboard_network_config:
     value: { get_resource: onboard_network_config }
   init_5_run_core_commands:
     value: { get_resource: run_core_commands }
+  bigip_self_ips_addresses:
+    value: { get_attr: [network_vlan_ports, bigip_self_ips_addresses] }
+  bigip_self_ips_cidrs:
+    value: { get_attr: [network_vlan_ports, bigip_self_ips_cidrs] }
+  bigip_self_ips_masks:
+    value: { get_attr: [network_vlan_ports, bigip_self_ips_masks] }

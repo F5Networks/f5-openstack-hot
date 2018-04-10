@@ -59,6 +59,11 @@ parameters:
     type: string
     label: Wait Handle Curl
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+    default: None
   autoscale_group_tag:
     type: string
     label: Autoscale Group Tag
@@ -130,6 +135,7 @@ resources:
                   __bigiq_use_alt_mgmt_ip__: { get_param: bigiq_use_alt_bigip_mgmt_ip }
                   __bigiq_alt_mgmt_ip__: { get_param: bigiq_alt_bigip_mgmt_ip }
                   __bigiq_alt_mgmt_port__: { get_param: bigiq_alt_bigip_mgmt_port }
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl }
                 template: { get_file: ../scripts/onboard-autoscale.sh}
           - path: /config/cloud/openstack/.os

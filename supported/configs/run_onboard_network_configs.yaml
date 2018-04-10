@@ -14,7 +14,7 @@ resources:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
           repeat:
-            template: "nohup sh -c '/config/wait_cloudlibs_install.sh; f5-rest-node /config/cloud/openstack/node_modules/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-<%nic_index%>.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_<%nic_index%>_DONE  -o /var/log/cloud/openstack/onboard-network-<%nic_index%>.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null & "
+            template: "nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/onboard-network-<%nic_index%>.sh --wait-for ONBOARD_DONE --signal ONBOARD_NETWORK_<%nic_index%>_DONE  -o /var/log/cloud/openstack/onboard-network-<%nic_index%>.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null & "
             for_each:
               <%nic_index%>: { get_param: nic_indexes }
 outputs:

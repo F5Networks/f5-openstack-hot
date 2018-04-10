@@ -17,8 +17,16 @@ parameters:
     description: Management IP Address of the master BIG-IP.
   config_sync_ip:
     type: string
-    label: f5 BIG-IP Cluster Self-IP
+    label: f5 BIG-IP Cluster ConfigSync Self-IP
     description: ConfigSync IP Address of this BIG-IP.
+  config_sync_cidr:
+    type: string
+    label: f5 BIG-IP Cluster ConfigSync Self-IP CIDR
+    description: ConfigSync IP CIDR of this BIG-IP.
+  config_sync_vlan:
+    type: string
+    label: f5 BIG-IP Cluster ConfigSync Vlan Name
+    description: ConfigSync VLAN Name on this BIG-IP.
   device_group:
     type: string
     label: f5 BIG-IP Device Group Name
@@ -51,6 +59,12 @@ parameters:
     type: string
     label: Wait Handle
     description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+    default: None
+
 
 resources:
   onboard_cluster_config:
@@ -67,14 +81,17 @@ resources:
                 params:
                   __mgmt_ip__: { get_param: mgmt_ip}
                   __mgmt_port__: { get_param: mgmt_port }
-                  __master_mgmt_ip__: { get_param: master_mgmt_ip}
+                  __master_mgmt_ip__: { get_param: master_mgmt_ip }
                   __device_group__: { get_param: device_group }
                   __sync_type__: { get_param: sync_type }
                   __auto_sync__: { get_param: auto_sync }
                   __host_name__: { get_param: host_name }
                   __save_on_auto_sync__: { get_param: save_on_auto_sync }
                   __config_sync_ip__: { get_param: config_sync_ip }
+                  __config_sync_vlan__: { get_param: config_sync_vlan }
+                  __config_sync_cidr__: { str_split: ['/', { get_param: config_sync_cidr }, 1 ] }
                   __use_config_drive__: { get_param: use_config_drive }
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
                   wc_notify: { get_param: wait_handle_curl }
                 template: { get_file: ../scripts/onboard-cluster.sh}
 outputs:

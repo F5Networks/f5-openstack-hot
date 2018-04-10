@@ -1,0 +1,55 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_licensing_type: NO_LIC
+  bigip_license_keys:
+    - bigip1baseLicenseKey
+    - bigip2baseLicenseKey
+  bigip_addon_license_keys:
+    - bigip1addonKey1;bigip1addonKey2;bigip1addonKey3
+    - bigip2addonKey1;bigip1addonKey2;bigip2addonKey3
+  bigip_modules:
+    - ltm:nominal
+    - ilx:minimum
+  external_network: external_net
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: Mgmt_secgroup_2_NIC_cluster
+  network_vlan_name: data3
+  network_vlan_subnets:
+  # subnets for first instance - this example creates 2 Neutron Fixed IPs, first will be a self ip
+    - data3-subnet1;data3-subnet2
+  # subnets for second instance - this example creates 1 Neutron Fixed IP and it will be configured as BIG-IP self-ip
+    - data3-subnet1
+  # this 0-based index must point to same subnet value for both instances
+  network_vlan_subnets_cluster_index: 0
+  network_vlan_security_group_name: Data_secgroup_2_NIC_cluster
+  bigip_vlan_nic: "1.1"
+  bigip_vlan_mtu: 1400
+  libs_proxy_protocol: http
+  libs_proxy_host: 10.10.10.110
+  libs_proxy_port: 8080
+  libs_proxy_auth: 'username:password'
+  libs_proxy_addtl_opts: -L
+  os_heat_wc_notify_options: -k -v
+  bigip_remote_hosts_names:
+    - host1.mytest.com
+    - heatapi.mycloud.com
+  bigip_remote_hosts_ips:
+    - 192.168.1.111
+    - 192.168.1.10
+  bigip_timezone: GMT
+
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfig: ../../../../../configs/onboarding_network_config.yaml
+  F5::BigIP::OnboardClusterConfig: ../../../../../configs/onboarding_cluster_config.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::ClusterInstance2Nic: f5_bigip_cluster_instance_2_nic.yaml

@@ -1,0 +1,48 @@
+heat_template_version: 2016-04-08
+
+description: This template creates a standard neutron port to associate with a Big-IP instance. This template uses an index parameter that enables ports to be created as part of a resource group.
+
+parameters:
+  count:
+    type: number
+    label: f5 BIG-IP NIC count
+    description: Number of additional NICs to attach to the BIG-IP. Note - exclude management nic from count.
+  security_group_ids:
+    type: comma_delimited_list
+    label: Security Groups
+    description: Security group settings for the ports
+  network_names:
+    type: comma_delimited_list
+    label: Network Names
+    description: A list of networks the ports should be created in
+  network_subnets:
+    type: comma_delimited_list
+    label: Network Subnets
+    description: A list of subnets the ports should be created in
+
+resources:
+  network_vlan_ports:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: count }
+      resource_def:
+        type: F5::BigIP::NeutronPort
+        properties:
+          index: "%index%"
+          network_names: { get_param: network_names }
+          network_subnets: { get_param: network_subnets }
+          security_groups: { get_param: security_group_ids }
+
+outputs:
+  neutron_ports_ids:
+    value: { get_attr: [network_vlan_ports, neutron_port_id] }
+  neutron_ports_fixed_ips:
+    value: { get_attr: [network_vlan_ports, neutron_port_fixed_ips] }
+  neutron_ports_subnets:
+    value: { get_attr: [network_vlan_ports, neutron_port_subnets]}
+  bigip_self_ips_addresses:
+    value: { get_attr: [network_vlan_ports, bigip_self_ip_address] }
+  bigip_self_ips_cidrs:
+    value: { get_attr: [network_vlan_ports, bigip_self_ip_cidr] }
+  bigip_self_ips_masks:
+    value: { get_attr: [network_vlan_ports, bigip_self_ip_mask] }

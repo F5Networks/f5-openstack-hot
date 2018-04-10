@@ -1,0 +1,97 @@
+heat_template_version: 2016-04-08
+
+description: This template contains static management nic config for a standard f5 standalone VE image.
+
+parameters:
+  interface_name:
+    type: string
+    label: Interface Name
+    description: Name of the management interface to be configured
+    default: mgmt
+  ip_address:
+    type: string
+    label: IP Address
+    description: IP Address to assign to the interface
+  cidr:
+    type: string
+    label: cidr
+    description: IP CIDR to assign to the interface
+  gateway:
+    type: string
+    label: Gateway
+    description: Gateway to associate with the interface
+    default: None
+  dns:
+    type: string
+    label: DNS Servers
+    description: DNS Servers to add
+    default: None
+  mtu:
+    type: string
+    label: MTU
+    description: Default MTU value for the default management route
+    default: 1400
+  is_1nic:
+    type: boolean
+    label: 1NIC Template
+    description: Flags a template as 1NIC
+    default: false
+  wait_handle_curl:
+    type: string
+    label: Wait Handle
+    description: Resolved curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+  wait_handle_curl_options:
+    type: string
+    label: Wait Handle Curl Additional Options
+    description: Additonal options to add to curl_cli value of the WaitConditionHandle that enables status signals to be sent back to Heat
+
+resources:
+  static_mgmt_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        merge_how: dict(recurse_array,no_replace)+list(append)
+        write_files:
+          - path: /config/setup-staticMgmt.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
+                  __is_1_nic__: { get_param: is_1nic }
+                  __nic__: { get_param: interface_name }
+                  __addr__: { get_param: ip_address }
+                  __cidr__: { str_split: ['/', { get_param: cidr }, 1] }
+                  __gateway__: { get_param: gateway }
+                  __dns__: { get_param: dns }
+                  __mtu__: { get_param: mtu }
+                  __wc_notify_options__: { get_param: wait_handle_curl_options }
+                  wc_notify: { get_param: wait_handle_curl }
+                template: { get_file: ../scripts/setup-staticMgmt.sh }
+          - path: /config/startup-persist-mtu.sh
+            permissions: 0755
+            owner: root:root
+            content:
+              str_replace:
+                params:
+                  __mtu__: { get_param: mtu }
+                  __nic__: { get_param: interface_name }
+                template: { get_file: ../scripts/startup-persist-mtu.sh }
+          - path: /config/wait-staticMgmtConfig.sh
+            permissions: 0755
+            owner: root:root
+            content: { get_file: ../scripts/wait-staticMgmtConfig.sh }
+          - path: /config/wait-cloudlibsDownload.sh
+            permissions: 0755
+            owner: root:root
+            content: { get_file: ../scripts/wait-cloudlibsDownload.sh }
+        bootcmd:
+          - echo '******BOOT COMMAND START*******'
+          - /usr/bin/setdb dhclient.mgmt disable && echo '*** disabled dhclient'
+          - echo '******BOOT COMMAND END*******'
+
+outputs:
+  OS::stack_id:
+    description: F5::BigIP::StaticMgmtConfig resource.
+    value:
+      get_resource: static_mgmt_config
