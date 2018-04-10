@@ -26,6 +26,7 @@ dbVars="__db_vars__"
 tz="__timezone__"
 msg=""
 stat="FAILURE"
+lastError=""
 logFile="/var/log/cloud/openstack/onboard.log"
 wcNotifyOptions="__wc_notify_options__"
 
@@ -128,16 +129,17 @@ function onboard_run() {
         --password-encrypted ; then
 
         # older cloud-libs versions exit with 0 signal
-        licenseExists=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "Fault code: 51092" -i -c)
+        licenseExists=$(tail $logFile -n 25 | grep "Fault code: 51092" -i -c)
 
         if [ "$licenseExists" -gt 0 ]; then
             msg="Onboard completed but licensing failed. Error 51092: This license has already been activated on a different unit."
             stat="SUCCESS"
         else
-            errorCount=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "BIG-IP onboard failed" -i -c)
+            errorCount=$(tail $logFile -n 25 | grep "BIG-IP onboard failed" -i -c)
 
             if [ "$errorCount" -gt 0 ]; then
-                msg="Onboard command failed. See logs for details."
+                lastError=$(grep "error: \[pid" $logFile | tail -n 2)
+                msg="Onboard command failed. See logs for details. Most recent errors: $lastError"
             else
                 msg="Onboard command exited without error."
                 stat="SUCCESS"
@@ -145,12 +147,13 @@ function onboard_run() {
 
         fi
     else
-        licenseExists=$(tail /var/log/cloud/openstack/onboard.log -n 25 | grep "Fault code: 51092" -i -c)
+        licenseExists=$(tail $logFile -n 25 | grep "Fault code: 51092" -i -c)
         if [ "$licenseExists" -gt 0 ]; then
             msg="Onboard completed but licensing failed. Error 51092: This license has already been activated on a different unit."
             stat="SUCCESS"
         else
-            msg='Onboard exited with an error signal. See logs for details.'
+            lastError=$(grep "error: \[pid" $logFile | tail -n 2)
+            msg="Onboard exited with an error signal. See logs for details. Most recent errors: $lastError"
         fi
     fi
 }

@@ -1,0 +1,119 @@
+parameters:
+  bigip_image: test-bigip-13
+  bigip_flavor: f5.medium
+  use_config_drive: true
+  bigip_os_ssh_key: sshKeyName
+  bigip_admin_pwd: adminPwd
+  bigip_root_pwd: rootPwd
+  bigip_license_key: baseLicenseKey
+  bigip_licensing_type: BYOL
+  bigip_addon_license_keys:
+    - addonKey1
+    - addonKey2
+  bigip_modules:
+    - ltm:nominal
+  mgmt_network: mgmt_net
+  mgmt_security_group_name: mgmt-secgroup-nnic
+  bigip_nic_count: 5
+  network_vlan_names:
+    - dev-data1
+    - dev-data2
+    - dev-data3
+    - dev-data4
+    - dev-data5
+  network_vlan_subnets:
+    - dev-data1-subnet
+    - dev-data2-subnet;dev-data2-subnet
+    - dev-data3-subnet1;dev-data3-subnet2
+    - dev-data4-subnet;dev-data4-subnet;dev-data4-subnet
+    - dev-data5-subnet
+  network_vlan_security_group_rules:
+    security_group_rules:
+      - rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: udp
+            remote_ip_prefix: 0.0.0.0/0
+      - rules:
+          - protocol: icmp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+          - protocol: udp
+            remote_ip_prefix: 0.0.0.0/0
+      - rules:
+          - protocol: icmp
+            direction: egress
+          - protocol: tcp
+            direction: egress
+          - protocol: udp
+            direction: egress
+      - rules:
+          - protocol: icmp
+            direction: ingress
+          - protocol: icmp
+            direction: egress
+          - protocol: tcp
+            direction: ingress
+          - protocol: tcp
+            direction: egress
+          - protocol: udp
+            direction: ingress
+          - protocol: udp
+            direction: egress
+      - rules:
+          - protocol: tcp
+            remote_ip_prefix: 0.0.0.0/0
+            port_range_min: 22
+            port_range_max: 22
+  bigip_vlan_mtus:
+    - 1400
+    - 1450
+    - 1400
+    - 1410
+    - 1460
+  bigip_vlan_tags:
+    - 100
+    - 200
+    - 300
+    - 400
+    - 500
+  bigip_vlan_names:
+    - data1
+    - data2
+    - data3
+    - data4
+    - data5
+  bigip_self_port_lockdowns:
+    -
+    - allow-default;tcp:8080
+    - allow-none
+    -
+    - tcp:22;tcp:443
+  libs_proxy_protocol: http
+  libs_proxy_host: 10.10.10.110
+  libs_proxy_port: 8080
+  libs_proxy_auth: username:password
+  libs_proxy_addtl_opts: -L
+  os_heat_wc_notify_options: -k -v
+  bigip_remote_hosts_names:
+    - host1.mytest.com
+    - heatapi.mycloud.com
+  bigip_remote_hosts_ips:
+    - 192.168.1.111
+    - 192.168.1.
+  bigip_timezone: GMT
+resource_registry:
+  F5::BigIP::OverrideDefaultConfig: ../../../../../configs/override_default_config.yaml
+  F5::BigIP::OnboardingLibs: ../../../../../configs/onboarding_libs.yaml
+  F5::BigIP::OnboardingScripts: ../../../../../configs/onboarding_scripts.yaml
+  F5::BigIP::OnboardNetworkConfigNNic: ../../../../../configs/onboarding_network_config_nnic.yaml
+  F5::BigIP::ManagementSecurityGroup: ../../../../../security_groups/bigip_mgmt_security_group.yaml
+  F5::BigIP::DataSecurityGroup: ../../../../../security_groups/bigip_data_security_group.yaml
+  F5::BigIP::ControlSecurityGroup: ../../../../../security_groups/bigip_control_security_group.yaml
+  F5::BigIP::CustomSecurityGroup: ../../../../../security_groups/bigip_custom_security_group.yaml
+  F5::BigIP::NeutronPort: ../../../../../networks/bigip_neutron_port.yaml
+  F5::BigIP::NeutronPorts: ../../../../../networks/bigip_neutron_ports.yaml
+  F5::BigIP::NNicHandler: ../../../../../networks/bigip_nnic_handler.yaml
