@@ -43,7 +43,7 @@ parameters:
     type: string
     label: f5-cloud-libs-openstack tag
     description: Tag that determines version of f5-cloudlibs-openstack to use. If specified, ensure that hashes are updated for verifyHash.
-    default: v2.0.0
+    default: v2.0.2
   cloudlibs_os_url_override:
     type: string
     label: f5-cloud-libs-openstack URL Override

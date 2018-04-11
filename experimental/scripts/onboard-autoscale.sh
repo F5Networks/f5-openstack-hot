@@ -68,6 +68,17 @@ function set_vars(){
     autoscaleMetadataUrl=${autoscaleMetadataUrl/&/\\&}
     # remove trailing .
     hostName=${hostName%.}
+
+    # temp workaround
+    # we've frozen changes to current autoscale implementation
+    output=$(f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/decryptDataFromFile.js --data-file /config/cloud/openstack/.adminPwd)
+    shopt -s extglob
+    output="${output%%*( )}"
+    shopt -u extglob
+    output="${output//$'\n'/}"
+    output="${output%$'\n'}"
+    echo "$output" > /config/cloud/openstack/.adminPwd
+
 }
 
 function run_autoscale() {
@@ -84,7 +95,6 @@ function run_autoscale() {
     --port "$mgmtPort" \
     --user admin \
     --password-url file:///config/cloud/openstack/.adminPwd \
-    --password-encrypted \
     --cloud openstack \
     --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
     --device-group "$deviceGroup" \
@@ -121,7 +131,6 @@ function create_iCall() {
                 --port "$mgmtPort" \
                 --user admin \
                 --password-url file:///config/cloud/openstack/.adminPwd \
-                --password-encrypted \
                 --cloud openstack \
                 --provider-options instanceMetadataUrl:"$instanceUrl",autoscaleMetadataUrl:"$autoscaleMetadataUrl",osCredentialsUrl:"$osCreds",autoscaleGroupTag:"$autoscaleGroupTag",autoscaleMetadataResource:"$autoscaleMetadataResource",autoscaleStack:"$autoscaleStack" \
                 --device-group "$deviceGroup" \

@@ -41,7 +41,7 @@ parameters:
     type: string
     label: f5-cloud-libs-openstack Tag
     description: Tag that determines version of f5 cloudlibs-package to use for provisioning. If specified, ensure that hashes are valid by either updating scripts/verifyHash or by providing a f5_cloudlibs_verify_hash_url_override value.
-    default: v2.0.0
+    default: v2.0.2
   f5_cloudlibs_openstack_url_override:
     type: string
     label: f5-cloud-libs-openstack URL Override

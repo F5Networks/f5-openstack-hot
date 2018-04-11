@@ -154,6 +154,11 @@ function onboard_run() {
         else
             lastError=$(grep "error: \[pid" $logFile | tail -n 2)
             msg="Onboard exited with an error signal. See logs for details. Most recent errors: $lastError"
+            # escape \, /, ' and " for json
+            msg=${msg//\\/\\\\}
+            msg=${msg//\'/\\\'}
+            msg=${msg//\//\\\/}
+            msg=${msg//\"/\\\"}
         fi
     fi
 }
