@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This solution uses a Heat template to launch the deployment of F5 Virtual Edition (VE) instances in **OS::Heat::AutoScalingGroup** that can scale arbitrary resources. The BIG-IP VEs have the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality.
+This solution uses a Heat template to launch the deployment of F5 Virtual Edition (VE) instances in **OS::Heat::AutoScalingGroup** that can scale arbitrary resources. The BIG-IP VEs have the [Local Traffic Manager (LTM)](https://f5.com/products/big-ip/local-traffic-manager-ltm) module enabled to provide advanced traffic management functionality.
 
 In this auto scale solution, as thresholds are met, the number of BIG-IP VE LTM instances automatically increases or decreases accordingly. Scaling thresholds are by default based on **network.incoming.bytes.rate** meter. The meter type can be changed by providing the parameter value. This solution is for BIG-IP LTM only.
 
@@ -45,9 +45,11 @@ Additionally, F5 provides checksums for all of our supported OpenStack heat temp
 
 Instance configuration data is retrieved from the metadata service. OpenStack supports encrypting the metadata traffic.
 If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
-For more information, please refer to:
-- https://docs.openstack.org/heat/latest/template_guide/software_deployment.html
-- https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic
+For more information, refer to:
+- Heat Template Guide - [Software Deployment](https://docs.openstack.org/heat/latest/template_guide/software_deployment.html)
+- Nova Admin - [Encrypting Compute Metadata Traffic](https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic)
+
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
 
 
 ## Supported instance types and OpenStack versions:
@@ -115,7 +117,7 @@ The following parameters can be defined in your environment file.
 | bigiq_license_username | Yes | The BIG-IQ username to use to license the BIG-IP instances. |  |
 | bigiq_license_pwd | Yes | The BIG-IQ password to use to license the BIG-IP instances. |  |
 | bigiq_license_pool | Yes | The BIG-IQ License Pool to use to license the BIG-IP instances. |  |
-| bigiq_use_bigip_floating_ip | Yes | Determines whether to use the floating ip of the BIG-IP for BIG-IQ licensing |  |
+| bigiq_use_bigip_floating_ip | Yes | Determines whether to use the floating IP of the BIG-IP for BIG-IQ licensing |  |
 | bigip_modules | No | Modules to provision on the BIG-IP VE.  The default is `ltm:nominal` | Syntax: List of `module:level`. See [Parameter Values](#parameter-values) |
 
 #### OS Network
@@ -239,4 +241,4 @@ under the License.
 ### Contributor License Agreement
 
 Individuals or business entities who contribute to this project must have
-completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
+completed and submitted the F5 Contributor License Agreement.
