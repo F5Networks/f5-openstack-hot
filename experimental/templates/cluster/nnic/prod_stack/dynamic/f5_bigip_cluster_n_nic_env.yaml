@@ -132,4 +132,4 @@ resource_registry:
   F5::BigIP::CustomSecurityGroup: ../../../../../security_groups/bigip_custom_security_group.yaml
   F5::BigIP::NeutronPort: ../../../../../networks/bigip_neutron_port.yaml
   F5::BigIP::NeutronPorts: ../../../../../networks/bigip_neutron_ports.yaml
-  F5::BigIP::NNicHandler: ../../../../../.networks/bigip_nnic_handler.yaml
+  F5::BigIP::NNicHandler: ../../../../../networks/bigip_nnic_handler.yaml

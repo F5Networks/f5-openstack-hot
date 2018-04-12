@@ -159,7 +159,6 @@ resource_registry:
   F5::BigIP::ManagementSecurityGroup: ../../../../../security_groups/bigip_mgmt_security_group.yaml
   F5::BigIP::DataSecurityGroup: ../../../../../security_groups/bigip_data_security_group.yaml
   F5::BigIP::ControlSecurityGroup: ../../../../../security_groups/bigip_control_security_group.yaml
-  F5::BigIP::ClusterInstanceNNic: f5_bigip_cluster_instance_n_nic_nested.yaml
   F5::BigIP::CustomSecurityGroup: ../../../../../security_groups/bigip_custom_security_group.yaml
   F5::BigIP::NeutronPort: ../../../../../networks/bigip_neutron_port.yaml
   F5::BigIP::NeutronPorts: ../../../../../networks/bigip_neutron_ports.yaml
