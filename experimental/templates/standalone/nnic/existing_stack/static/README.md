@@ -10,6 +10,8 @@ This solution uses a Heat Orchestration Template to launch an nNIC (multi NIC) d
 
 The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
 
+This template gives you the option of using a [BIG-IQ device](https://f5.com/products/big-iq-centralized-management) to license BIG-IP VEs from a pool of license/registration keys.
+
 The **standalone** heat orchestration template incorporates existing networks defined in Neutron.
 
 This template is in the **static** directory, meaning you configure the BIG-IP VE management IP address statically.  This is useful if there is no DHCP server available, or if it is disabled on the neutron subnet.  If you want to use a template that assigned using DHCP, see the template in the **dynamic** directory.
