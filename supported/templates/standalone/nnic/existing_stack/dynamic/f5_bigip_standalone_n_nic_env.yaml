@@ -128,9 +128,9 @@ parameters:
     -
     - tcp:22;tcp:443
 
-  ###Tag value for f5-cloud-libs download. Syntax: <vrelease> Defaults to v3.5.0
-  # f5_cloudlibs_tag: v3.5.0
-  # f5_cloudlibs_verify_hash_url_override: https://raw.githubusercontent.com/F5Networks/f5-cloud-libs/v3.5.0/dist/verifyHash
+  ###Tag value for f5-cloud-libs download. Syntax: <vrelease> Defaults to v4.0.3
+  # f5_cloudlibs_tag: v4.0.3
+  # f5_cloudlibs_verify_hash_url_override: https://raw.githubusercontent.com/F5Networks/f5-cloud-libs/v4.0.3/dist/verifyHash
   libs_proxy_protocol: http
   libs_proxy_host: 10.10.10.110
   libs_proxy_port: 8080

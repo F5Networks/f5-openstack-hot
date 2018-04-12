@@ -372,7 +372,7 @@ resources:
           ua_project_id: { get_param: 'OS::project_id' }
           ua_stack_id: { get_param: 'OS::stack_id' }
           ua_template_name: sup-ex-dynamic-f5_bigip_cluster_2_nic.yaml
-          ua_template_version: 3.1.0
+          ua_template_version: 4.0.0
     depends_on: device_mgmt_ports
 outputs:
   bigip1_instance_id:
