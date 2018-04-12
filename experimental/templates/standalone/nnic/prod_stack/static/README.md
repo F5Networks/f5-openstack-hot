@@ -12,7 +12,9 @@ The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-mana
 
 The **standalone** heat orchestration template incorporates existing networks defined in Neutron.
 
-Templates under **prod_stack** do not require an external network and do not create a floating ip on the Neutron port.
+Templates under **prod_stack** do not require an external network and do not create a floating IP address on the Neutron port.
+
+This template is in the **static** directory, meaning you configure the BIG-IP VE management IP address statically.  This is useful if there is no DHCP server available, or if it is disabled on the neutron subnet.  If you want to use a template that assigned using DHCP, see the template in the **dynamic** directory.
 
 ## Prerequisites and Configuration Notes
 
@@ -39,6 +41,8 @@ For more information, please refer to:
 
 - Heat Template Guide - [Software Deployment](https://docs.openstack.org/heat/latest/template_guide/software_deployment.html)
 - Nova Admin - [Encrypting Compute Metadata Traffic](https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic)
+
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
 
 ## Supported instance types and OpenStack versions
 
@@ -215,4 +219,4 @@ under the License.
 ### Contributor License Agreement
 
 Individuals or business entities who contribute to this project must have
-completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
+completed and submitted the F5 Contributor License Agreement.

@@ -21,6 +21,19 @@ These templates employ similar pattern as OpenStack TripleO wherein the common/r
 Descriptions for each template are contained at the top of each template in the *Description* key.
 For additional information, and assistance in deploying a template, see the README file on the individual template pages.
 
+### Template options
+Each template category in this repo has sub-directories with different versions of a particular template. 
+  - ***Existing Stack***  
+  Templates under **existing_stack** directories deploy into an existing networking stack; meaning the networking infrastructure MUST be available prior to deploying. 
+  - ***Prod Stack***  
+  Templates under **prod_stack**  directories do not require an external network and do not create a floating IP address on the Neutron port.
+
+Under each of those categories, some templates also contain both of the following sub-directories:
+  - ***Dynamic***    
+  Templates under **dynamic** directories use DHCP to dynamically determine the BIG-IP VE management IP address. All supported templates currently only have this option.
+  - ***Static***    
+  Templates under **static** directories require you to configure the BIG-IP VE management IP address statically.  This is useful if there is no DHCP server available, or if it is disabled on the neutron subnet.  Many of the templates in the Experimental directory now have this option. 
+
 ### Matrix for tagged releases
 F5 has created a matrix that contains all of the tagged releases of the F5 OpenStack Heat Orchestration templates, and the corresponding BIG-IP versions available for a specific tagged release. See https://github.com/F5Networks/f5-openstack-hot/blob/master/openstack-bigip-version-matrix.md.
 
@@ -53,13 +66,24 @@ The following is a summary of prerequisites for successfully launching templates
   - Glance Components:
     - BIG-IP Virtual Edition Image Version 13.0 or later added to Images. The image file must be in qcow.zip format and can be any size (ALL, LTM, or LTM_1SLOT).
 
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
+
+
 ## List of Supported F5 OpenStack Heat Orchestration templates 
 The following is a list of the current *supported* F5 OpenStack HOT templates. Click the links to view the README files which include the deployment instructions and additional information.
 
-  - [Standalone 1 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/1nic)
-  - [Standalone 2 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/2nic)
-  - [Standalone N NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/nnic)
-  - [Cluster 2 NIC](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/cluster/2nic)
+**Standalone 1 NIC**
+  - [Existing Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/1nic/existing_stack/dynamic)
+  - [Prod Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/1nic/prod_stack/dynamic)
+
+**Standalone nNIC**
+  - [Existing Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/nnic/existing_stack/dynamic)
+  - [Prod Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/standalone/nnic/prod_stack/dynamic)
+  
+**Cluster 2 NIC**
+  - [Existing Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/cluster/2nic/existing_stack/dynamic)
+  - [Prod Stack](https://github.com/F5Networks/f5-openstack-hot/tree/master/supported/templates/cluster/2nic/prod_stack/dynamic)
+  
 
 
 

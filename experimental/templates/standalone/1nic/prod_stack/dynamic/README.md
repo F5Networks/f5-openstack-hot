@@ -12,7 +12,9 @@ The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-mana
 
 The **standalone** heat orchestration template incorporates existing networks defined in Neutron.
 
-Templates under **prod_stack** do not require an external network and do not create a floating ip on the Neutron port.
+Templates under **prod_stack** do not require an external network and do not create a floating IP address on the Neutron port.
+
+This template is in the **dynamic** directory, meaning the BIG-IP VE management IP address is determined using DHCP. If you want to configure the BIG-IP VE management IP address statically (useful if there is no DHCP server available, or if it is disabled on the neutron subnet), see the template in the **static** directory.
 
 ## Prerequisites and Configuration Notes
 
@@ -35,10 +37,12 @@ Additionally, F5 provides checksums for all of our supported OpenStack heat temp
 
 Instance configuration data is retrieved from the metadata service. OpenStack supports encrypting the metadata traffic.
 If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
-For more information, please refer to:
+For more information, refer to:
 
 - Heat Template Guide - [Software Deployment](https://docs.openstack.org/heat/latest/template_guide/software_deployment.html)
 - Nova Admin - [Encrypting Compute Metadata Traffic](https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic)
+
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
 
 ## Supported instance types and OpenStack versions
 
@@ -116,7 +120,7 @@ The following parameters can be defined in your environment file.
 | bigiq_license_username | No | The BIG-IQ username to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 | bigiq_license_pwd | No | The BIG-IQ password to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ`|
 | bigiq_license_pool | No | The BIG-IQ License Pool to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
-| bigiq_use_bigip_floating_ip | No | Determines whether to use the floating ip of the BIG-IP for BIG-IQ licensing | Must be provided if `bigip_licensing_type` is `BIGIQ` |
+| bigiq_use_bigip_floating_ip | No | Determines whether to use the floating IP of the BIG-IP for BIG-IQ licensing | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 | bigiq_alt_bigip_port | No | The alternate port to use when licensing the BIG-IP through BIG-IQ. If not specified, management port is used. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 
 #### OS Network
@@ -192,4 +196,4 @@ under the License.
 ### Contributor License Agreement
 
 Individuals or business entities who contribute to this project must have
-completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
+completed and submitted the F5 Contributor License Agreement.

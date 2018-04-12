@@ -6,20 +6,24 @@
 
 ## Introduction
 
-This solution uses a Heat Orchestration Template to launch and configure two BIG-IP nNIC VEs in a clustered, highly available configuration in an OpenStack Private Cloud.
+This solution uses a Heat Orchestration Template to launch and configure two BIG-IP nNIC VEs in a clustered, highly available configuration in an OpenStack Private Cloud. In a multi NIC implementation, one interface is for management and data-plane traffic from the Internet, and the NIC count you provide determines the number of additional NICs used for processing traffic.  You can include up to 10 total NICs, including the NIC for management and data-plane traffic from the Internet.
+
+The BIG-IP VE has the <a href="https://f5.com/products/big-ip/local-traffic-manager-ltm">Local Traffic Manager</a> (LTM) module enabled to provide advanced traffic management functionality. This means you can also configure the BIG-IP VE to enable F5's L4/L7 security features, access control, and intelligent traffic management.
 
 The **cluster** heat orchestration template incorporates existing networks defined in Neutron.
 
-Templates under **prod_stack** do not require an external network and do not create a floating ip on the Neutron port.
+This template is in the **static** directory, meaning you configure the BIG-IP VE management IP address statically.  This is useful if there is no DHCP server available, or if it is disabled on the neutron subnet.  If you want to use a template that assigned using DHCP, see the template in the **dynamic** directory.
+
+Templates under **prod_stack** do not require an external network and do not create a floating IP address on the Neutron port.
 
 ## Prerequisites and Configuration Notes
 
-- Management Interface IP is determined via DHCP.
+- The BIG-IP management interface IP is configured statically. You must still have an IP allocation pool configured on the subnet in order to assign a fixed IP address to the instance.
 - If you do not specify a URL override (the parameter name is **f5_cloudlibs_url_override**), the default location is GitHub and the subnet for the management network requires a route and access to the Internet for the initial configuration to download the BIG-IP cloud library.
 - If you specify a value for **f5_cloudlibs_url_override** or **f5_cloudlibs_tag**, ensure that corresponding hashes are valid by either updating scripts/verifyHash or by providing a **f5_cloudlibs_verify_hash_url_override** value.
 - **Important**: This [article](https://support.f5.com/csp/article/K13092#userpassword) contains links to information regarding BIG-IP user and password management. Please take note of the following when supplying password values:
-  - The BIG-IP version and any default policies that may apply
-- Any characters you should avoid
+  - The BIG-IP version and any default policies that may apply.
+- Any characters you should avoid.
 - This template leverages the built in heat resource type *OS::Heat::WaitCondition* to track status of onboarding by sending signals to the orchestration API.
 - This template can send non-identifiable statistical information to F5 Networks to help us improve our templates. See [Sending statistical information to F5](#sending-statistical-information-to-f5).
 - In order to pass traffic from your clients to the servers, after launching the template, you must create virtual server(s) on the BIG-IP VE.
@@ -33,10 +37,12 @@ Additionally, F5 provides checksums for all of our supported OpenStack heat temp
 
 Instance configuration data is retrieved from the metadata service. OpenStack supports encrypting the metadata traffic.
 If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
-For more information, please refer to:
+For more information, refer to:
 
 - Heat Template Guide - [Software Deployment](https://docs.openstack.org/heat/latest/template_guide/software_deployment.html)
 - Nova Admin - [Encrypting Compute Metadata Traffic](https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic)
+
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
 
 ## Supported instance types and OpenStack versions
 
@@ -116,7 +122,7 @@ The following parameters can be defined in your environment file.
 | bigiq_license_username | No | The BIG-IQ username to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 | bigiq_license_pwd | No | The BIG-IQ password to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ`|
 | bigiq_license_pool | No | The BIG-IQ License Pool to use to license the BIG-IP instances. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
-| bigiq_use_bigip_floating_ip | No | Determines whether to use the floating ip of the BIG-IP for BIG-IQ licensing | Must be provided if `bigip_licensing_type` is `BIGIQ` |
+| bigiq_use_bigip_floating_ip | No | Determines whether to use the floating IP of the BIG-IP for BIG-IQ licensing | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 | bigiq_alt_bigip_port | No | The alternate port to use when licensing the BIG-IP through BIG-IQ. If not specified, management port is used. | Must be provided if `bigip_licensing_type` is `BIGIQ` |
 
 
@@ -137,8 +143,8 @@ The following parameters can be defined in your environment file.
 | bigip_default_gateway | No | Optional upstream Gateway IP Address for the BIG-IP instance.  |  |
 | bigip_mgmt_port | No | The default is 443 |  |
 | bigip_mgmt_nic_name | No | The default is ***mgmt** |  |
-| bigip_mgmt_nic_gateway | Yes | Gateway to configure the management nic with |  |
-| bigip_mgmt_nic_mtu | No | The MTU to configure teh management nic with. The default is **1400** |  |
+| bigip_mgmt_nic_gateway | Yes | Gateway to configure the management NIC with |  |
+| bigip_mgmt_nic_mtu | No | The MTU to configure the management NIC with. The default is **1400** |  |
 | bigip_vlan_name | No | Name of the VLAN to be created on the BIG-IP. The default is **data**. |  |
 | bigip_vlan_mtu | No | MTU value of the VLAN on the BIG-IP. The default is **1400**. |  |
 | bigip_vlan_tag | No | Tag to apply on the VLAN on the BIG-IP. Use the default value **None** for untagged. |  |
@@ -219,4 +225,4 @@ under the License.
 ### Contributor License Agreement
 
 Individuals or business entities who contribute to this project must have
-completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
+completed and submitted the F5 Contributor License Agreement.

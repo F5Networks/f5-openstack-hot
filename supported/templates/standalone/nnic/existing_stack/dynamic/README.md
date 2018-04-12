@@ -33,10 +33,12 @@ Additionally, F5 provides checksums for all of our supported OpenStack heat temp
 
 Instance configuration data is retrieved from the metadata service. OpenStack supports encrypting the metadata traffic.
 If SSL is enabled in your environment, ensure that calls to the metadata service in the templates are updated accordingly.
-For more information, please refer to:
+For more information, refer to:
 
 - Heat Template Guide - [Software Deployment](https://docs.openstack.org/heat/latest/template_guide/software_deployment.html)
 - Nova Admin - [Encrypting Compute Metadata Traffic](https://docs.openstack.org/nova/latest/admin/security.html#encrypt-compute-metadata-traffic)
+
+**Note**: The templates use cloud-init for provisioning. To mitigate security risks associated with retrieving cloud-config data, or if you do not fully trust the medium over which your cloud-config will be stored and/or transmitted, we recommend you change your passwords after stack creation has been completed successfully. 
 
 ## Supported instance types and OpenStack versions
 
@@ -207,4 +209,4 @@ under the License.
 ### Contributor License Agreement
 
 Individuals or business entities who contribute to this project must have
-completed and submitted the [F5 Contributor License Agreement](http://f5-openstack-docs.readthedocs.io/en/latest/cla_landing.html).
+completed and submitted the F5 Contributor License Agreement.
