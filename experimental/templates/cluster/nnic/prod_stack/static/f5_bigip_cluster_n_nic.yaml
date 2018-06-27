@@ -691,7 +691,7 @@ resources:
     type: OS::Heat::MultipartMime
     properties:
       parts:
-        - config: { get_resource: init_0_static_mgmt_config_bigip1 }
+        - config: { get_resource: init_0_static_mgmt_config_bigip2 }
         - config: { get_resource: init_1_override_default_config }
         - config: { get_resource: init_2_onboard_libs }
         - config: { get_resource: init_3_onboard_scripts_bigip2 }
