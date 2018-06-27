@@ -395,7 +395,7 @@ resources:
       ua_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
       ua_project_id: { get_param: 'OS::project_id' }
       ua_stack_id: { get_param: 'OS::stack_id' }
-      ua_template_name: exp-ex-dynamic-f5_bigip_standalone_n_nic.yaml
+      ua_template_name: exp-prod-dynamic-f5_bigip_standalone_n_nic.yaml
       ua_template_version: 4.0.0
       ua_license_type: { get_param: bigip_licensing_type }
   bigip_provision:

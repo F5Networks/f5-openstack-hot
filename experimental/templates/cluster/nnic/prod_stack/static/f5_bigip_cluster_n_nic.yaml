@@ -512,7 +512,7 @@ resources:
       ua_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
       ua_project_id: { get_param: 'OS::project_id' }
       ua_stack_id: { get_param: 'OS::stack_id' }
-      ua_template_name: exp-ex-static-f5_bigip_cluster_n_nic.yaml
+      ua_template_name: exp-prod-static-f5_bigip_cluster_n_nic.yaml
       ua_template_version: 4.0.0
       ua_license_type: { get_param: bigip_licensing_type }
   init_5_onboard_cluster_config_bigip1:
@@ -667,7 +667,7 @@ resources:
       ua_cloudlibs_tag: { get_param: f5_cloudlibs_tag }
       ua_project_id: { get_param: 'OS::project_id' }
       ua_stack_id: { get_param: 'OS::stack_id' }
-      ua_template_name: exp-ex-static-f5_bigip_cluster_n_nic.yaml
+      ua_template_name: exp-prod-static-f5_bigip_cluster_n_nic.yaml
       ua_template_version: 4.0.0
       ua_license_type: { get_param: bigip_licensing_type }
   init_5_onboard_cluster_config_bigip2:
