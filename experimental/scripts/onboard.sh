@@ -138,8 +138,8 @@ function onboard_run() {
             errorCount=$(tail $logFile -n 25 | grep "BIG-IP onboard failed" -i -c)
 
             if [ "$errorCount" -gt 0 ]; then
-                lastError=$(grep "error: \[pid" $logFile | tail -n 2)
-                msg="Onboard command failed. See logs for details. Most recent errors: $lastError"
+                lastError=$(grep "error: \[pid" $logFile | tail -n 1)
+                msg="Onboard command failed. See logs for details. Most recent error: $lastError"
             else
                 msg="Onboard command exited without error."
                 stat="SUCCESS"
@@ -152,8 +152,8 @@ function onboard_run() {
             msg="Onboard completed but licensing failed. Error 51092: This license has already been activated on a different unit."
             stat="SUCCESS"
         else
-            lastError=$(grep "error: \[pid" $logFile | tail -n 2)
-            msg="Onboard exited with an error signal. See logs for details. Most recent errors: $lastError"
+            lastError=$(grep "error: \[pid" $logFile | tail -n 1)
+            msg="Onboard exited with an error signal. See logs for details. Most recent error: $lastError"
             # escape \, /, ' and " for json
             msg=${msg//\\/\\\\}
             msg=${msg//\'/\\\'}
