@@ -489,7 +489,7 @@ resources:
           ua_region: { get_param: os_region }
           ua_stack_id: { get_param: 'OS::stack_id' }
           ua_template_name: exp-ex-dynamic-f5_bigip_autoscale_ltm_2_nic.yaml
-          ua_template_version: 4.0.0
+          ua_template_version: 4.0.1
 
 
 outputs:
