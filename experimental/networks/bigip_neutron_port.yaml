@@ -19,6 +19,12 @@ parameters:
     type: comma_delimited_list
     label: Network Subnets
     description: A list of subnets the ports should be created in
+  network_static_self_ips:
+    type: comma_delimited_list
+    label: Fixed Static IPs
+    description: A list of Fixed IPs
+    default:
+      -
 
 resources:
   bigip_neutron_port:
@@ -37,8 +43,13 @@ resources:
               str_split:
                 - ';'
                 - { get_param: [network_subnets, { get_param: index }] }
+            <%ip_address%>:
+              str_split:
+                - ';'
+                - { get_param: [network_static_self_ips, { get_param: index }] }
           template:
             subnet: <%subnet%>
+            ip_address: <%ip_address%>
 
 outputs:
   neutron_port_id:
