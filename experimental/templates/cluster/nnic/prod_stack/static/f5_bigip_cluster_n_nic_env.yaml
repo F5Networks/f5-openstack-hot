@@ -22,6 +22,10 @@ parameters:
   mgmt_network: mgmt-dhcp-disabled
   mgmt_subnet: mgmt-dhcp-disabled_subnet
   mgmt_security_group_name: Mgmt_secgroup_2_NIC_cluster
+  
+  bigip1_mgmt_IP: 169.1.2.10
+  bigip2_mgmt_IP: 169.1.2.20
+  
   bigip_nic_count: 2
   network_vlan_names_cluster_index: 1
   network_vlan_subnets_cluster_index: 1
