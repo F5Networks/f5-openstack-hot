@@ -210,6 +210,12 @@ parameters:
     type: json
     label: OS Neutron Port Fixed IPs Subnets
     description: The list of Neutron Subnets for each Port's Fixed IP with each item in the format <subnetName;subnetName;subnetName>. Each item's first IP will be configured as self ip on the BIG-IP VLAN.
+  network_vlan_static_self_ips:
+    type: json
+    label: OS Neutron Port Fixed IPs
+    description: The list of Neutron Fixed IPs that will be configured as a self ip on the BIG-IP VLAN
+    default:
+      -
   network_vlan_names_cluster_index:
     type: number
     label: OS Neutron VLAN Index for Cluster Fixed IP
