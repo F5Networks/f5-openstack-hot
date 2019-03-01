@@ -188,6 +188,12 @@ parameters:
     description: Network to which the BIG-IP management interface is attached.
     constraints:
       - custom_constraint: neutron.network
+  mgmt_subnet:
+    type: string
+    label: Management Network Subnet
+    description: Network Subnet to which the BIG-IP management interface is attached.
+    constraints:
+      - custom_constraint: neutron.subnet
   mgmt_security_group_name:
     type: string
     label: Management Security Group Name
@@ -328,10 +334,12 @@ parameter_groups:
   - label: OS Network
     parameters:
       - mgmt_network
+      - mgmt_subnet
       - mgmt_security_group_name
       - network_vlan_security_group_rules
       - network_vlan_names
       - network_vlan_subnets
+      - network_vlan_static_self_ips
       - network_vlan_subnets_cluster_index
       - network_vlan_names_cluster_index
   - label: BIG-IP Network
