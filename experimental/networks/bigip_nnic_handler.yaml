@@ -1,4 +1,5 @@
-heat_template_version: 2016-04-08
+heat_template_version: newton
+#heat_template_version: 2016-04-08
 
 description: This template builds components for dynamic number of nics.
 
