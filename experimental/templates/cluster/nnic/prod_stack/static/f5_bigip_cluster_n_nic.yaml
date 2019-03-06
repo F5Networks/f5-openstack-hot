@@ -216,22 +216,21 @@ parameters:
     type: json
     label: OS Neutron Port Fixed IPs
     description: The list of Neutron Fixed IPs that will be configured as a self ip on the BIG-IP VLAN
-    default:
-      -
+    default: []
   bigip1_mgmt_IP:
     type: string
     label: BIG-IP Instance One Management IP
     description: Fixed Static IP address for the BIG-IP instance one
     default: None
-    constraints:
-      - custom_constraint: ip_addr
+    #constraints:
+      #- custom_constraint: ip_addr
   bigip2_mgmt_IP:
     type: string
     label: BIG-IP Instance Two Management IP
     description: Fixed Static IP address for the BIG-IP instance two
     default: None
-    constraints:
-      - custom_constraint: ip_addr
+    #constraints:
+      #- custom_constraint: ip_addr
   network_vlan_names_cluster_index:
     type: number
     label: OS Neutron VLAN Index for Cluster Fixed IP
@@ -327,7 +326,7 @@ conditions:
     not:
       equals:
         - get_param: network_vlan_static_self_ips
-        - None
+        - []
   static_IP:
     and:
       - mgmt_ip1
@@ -516,7 +515,7 @@ resources:
         if:
           - static_IP
           - get_param: [network_vlan_static_self_ips, 0]
-          - None      
+          - ""      
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
@@ -683,7 +682,7 @@ resources:
         if:
           - static_IP
           - get_param: [network_vlan_static_self_ips, 1]
-          - None
+          - ""
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
