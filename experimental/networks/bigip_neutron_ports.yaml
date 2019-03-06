@@ -24,8 +24,7 @@ parameters:
     type: comma_delimited_list
     label: Fixed IPs to map to the BIG-IP
     description: Fixed IPs for the corresponding VLANs.
-    default:
-      -
+    default: ""
 
 resources:
   network_vlan_ports:
