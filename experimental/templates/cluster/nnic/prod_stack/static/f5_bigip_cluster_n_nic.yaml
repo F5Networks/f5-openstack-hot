@@ -1,5 +1,4 @@
-heat_template_version: newton
-#heat_template_version: 2016-04-08
+heat_template_version: ocata
 description: This template deploys standard f5 BIG-IP VE - NNIC instances in a config-sync cluster.
 parameters:
   bigip_image:
@@ -510,12 +509,11 @@ resources:
       bigip_nic_count: { get_param: bigip_nic_count }
       network_vlan_names: { get_param: network_vlan_names }
       network_vlan_subnets: { get_param: [network_vlan_subnets, 0] }
-      #network_vlan_static_self_ips: { get_param: [network_vlan_static_self_ips, 0] }
       network_vlan_static_self_ips:
         if:
           - static_IP
           - get_param: [network_vlan_static_self_ips, 0]
-          - ""      
+          - []    
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
@@ -677,12 +675,11 @@ resources:
       bigip_nic_count: { get_param: bigip_nic_count }
       network_vlan_names: { get_param: network_vlan_names }
       network_vlan_subnets: { get_param: [network_vlan_subnets, 1] }
-      #network_vlan_static_self_ips: { get_param: [network_vlan_static_self_ips, 1] }
       network_vlan_static_self_ips:
         if:
           - static_IP
           - get_param: [network_vlan_static_self_ips, 1]
-          - ""
+          - []
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
