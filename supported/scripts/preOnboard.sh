@@ -140,7 +140,7 @@ function check_restjavad_status() {
     #Workaround for ID710809
     for i in $(seq 3); do
         echo "Checking status of restjavad..."
-        if [ $(curl -sk --user admin:admin -H "Content-Type:application/json" -X GET https://127.0.0.1/mgmt/tm/cli/versio -o /dev/null -w "%{http_code}") = "200" ]; then
+        if [ $(curl -sk --user admin:admin -o /dev/null -w "%{http_code}" https://localhost/mgmt/tm/sys/available) = "200" ]; then
             echo "restjavad is running properly"
             stat="SUCCESS"
             break
