@@ -493,6 +493,7 @@ resources:
       cloud_config:
         merge_how: dict(recurse_array,no_replace)+list(append)
         runcmd:
+          - nohup sh -c 'while true; do if [ -s /service/restjavad/supervise/pid ] ; then setsid strace -p $(cat /service/restjavad/supervise/pid) -o /shared/tmp/restjavad-strace.txt -f -s 1024 -v -tt ; break; fi ; done > /dev/null 2>&1' &>/dev/null < /dev/null &
           - nohup /config/preOnboard.sh &>> /var/log/cloud/openstack/preOnboard.log < /dev/null &
           - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/encrypt.sh -o /var/log/cloud/openstack/encrypt.log' &>> /var/log/cloud/openstack/runScript.log < /dev/null &
           - nohup sh -c '/config/wait-cloudlibsInstall.sh; f5-rest-node /config/cloud/openstack/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js --file /config/onboard.sh --wait-for ENCR_DONE -o /var/log/cloud/openstack/onboard.log' &>> /var/log/cloud/openstack/onboard.log < /dev/null &
