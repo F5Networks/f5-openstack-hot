@@ -140,6 +140,38 @@ function configure_ssh_key() {
     fi
 }
 
+function check_restjavad_status() {
+    # Workaround for ID710809
+    # Debug collects the strace of restjavad
+    for i in $(seq 3); do
+        echo "Checking status of restjavad..."
+        if [ $(curl -sk --user admin:admin -o /dev/null -w "%{http_code}" https://localhost/mgmt/tm/sys/available) = "200" ]; then
+            kill $(pidof strace) > /dev/null 2>&1  #debug
+            rm -f /shared/tmp/restjavad-strace.txt #debug
+            echo "restjavad is running properly"
+            stat="SUCCESS"
+            break
+        else
+            stat="FAILURE"
+            echo "Restarting restjavad"
+            bigstart restart restjavad
+            if [ -f /shared/tmp/restjavad-strace.txt ]; then #debug
+                time=$(date +%s) #debug
+                mv /shared/tmp/restjavad-strace.txt /shared/tmp/restjavad-strace_$time.out #debug
+                echo "Initial restjavad failed... Please upload /shared/tmp/restjavad-strace_$time.out to F5 support" #debug
+            fi #debug
+            if [ $i != "3" ]; then #debug
+                nohup sh -c 'while true; do if [ -s /service/restjavad/supervise/pid ] ; then setsid strace -p $(cat /service/restjavad/supervise/pid) -o /shared/tmp/restjavad-strace.txt -f -s 1024 -v -tt ; break; fi ; done > /dev/null 2>&1' &>/dev/null < /dev/null & #debug
+                sleep 60
+            fi #debug
+        fi
+    done
+
+    if [[ "$stat" == "FAILURE" ]]; then
+        msg="restjavad is not running properly, onboarding failed..."
+        echo "$msg"
+    fi
+}
 
 function send_heat_signal() {
     #buffer wait before sending heat signal
@@ -171,6 +203,7 @@ function main() {
     prep_cloud_libs
     set_remote_hosts
     configure_ssh_key
+    check_restjavad_status
     send_heat_signal
 }
 
