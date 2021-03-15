@@ -1,3 +1,10 @@
+
+**This GitHub repository has been archived and is read-only. This project is no longer actively maintained.**
+
+
+
+
+
 # F5 OpenStack HOT (Heat Orchestration Templates)
 
 [![Slack Status](https://f5cloudsolutions.herokuapp.com/badge.svg)](https://f5cloudsolutions.herokuapp.com)
