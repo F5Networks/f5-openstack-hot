@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: ocata
 description: This template deploys standard f5 BIG-IP VE - NNIC instances in a config-sync cluster.
 parameters:
   bigip_image:
@@ -188,6 +188,13 @@ parameters:
     description: Network to which the BIG-IP management interface is attached.
     constraints:
       - custom_constraint: neutron.network
+  mgmt_subnet:
+    type: string
+    label: Management Network Subnet
+    description: Network Subnet to which the BIG-IP management interface is attached.
+    constraints:
+      - custom_constraint: neutron.subnet
+    default: None
   mgmt_security_group_name:
     type: string
     label: Management Security Group Name
@@ -204,6 +211,25 @@ parameters:
     type: json
     label: OS Neutron Port Fixed IPs Subnets
     description: The list of Neutron Subnets for each Port's Fixed IP with each item in the format <subnetName;subnetName;subnetName>. Each item's first IP will be configured as self ip on the BIG-IP VLAN.
+  network_vlan_static_self_ips:
+    type: json
+    label: OS Neutron Port Fixed IPs
+    description: The list of Neutron Fixed IPs that will be configured as a self ip on the BIG-IP VLAN
+    default: []
+  bigip1_mgmt_IP:
+    type: string
+    label: BIG-IP Instance One Management IP
+    description: Fixed Static IP address for the BIG-IP instance one
+    default: None
+    #constraints:
+      #- custom_constraint: ip_addr
+  bigip2_mgmt_IP:
+    type: string
+    label: BIG-IP Instance Two Management IP
+    description: Fixed Static IP address for the BIG-IP instance two
+    default: None
+    #constraints:
+      #- custom_constraint: ip_addr
   network_vlan_names_cluster_index:
     type: number
     label: OS Neutron VLAN Index for Cluster Fixed IP
@@ -284,6 +310,27 @@ parameters:
     label: Additional Heat Wait Condition Notify Curl Options
     description: Additional options for the heat wait condition signals sent via curl
     default: None
+conditions:
+  mgmt_ip1:
+    not:
+      equals:
+        - get_param: bigip1_mgmt_IP
+        - None
+  mgmt_ip2:
+    not:
+      equals:
+        - get_param: bigip2_mgmt_IP
+        - None
+  other_ips:
+    not:
+      equals:
+        - get_param: network_vlan_static_self_ips
+        - []
+  static_IP:
+    and:
+      - mgmt_ip1
+      - mgmt_ip2
+      - other_ips
 parameter_groups:
   - label: BIG-IP General Provisioning
     parameters:
@@ -328,10 +375,12 @@ parameter_groups:
   - label: OS Network
     parameters:
       - mgmt_network
+      - mgmt_subnet
       - mgmt_security_group_name
       - network_vlan_security_group_rules
       - network_vlan_names
       - network_vlan_subnets
+      - network_vlan_static_self_ips
       - network_vlan_subnets_cluster_index
       - network_vlan_names_cluster_index
   - label: BIG-IP Network
@@ -446,6 +495,12 @@ resources:
     type: OS::Neutron::Port
     properties:
       network: { get_param: mgmt_network }
+      fixed_ips:
+        if:
+          - static_IP
+          - - subnet_id: {get_param: mgmt_subnet}
+              ip_address: {get_param: bigip1_mgmt_IP}
+          - - subnet_id: {get_param: mgmt_subnet}
       security_groups:
         - { get_attr: [mgmt_security_group, mgmt_security_group_id] }
   bigip_nnic_handler_bigip1:
@@ -454,6 +509,11 @@ resources:
       bigip_nic_count: { get_param: bigip_nic_count }
       network_vlan_names: { get_param: network_vlan_names }
       network_vlan_subnets: { get_param: [network_vlan_subnets, 0] }
+      network_vlan_static_self_ips:
+        if:
+          - static_IP
+          - get_param: [network_vlan_static_self_ips, 0]
+          - []    
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }
@@ -601,6 +661,12 @@ resources:
     type: OS::Neutron::Port
     properties:
       network: { get_param: mgmt_network }
+      fixed_ips:
+        if:
+          - static_IP
+          - - subnet_id: {get_param: mgmt_subnet}
+              ip_address: {get_param: bigip2_mgmt_IP}
+          - - subnet_id: {get_param: mgmt_subnet}
       security_groups:
         - { get_attr: [mgmt_security_group, mgmt_security_group_id] }
   bigip_nnic_handler_bigip2:
@@ -609,6 +675,11 @@ resources:
       bigip_nic_count: { get_param: bigip_nic_count }
       network_vlan_names: { get_param: network_vlan_names }
       network_vlan_subnets: { get_param: [network_vlan_subnets, 1] }
+      network_vlan_static_self_ips:
+        if:
+          - static_IP
+          - get_param: [network_vlan_static_self_ips, 1]
+          - []
       network_vlan_security_group_ids: { get_attr: [security_groups, security_group_id] }
       bigip_vlan_names: { get_param: bigip_vlan_names }
       bigip_vlan_tags: { get_param: bigip_vlan_tags }

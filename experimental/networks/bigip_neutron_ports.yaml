@@ -1,4 +1,4 @@
-heat_template_version: 2016-04-08
+heat_template_version: ocata
 
 description: This template creates a standard neutron port to associate with a Big-IP instance. This template uses an index parameter that enables ports to be created as part of a resource group.
 
@@ -19,6 +19,11 @@ parameters:
     type: comma_delimited_list
     label: Network Subnets
     description: A list of subnets the ports should be created in
+  network_static_self_ips:
+    type: json
+    label: Fixed IPs to map to the BIG-IP
+    description: Fixed IPs for the corresponding VLANs.
+    default: []
 
 resources:
   network_vlan_ports:
@@ -31,6 +36,7 @@ resources:
           index: "%index%"
           network_names: { get_param: network_names }
           network_subnets: { get_param: network_subnets }
+          network_static_self_ips: { get_param: network_static_self_ips }
           security_groups: { get_param: security_group_ids }
 
 outputs:
